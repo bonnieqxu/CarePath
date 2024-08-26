@@ -103,10 +103,10 @@
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav ms-auto p-4 p-lg-0">
           <a href="{% url 'home' %}" class="nav-item nav-link active">Home</a>
-          <a href="{% url 'about' %}" class="nav-item nav-link">Your Journey</a>
+          <a href="{% url 'journey' %}" class="nav-item nav-link">Your Journey</a>
 
-          <a href="{% url 'faq' %}" class="nav-item nav-link">FAQ</a>
-          <a href="{% url 'contact' %}" class="nav-item nav-link">Our Team</a>
+          <a href="{% url 'info' %}" class="nav-item nav-link">Important Info</a>
+          <a href="{% url 'team' %}" class="nav-item nav-link">Our Team</a>
 
           {% if not user.is_authenticated %}
 
@@ -127,8 +127,8 @@
     <!-- <div class="navbar">
       <a href="{% url 'home' %}" class="navbar-brand">Home</a>
 
-      <a href="{% url 'about' %}" class="navbar-item">About</a>
-      <a href="{% url 'contact' %}" class="navbar-item">Contact</a>
+      <a href="{% url 'journey' %}" class="navbar-item">Your Journey</a>
+      <a href="{% url 'team' %}" class="navbar-item">Our Team</a>
 
       {% if not user.is_authenticated %}
 

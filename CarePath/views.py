@@ -24,14 +24,14 @@ def home(request):
     return render(request, 'CarePath/home.html')
 
 
-def about(request):
-    return render(request, "CarePath/about.html")
+def journey(request):
+    return render(request, "CarePath/journey.html")
 
-def contact(request):
-    return render(request, "CarePath/contact.html")
+def team(request):
+    return render(request, "CarePath/team.html")
 
-def faq(request):
-    return render(request, "CarePath/faq.html")
+def info(request):
+    return render(request, "CarePath/info.html")
 
 def register(request):
     if request.method == 'POST':
