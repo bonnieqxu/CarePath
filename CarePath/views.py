@@ -33,14 +33,14 @@ def team(request):
 def info(request):
     return render(request, "CarePath/info.html")
 
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            return redirect('login')
-    else:
-        form = UserCreationForm()
+# def register(request):
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             return redirect('login')
+#     else:
+#         form = UserCreationForm()
     
-    return render(request, 'CarePath/register.html', {'form': form})
+#     return render(request, 'CarePath/register.html', {'form': form})
 
