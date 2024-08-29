@@ -20,12 +20,34 @@ from django.contrib.auth import login
 #         return context
 
 
+#----------------------- visitor related views  -------------------------------
+
+# landing page
 def home(request):
     return render(request, 'CarePath/home.html')
 
-
+# healthcare journey related views
 def journey(request):
     return render(request, "CarePath/journey.html")
+
+def mdm(request):
+    return render(request, "CarePath/mdm.html")
+
+def pre_dental(request):
+    return render(request, "CarePath/pre_dental.html")
+
+def tx_sideeffect(request):
+    return render(request, "CarePath/tx_sideeffect.html")
+
+def mucositis(request):
+    return render(request, "CarePath/mucositis.html")
+
+def post_dental(request):
+    return render(request, "CarePath/post_dental.html")
+
+def discharge(request):
+    return render(request, "CarePath/discharge.html")
+
 
 def team(request):
     return render(request, "CarePath/team.html")
@@ -43,4 +65,7 @@ def info(request):
 #         form = UserCreationForm()
     
 #     return render(request, 'CarePath/register.html', {'form': form})
+
+def register(request):
+    return render(request, "CarePath/register.html")
 

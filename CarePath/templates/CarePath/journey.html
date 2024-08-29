@@ -1,110 +1,142 @@
-{% extends "CarePath/layout.html" %} {% block title %} Your Journey {% endblock %}
-{% block content %}
-
-
-
-
-
+{% extends "CarePath/layout.html" %} {% block title %} Your Journey 
+{% endblock%} {% block content %}
 
 <!-- Treatment Journey Start -->
 <div class="container-xxl py-5">
-    <div class="container">
-        <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
-            <!-- <p class="d-inline-block border rounded-pill py-1 px-4">Services</p> -->
-            <h1>Your Journey</h1>
-        </div>
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="service-item bg-light rounded h-100 p-5">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4" style="width: 65px; height: 65px;">
-                        <!-- <i class="fa fa-x-ray text-primary fs-4"></i> -->
-                        <!-- <i class="fa fa-x-ray text-primary fs-4"></i> -->
-                        <!-- <i class="fa fa-brain text-primary fs-4"></i> -->
-                        <i class="fa fa-solid fa-hospital text-primary fs-4"></i>
-                    </div>
-                    <h4 class="mb-3">1. MDM Meeting</h4>
-                    <p class="mb-4">Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet.</p>
-                    <a class="btn" href="#"><i class="fa fa-plus text-primary me-3"></i>Read More</a>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="service-item bg-light rounded h-100 p-5">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4" style="width: 65px; height: 65px;">
-                        <i class="fa fa-tooth text-primary fs-4"></i>
-                    </div>
-                    <h4 class="mb-3">2. Dental Treatment</h4>
-                    <p class="mb-4"> Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet.</p>
-                    <a class="btn" href="#"><i class="fa fa-plus text-primary me-3"></i>Read More</a>
-                </div>
-            </div>
-            
-            <!-- <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="service-item bg-light rounded h-100 p-5">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4" style="width: 65px; height: 65px;">
-                        <i class="fa fa-heartbeat text-primary fs-4"></i>
-                    </div>
-                    <h4 class="mb-3">3. Potential Surgery</h4>
-                    <p class="mb-4">Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet.</p>
-                    <a class="btn" href=""><i class="fa fa-plus text-primary me-3"></i>Read More</a>
-                </div>
-            </div> -->
-            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="service-item bg-light rounded h-100 p-5">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4" style="width: 65px; height: 65px;">
-                        <i class="fa fa-x-ray text-primary fs-4"></i>
-                    </div>
-                    <h4 class="mb-3">3. Other Treatment</h4>
-                    <p class="mb-4">Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet.</p>
-                    <a class="btn" href="#"><i class="fa fa-plus text-primary me-3"></i>Read More</a>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="service-item bg-light rounded h-100 p-5">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4" style="width: 65px; height: 65px;">
-                        
-                        <i class="fa fa-solid fa-radiation text-primary fs-4"></i>
-                        
-                    </div>
-                    <h4 class="mb-3">4.Radiotherapy</h4>
-                    <p class="mb-4"> possible chemo</p>
-                    <a class="btn" href="#"><i class="fa fa-plus text-primary me-3"></i>Read More</a>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="service-item bg-light rounded h-100 p-5">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4" style="width: 65px; height: 65px;">
-                        <!-- <i class="fa fa-wheelchair text-primary fs-4"></i> -->
-                        
-                        <i class="fa fa-solid fa-user-nurse text-primary fs-4"></i>
-                    </div>
-                    <h4 class="mb-3">Mucositis Clinic</h4>
-                    <p class="mb-4">+ SLT.</p>
-                    <a class="btn" href="#"><i class="fa fa-plus text-primary me-3"></i>Read More</a>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="service-item bg-light rounded h-100 p-5">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4" style="width: 65px; height: 65px;">
-                        <i class="fa fa-tooth text-primary fs-4"></i>
-                    </div>
-                    <h4 class="mb-3">Post RT Visits </h4>
-                    <p class="mb-4">Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet.</p>
-                    <a class="btn" href="#"><i class="fa fa-plus text-primary me-3"></i>Read More</a>
-                </div>
-            </div>
-            <!-- <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="service-item bg-light rounded h-100 p-5">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4" style="width: 65px; height: 65px;">
-                        <i class="fa fa-vials text-primary fs-4"></i>
-                        <i class="fa fa-solid fa-hospital text-primary fs-4"></i>
-                    </div>
-                    <h4 class="mb-3">Laboratory</h4>
-                    <p class="mb-4">Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet.</p>
-                    <a class="btn" href=""><i class="fa fa-plus text-primary me-3"></i>Read More</a>
-                </div>
-            </div> -->
-        </div>
+  <div class="container">
+    <div
+      class="text-center mx-auto mb-5 wow fadeInUp"
+      data-wow-delay="0.1s"
+      style="max-width: 600px"
+    >
+      <h1>Your Journey</h1>
     </div>
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+        <div class="service-item bg-light rounded h-100 p-5">
+          <div
+            class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4"
+            style="width: 65px; height: 65px"
+          >
+            <i class="fa fa-solid fa-hospital text-primary fs-4"></i>
+          </div>
+          <h4 class="mb-3">1. MDM Meeting</h4>
+          <p class="mb-4">
+            The Multidisciplinary Meeting (MDM) is a special clinic where a team
+            of dedicated health professionals from different areas come together
+            to discuss and review cases involving head and neck issues.
+          </p>
+          <a class="btn" href="{% url 'mdm' %}"
+            ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
+            >Read More</a
+          >
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+        <div class="service-item bg-light rounded h-100 p-5">
+          <div
+            class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4"
+            style="width: 65px; height: 65px"
+          >
+            <i class="fa fa-tooth text-primary fs-4"></i>
+          </div>
+          <h4 class="mb-3">2. Dental Assessment</h4>
+          <p class="mb-4">
+            A dental assessment and treatments before your cancer treatments are
+            crucial steps in your cancer care journey. By addressing dental
+            issues early, we can prevent complications, reduce the risk of
+            serious conditions like osteoradionecrosis, and maintain your oral
+            health.
+          </p>
+          <a class="btn" href="{% url 'pre_dental' %}"
+            ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
+            >Read More</a
+          >
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+        <div class="service-item bg-light rounded h-100 p-5">
+          <div
+            class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4"
+            style="width: 65px; height: 65px"
+          >
+            <i class="fa fa-x-ray text-primary fs-4"></i>
+          </div>
+          <h4 class="mb-3">3. Possible Treatments and Side effects</h4>
+          <p class="mb-4">
+            Most head and neck cancers are treated with surgery, radiotherapy,
+            chemotherapy or a combination of these modalities.
+          </p>
+          <a class="btn" href="{% url 'tx_sideeffect' %}"
+            ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
+            >Read More</a
+          >
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+        <div class="service-item bg-light rounded h-100 p-5">
+          <div
+            class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4"
+            style="width: 65px; height: 65px"
+          >
+            <i class="fa fa-solid fa-user-nurse text-primary fs-4"></i>
+          </div>
+          <h4 class="mb-3">4. Oral Mucositis and Dry Mouth Support Clinic</h4>
+          <p class="mb-4">
+            This clinic is available to patients receiving radiation treatment
+            to the oral cavity or mouth. It runs simultaneously with your
+            radiotherapy treatment and occurs each Thursday morning between 8.30
+            am to 12 pm.
+          </p>
+          <a class="btn" href="{% url 'mucositis' %}"
+            ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
+            >Read More</a
+          >
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+        <div class="service-item bg-light rounded h-100 p-5">
+          <div
+            class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4"
+            style="width: 65px; height: 65px"
+          >
+            <i class="fa fa-tooth text-primary fs-4"></i>
+          </div>
+          <h4 class="mb-3">5. Post-treatment Dental Visits</h4>
+          <p class="mb-4">
+            After your treatment, you will soon have an appointment with our
+            dental team, where we'll examine your mouth and address any
+            remaining dental needs.
+          </p>
+          <a class="btn" href="{% url 'post_dental'%}"
+            ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
+            >Read More</a
+          >
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+        <div class="service-item bg-light rounded h-100 p-5">
+          <div
+            class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4"
+            style="width: 65px; height: 65px"
+          >
+            <i class="fa fa-solid fa-check text-primary fs-4"></i>
+          </div>
+          <h4 class="mb-3">6. Discharge</h4>
+          <p class="mb-4">
+            As you transition back to the community, our dental team will
+            discharge you from our service. We will send a discharge letter to
+            your GP detailing the treatment you received while under our care.
+          </p>
+          <a class="btn" href="{% url 'discharge'%}"
+            ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
+            >Read More</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <!-- Treatment Journey End -->
 
