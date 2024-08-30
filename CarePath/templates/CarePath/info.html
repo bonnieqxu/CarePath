@@ -1,5 +1,5 @@
-{% extends "CarePath/layout.html" %} {% block title %} Important Information 
-{% endblock %} {% block content %}
+{% extends "CarePath/layout.html" %} {% block title %} Important Information
+{%endblock %} {% block content %}
 
 <!-- FAQ Start -->
 <div class="container-xxl py-5">
@@ -22,10 +22,12 @@
           </div>
           <h4 class="mb-3">Your Mouth Care During Radiotherapy</h4>
           <p class="mb-4">
-            Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed
-            diam stet diam sed stet.
+            You have a lot going on and maybe everyday things like daily tooth
+            brushing does not seem like a top priority. Looking after your mouth
+            is more important than ever, especially if you are having radiation
+            therapy treatment to your head and neck area.
           </p>
-          <a class="btn" href="#"
+          <a class="btn" href="{% url 'mouthcare' %}"
             ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
             >Read More</a
           >
@@ -39,12 +41,12 @@
           >
             <i class="fa fa-tooth text-primary fs-4"></i>
           </div>
-          <h4 class="mb-3">Dry Mouth</h4>
+          <h4 class="mb-3">Dry Mouth Management</h4>
           <p class="mb-4">
-            Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed
-            diam stet diam sed stet.
+            Dry mouth, or xerostomia, is a common issue that can happen for
+            several reasons. Let's explore why this might be happening to you.
           </p>
-          <a class="btn" href="#"
+          <a class="btn" href="{% url 'drymouth' %}"
             ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
             >Read More</a
           >
@@ -59,12 +61,13 @@
           >
             <i class="fa fa-solid fa-question text-primary fs-4"></i>
           </div>
-          <h4 class="mb-3">Mucositis</h4>
+          <h4 class="mb-3">Side Effects</h4>
           <p class="mb-4">
-            Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed
-            diam stet diam sed stet.
+            Patients undergoing radiotherapy can experience several unwanted
+            oral side effects, which have both short-term and long-term
+            implications.
           </p>
-          <a class="btn" href="#"
+          <a class="btn" href="{% url 'sideeffect'%}"
             ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
             >Read More</a
           >
@@ -79,10 +82,7 @@
             <i class="fa fa-solid fa-comments text-primary fs-4"></i>
           </div>
           <h4 class="mb-3">Speech</h4>
-          <p class="mb-4">
-            Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed
-            diam stet diam sed stet.
-          </p>
+          <p class="mb-4"></p>
 
           <a class="btn" href="#"
             ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
@@ -99,10 +99,7 @@
             <i class="fa fa-solid fa-utensils text-primary fs-4"></i>
           </div>
           <h4 class="mb-3">Diet</h4>
-          <p class="mb-4">
-            Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed
-            diam stet diam sed stet.
-          </p>
+          <p class="mb-4"></p>
 
           <a class="btn" href="#"
             ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
@@ -116,16 +113,15 @@
             class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle mb-4"
             style="width: 65px; height: 65px"
           >
-        
-
             <i class="fa fa-solid fa-check text-primary fs-4"></i>
           </div>
-          <h4 class="mb-3">Products</h4>
+          <h4 class="mb-3">Maintaining Oral Health</h4>
           <p class="mb-4">
-            Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed
-            diam stet diam sed stet.
+            Maintaining good oral hygiene is essential for your overall health,
+            especially after oncology treatment. Here are some helpful tips to
+            keep your mouth in the best condition.
           </p>
-          <a class="btn" href="#"
+          <a class="btn" href="{% url 'mouthcare_post' %}"
             ><i class="fa fa-plus text-primary" style="margin-right: 12px"></i
             >Read More</a
           >

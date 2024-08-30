@@ -1,0 +1,111 @@
+{% extends "CarePath/layout.html" %} {% block title %} Mouthcare Post Tx 
+{% endblock %} {% block content %}
+
+<div class="container d-flex justify-content-center">
+  <div class="my-div p-4 bg-light">
+    <h1 style="font-weight: bold">Your Mouth Care After Oncology Treatment</h1>
+    <br />
+
+    <p>
+      Congratulations on completing your oncology treatment! As you move
+      forward, taking care of your oral health is a key part of your recovery,
+      especially after oncology treatment. Here are some helpful tips to keep
+      your mouth in the best condition:
+    </p>
+
+    <h5 style="font-weight: bold">1. Have a Good Homecare Routine</h5>
+    <h6 style="font-weight: bold">Brushing</h6>
+    <p>
+      • Brush Twice Daily: Brush your teeth every morning and night. <br />
+      • Use a Soft Toothbrush: A soft bristle toothbrush is gentle on your gums
+      and teeth. <br />
+      • High Fluoride Toothpaste: Use a high fluoride toothpaste like Colgate
+      NeutraFlour 5000 for added protection.
+    </p>
+    <h6 style="font-weight: bold">Cleaning Between Teeth</h6>
+    <p>
+      • Daily Cleaning: Make sure to clean between your teeth every day. <br />
+      • Floss or Interdental Brushes: Use floss or interdental brushes to remove
+      food particles and plaque between your teeth.
+    </p>
+
+    <h6 style="font-weight: bold">Denture Care</h6>
+
+    <p>
+      • Remove and Clean: Take out your denture(s) every night and brush them
+      thoroughly. Denture cleaning tablets can help keep them fresh.
+    </p>
+    <br />
+    <h5 style="font-weight: bold">2. Managing Dry Mouth</h5>
+    <p>
+      Dry mouth is a common issue after treatment. Here's how to manage it
+      effectively:
+    </p>
+
+    <p>
+      • Stay Hydrated: Drink plenty of water throughout the day. <br />
+      • Use Salt and Baking Soda Mouth Rinses: These rinses can help remove
+      thick, sticky saliva and lower mouth acidity. Rinse for 30 seconds after
+      each meal and continue this routine consistently until your next
+      appointment with the Dental Team. <br />
+      • Saliva Substitutes: Consider using products like Oral 7 to help manage
+      dry mouth. <br />
+      • Chew Sugar-Free Gum: This can stimulate saliva flow and help with
+      dryness.
+    </p>
+    <br />
+
+    <h5 style="font-weight: bold">3. Dietary Advice</h5>
+
+    <p>
+      • Eat a Balanced Diet: Choose foods that are soft and easy to chew, and
+      avoid very hot, spicy, sticky or crunchy foods that may irritate your
+      mouth's lining. <br />
+      • Limit Sugary and Acidic Foods: Reduce consumption of sugary and acidic
+      foods and drinks to lower the risk of cavities/decay. <br />
+      • Snack Wisely: If you snack frequently, rinse your mouth with salt and
+      baking soda mouth rinses afterwards to help clean away food particles and
+      reduce acidity. <br />
+      • Minimize Caffeine and Alcohol: Avoid excessive caffeine and alcohol, and
+      opt for alcohol-free mouthwash if needed.
+    </p>
+<br>
+    <h5 style="font-weight: bold">Long Term Oral Health Care</h5>
+
+    <p>
+      Unfortunately, we are unable to offer you long term, ongoing regular
+      dental care in the public sector. Once your oral health is stable, we will
+      discharge you to the care of your community dentist. If you do not
+      currently have a regular dentist in the community, we encourage you to
+      start looking for one soon.
+    </p>
+
+    <p>
+      It is important that you keep up with good oral hygiene and visit your
+      dentist regularly every 6 to 12 months to prevent your teeth from breaking
+      down. Be sure to inform your dentist that you have completed a course of
+      radiotherapy in the head and neck region. lf your dentist has concerns
+      regarding your dental management, please ask them to contact us at
+      spcare@adhb.govt.nz for any advice as necessary.
+    </p>
+
+    <br />
+
+    <p>
+      Congratulations again on completing your head and neck cancer treatment.
+      We wish you continued good health and happiness on your journey forward.
+      If you have any questions or need further assistance, don't hesitate to
+      reach out.
+    </p>
+
+    <div class="d-flex justify-content-center">
+      <a
+        href="{% url 'mouthcare_post_pdf' %}"
+        class="btn btn-primary"
+        style="margin-top: 20px"
+        >DOWNLOAD PDF</a
+      >
+    </div>
+  </div>
+</div>
+{% endblock %}

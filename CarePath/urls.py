@@ -18,7 +18,24 @@ urlpatterns = [
     path("post_dental/", views.post_dental, name="post_dental"),
     path("discharge/", views.discharge, name="discharge"),
 
+    # info page
     path("info/", views.info, name="info"),
+    path("mouthcare/", views.mouthcare, name="mouthcare"),
+    path('mouthcare_pdf/', views.mouthcare_pdf, name='mouthcare_pdf'),
+    path("drymouth/", views.drymouth, name="drymouth"),
+    path('drymouth_pdf/', views.drymouth_pdf, name='drymouth_pdf'),
+    path("sideeffect/", views.sideeffect, name="sideeffect"),
+    path('sideeffect_pdf/', views.sideeffect_pdf, name='sideeffect_pdf'),
+
+
+
+    path("mouthcare_post/", views.mouthcare_post, name="mouthcare_post"),
+    path('mouthcare_post_pdf/', views.mouthcare_post_pdf, name='mouthcare_post_pdf'),
+
+
+
+
+    # team page
     path("team/", views.team, name="team"),
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='CarePath/login.html'), name='login'),

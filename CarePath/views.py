@@ -1,7 +1,10 @@
 import re
+import os
 from django.utils.timezone import datetime
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+
+from django.conf import settings
 
 # from CarePath.forms import LogMessageForm
 # from CarePath.models import LogMessage
@@ -26,6 +29,8 @@ from django.contrib.auth import login
 def home(request):
     return render(request, 'CarePath/home.html')
 
+
+
 # healthcare journey related views
 def journey(request):
     return render(request, "CarePath/journey.html")
@@ -49,11 +54,68 @@ def discharge(request):
     return render(request, "CarePath/discharge.html")
 
 
+
+# informative materials views
+def info(request):
+    return render(request, "CarePath/info.html")
+
+def mouthcare(request):
+    return render(request, "CarePath/mouthcare.html")
+
+# download a mouthcare pdf
+def mouthcare_pdf(request):
+    file_path = os.path.join(settings.BASE_DIR, 'CarePath', 'static', 'CarePath', 'pdf', 'mouthcare.pdf')
+    with open(file_path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="mouthcare.pdf"'
+        return response
+    
+def drymouth(request):
+    return render(request, "CarePath/drymouth.html")
+    
+# download a drymouth pdf
+def drymouth_pdf(request):
+    file_path = os.path.join(settings.BASE_DIR, 'CarePath', 'static', 'CarePath', 'pdf', 'drymouth.pdf')
+    with open(file_path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="drymouth.pdf"'
+        return response
+
+def sideeffect(request):
+    return render(request, "CarePath/sideeffect.html")
+
+# download a side effect pdf
+def sideeffect_pdf(request):
+    file_path = os.path.join(settings.BASE_DIR, 'CarePath', 'static', 'CarePath', 'pdf', 'sideeffects.pdf')
+    with open(file_path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="sideeffects.pdf"'
+        return response
+
+
+
+
+
+
+def mouthcare_post(request):
+    return render(request, "CarePath/mouthcare_post.html")
+
+# download a post treatment mouthcare info pdf
+def mouthcare_post_pdf(request):
+    file_path = os.path.join(settings.BASE_DIR, 'CarePath', 'static', 'CarePath', 'pdf', 'mouthcare_post.pdf')
+    with open(file_path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="mouthcare_post.pdf"'
+        return response
+
+
+
+
+
 def team(request):
     return render(request, "CarePath/team.html")
 
-def info(request):
-    return render(request, "CarePath/info.html")
+
 
 # def register(request):
 #     if request.method == 'POST':

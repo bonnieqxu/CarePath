@@ -1,0 +1,67 @@
+{% extends "CarePath/layout.html" %} {% block title %} Side Effect {% endblock%}
+{% block content %}
+
+<div class="container d-flex justify-content-center">
+  <div class="my-div p-4 bg-light">
+    <h1 style="font-weight: bold">
+      Mucositis and Other Side effects to Expect
+    </h1>
+    <br />
+
+    <p>
+      Patients undergoing radiotherapy can experience several unwanted oral side
+      effects, which have both short-term and long-term implications.
+    </p>
+    <h5 style="font-weight: bold">Common short-term side effects include:</h5>
+    <p>
+      • Cellulitis - bacterial skin infection <br />
+      • Mucositis - inflammation/ulceration of the soft tissues <br />
+      • Dysphagia - difficulty swallowing <br />
+      • Dysgeusia - foul, salty, or metallic taste sensation persists in the
+      mouth <br />
+      • Weight loss
+    </p>
+    <br />
+    <h5 style="font-weight: bold">Common long-term side effects include:</h5>
+
+    <p>
+      • Rampant caries - rapidly growing dental decay <br />
+      • Trismus - muscle spasms and limited mouth opening <br />
+      • Xerostomia - dry mouth <br />
+      • Osteoradionecrosis (ORN) - bone death after radiation therapy
+    </p>
+    <br />
+    <h5 style="font-weight: bold">About ORN</h5>
+
+    <p>
+      Osteoradionecrosis (ORN) is a severe, late complication of radiation
+      therapy, commonly affecting the bones in the head and neck region,
+      particularly the mandible (lower jaw). Dental extraction in the irradiated
+      areas post radiotherapy (>50 Gy) remains the main risk factor for ORN.
+      Post-radiation infections can also contribute to the development of ORN.
+    </p>
+
+    <p>
+      People experience persistent pain, ranging from mild to severe in the
+      affected area, and possible loss of substantial amount of bone tissue
+      leading to pathological fractures in some cases. Management of ORN is
+      difficult and can involve significant time and cost.
+    </p>
+
+    <p>
+      Thorough dental examination and proper treatment of any dental issues
+      before starting radiation therapy is crucial for the prevention of ORN.
+    </p>
+
+    <div class="d-flex justify-content-center">
+      <a
+        href="{% url 'sideeffect_pdf' %}"
+        class="btn btn-primary"
+        style="margin-top: 20px"
+        >DOWNLOAD PDF</a
+      >
+    </div>
+  </div>
+</div>
+
+{% endblock %}
