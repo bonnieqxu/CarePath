@@ -60,6 +60,45 @@
   font-weight: normal;
 }
 
+/* top bar*/
+.top-bar {
+  padding: 10px 0;
+}
+
+.location-info {
+  margin-right: 30px;
+}
+
+/* responsive top bar */
+@media (max-width: 992px) {
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .location-info {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .text-end {
+    text-align: left !important;
+    margin-top: 10px;
+  }
+
+  .top-bar .col-lg-7,
+  .top-bar .col-lg-5 {
+    max-width: 100%;
+    flex: 0 0 100%;
+  }
+
+  .top-bar .h-100 {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 /*** Navbar ***/
 .navbar .dropdown-toggle::after {
   border: none;
@@ -131,88 +170,18 @@
 }
 
 /*** Header ***/
-.header-carousel .owl-carousel-text {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  padding: 3rem;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
-}
 
-.header-carousel .owl-nav {
-  position: absolute;
-  width: 200px;
-  height: 45px;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: space-between;
-}
-
-.header-carousel .owl-nav .owl-prev,
-.header-carousel .owl-nav .owl-next {
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  background: transparent;
-  border: 1px solid #ffffff;
-  border-radius: 45px;
-  font-size: 22px;
-  transition: 0.5s;
-}
-
-.header-carousel .owl-nav .owl-prev:hover,
-.header-carousel .owl-nav .owl-next:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-}
-
-.header-carousel .owl-dots {
-  position: absolute;
-  height: 45px;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.header-carousel .owl-dot {
+.carousel-caption h5 {
   position: relative;
-  display: inline-block;
-  margin: 0 5px;
-  width: 15px;
-  height: 15px;
-  background: transparent;
-  border: 1px solid #ffffff;
-  border-radius: 15px;
-  transition: 0.5s;
-}
-
-.header-carousel .owl-dot::after {
-  position: absolute;
-  content: "";
-  width: 5px;
-  height: 5px;
-  top: 4px;
-  left: 4px;
-  background: #ffffff;
+  top: 1%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 0 80px rgba(0, 0, 0, 0.1);
+  font-size: 10rem;
+  padding: 10px;
   border-radius: 5px;
-}
-
-.header-carousel .owl-dot.active {
-  background: var(--primary);
-  border-color: var(--primary);
 }
 
 .page-header {

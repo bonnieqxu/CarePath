@@ -1,5 +1,5 @@
-{% extends "CarePath/layout.html" %} {% block title %} Mouthcare Post Tx 
-{% endblock %} {% block content %}
+{% extends "CarePath/layout.html" %} {% block title %} Mouthcare Post Tx
+{%endblock %} {% block content %}
 
 <div class="container d-flex justify-content-center">
   <div class="my-div p-4 bg-light">
@@ -69,7 +69,7 @@
       • Minimize Caffeine and Alcohol: Avoid excessive caffeine and alcohol, and
       opt for alcohol-free mouthwash if needed.
     </p>
-<br>
+    <br />
     <h5 style="font-weight: bold">Long Term Oral Health Care</h5>
 
     <p>
@@ -102,8 +102,15 @@
       <a
         href="{% url 'mouthcare_post_pdf' %}"
         class="btn btn-primary"
-        style="margin-top: 20px"
+        style="margin-top: 20px; margin-right: 15px"
         >DOWNLOAD PDF</a
+      >
+
+      <a
+        href="{% url 'info' %}"
+        class="btn btn-primary"
+        style="margin-top: 20px"
+        >BACK</a
       >
     </div>
   </div>

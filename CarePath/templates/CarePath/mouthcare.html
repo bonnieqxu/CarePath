@@ -239,10 +239,17 @@
   </div>
 </div>
 
-
 <div class="d-flex justify-content-center">
-    <a href="{% url 'mouthcare_pdf' %}" class="btn btn-primary"  style="margin-top: 20px;">DOWNLOAD PDF</a>
-</div>
+  <a
+    href="{% url 'mouthcare_pdf' %}"
+    class="btn btn-primary"
+    style="margin-top: 20px; margin-right: 15px"
+    >DOWNLOAD PDF</a
+  >
 
+  <a href="{% url 'info' %}" class="btn btn-primary" style="margin-top: 20px"
+    >BACK</a
+  >
+</div>
 
 {% endblock %}
