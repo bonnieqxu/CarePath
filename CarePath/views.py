@@ -2,9 +2,11 @@ import re
 import os
 from django.utils.timezone import datetime
 from django.http import HttpResponse
+from django.contrib.auth import authenticate, login as auth_login
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import Group
 from .models import CustomUser
+from django.contrib import messages
 # from .forms import RegisterForm
 
 from django.conf import settings
@@ -160,7 +162,38 @@ def register(request):
     return render(request, 'CarePath/register.html')
 
 
-
+# user login
 def login(request):
+    if request.method == "POST":
+        email = request.POST['email']
+        password = request.POST['password']
+
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None:
+            auth_login(request, user)
+
+            # log into role appropriate Dashboard
+            if user.role == 'Patient':
+                return redirect('patient_dashboard')
+            elif user.role == 'Healthcare Provider':
+                return redirect('provider_dashboard')
+            elif user.role == 'Admin':
+                return redirect('admin_dashboard')
+        else:
+            # return error message
+            messages.error(request, 'Invalid email or password.')
+            return redirect('login')
+        
     return render(request, "CarePath/login.html")
 
+
+# dashboards
+def patient_dashboard(request):
+    return render(request, 'CarePath/patient_dashboard.html')
+
+def provider_dashboard(request):
+    return render(request, 'CarePath/provider_dashboard.html')
+
+def admin_dashboard(request):
+    return render(request, 'CarePath/admin_dashboard.html')
