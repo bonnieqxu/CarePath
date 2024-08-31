@@ -3,6 +3,9 @@ import os
 from django.utils.timezone import datetime
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import Group
+from .models import CustomUser
+# from .forms import RegisterForm
 
 from django.conf import settings
 
@@ -117,17 +120,47 @@ def team(request):
 
 
 
-# def register(request):
-#     if request.method == 'POST':
-#         form = UserCreationForm(request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             return redirect('login')
-#     else:
-#         form = UserCreationForm()
-    
-#     return render(request, 'CarePath/register.html', {'form': form})
 
+# register a new account
 def register(request):
-    return render(request, "CarePath/register.html")
+    if request.method == "POST":
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        phone_number = request.POST['phone_number']
+        email = request.POST['email']
+        address = request.POST['address']
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+        role = request.POST['role']
+
+        if password != confirm_password:
+            return render(request, 'CarePath/register.html', {'error': "Passwords do not match"})
+
+        if CustomUser.objects.filter(email=email).exists():
+            return render(request, 'CarePath/register.html', {'error': "Email already in use"})
+
+        # Create the new user
+        user = CustomUser.objects.create_user(
+            username=email,  # email is used as the username
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            phone_number=phone_number,
+            address=address,
+            password=password,
+            role=role,
+        )
+
+        user.save()
+        group = Group.objects.get(name=role)
+        user.groups.add(group)
+
+        return redirect('login')  # Redirect to the login page after successful registration
+
+    return render(request, 'CarePath/register.html')
+
+
+
+def login(request):
+    return render(request, "CarePath/login.html")
 

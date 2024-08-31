@@ -37,9 +37,18 @@ urlpatterns = [
 
     # team page
     path("team/", views.team, name="team"),
+
+
+
     path('register/', views.register, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='CarePath/login.html'), name='login'),
+    path('login/', views.login, name='login'),
+    # path('logout/', views.logout, name='logout'),
+    # path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+
+
+    # path('login/', auth_views.LoginView.as_view(template_name='CarePath/login.html'), name='login'),
+    # path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 
 ]
 

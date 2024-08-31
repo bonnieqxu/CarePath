@@ -4,32 +4,38 @@ from django.db import models
 
 from django.utils import timezone
 
-# class LogMessage(models.Model):
-#     message = models.CharField(max_length=300)
-#     log_date = models.DateTimeField("date logged")
+from django.contrib.auth.models import AbstractUser
 
-#     def __str__(self):
-#         """Returns a string representation of a message."""
-#         date = timezone.localtime(self.log_date)
-#         return f"'{self.message}' logged on {date.strftime('%A, %d %B, %Y at %X')}"
+from django.contrib import admin
 
-# class Patient(models.Model):
-#     first_name = models.CharField(max_length=50)
-#     last_name = models.CharField(max_length=50)
-#     dob = models.DateField()
-#     age = models.IntegerField()
-#     phone_number = models.CharField(max_length=15)
-#     email = models.EmailField(unique=True)
 
-#     def __str__(self):
-#         return f"{self.first_name} {self.last_name}"
+
+class CustomUser(AbstractUser):
+    ROLE_CHOICES = (
+        ('Patient', 'Patient'),
+        ('Healthcare Provider', 'Healthcare Provider'),
+        ('Admin', 'Admin'),
+    )
+
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    phone_number = models.CharField(max_length=15)
+    address = models.CharField(max_length=255)
+
     
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_set',  # 指定 related_name 以避免冲突
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_set',  # 指定 related_name 以避免冲突
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions'
+    )
 
-# class HealthcareProvider(models.Model):
-#     first_name = models.CharField(max_length=50)
-#     last_name = models.CharField(max_length=50)
-#     role = models.CharField(max_length=100)
-#     department = models.CharField(max_length=100)
-
-#     def __str__(self):
-#         return f"{self.first_name} {self.last_name} - {self.role}"
+    def __str__(self):
+        return f"{self.username} ({self.get_role_display()})"

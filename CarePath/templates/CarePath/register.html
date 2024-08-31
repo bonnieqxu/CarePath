@@ -1,6 +1,318 @@
-{% extends "CarePath/layout.html" %}
-{% block title %}
-
-{% endblock %}
+{% extends "CarePath/layout.html" %} {% block title %} Register {% endblock %}
 {% block content %}
+<div
+  class="container d-flex justify-content-center align-items-center"
+  style="max-width: 1000px"
+>
+  <div class="card o-hidden border-0 shadow-lg my-5">
+    <div class="card-body p-0">
+      <div class="row mx-auto" style="max-width: 100%">
+        <div class="p-5">
+          <div class="text-center">
+            <h1 class="h4 text-gray-900 mb-4">Create an Account</h1>
+          </div>
+
+          <hr />
+
+          <!-- <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            <div class="form-group row">
+              <div class="col-sm-6 mb-3 mb-sm-0">
+                <label for="first_name">First Name:</label>
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="first_name"
+                  name="first_name"
+                  required
+                />
+              </div>
+              <div class="col-sm-6">
+                <label for="last_name">Last Name:</label>
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="last_name"
+                  name="last_name"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="phone_number">Phone Number:</label>
+              <input
+                type="text"
+                class="form-control form-control-user"
+                id="phone_number"
+                name="phone_number"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input
+                type="email"
+                class="form-control form-control-user"
+                id="email"
+                name="email"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="address">Address:</label>
+              <input
+                type="text"
+                class="form-control form-control-user"
+                id="address"
+                name="address"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input
+                type="password"
+                class="form-control form-control-user"
+                id="password"
+                name="password"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="confirm_password">Confirm Password:</label>
+              <input
+                type="password"
+                class="form-control form-control-user"
+                id="confirm_password"
+                name="confirm_password"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary btn-user d-block mx-auto btn-block"
+            >
+              Register Account
+            </button>
+          </form>
+
+          <hr /> -->
+
+          <!-- <div class="text-center">
+            <a class="small" href="{% url 'login' %}"
+              >Already have an account? Login!</a
+            >
+          </div> -->
+
+          <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            <div class="form-group row">
+              <div class="col-sm-6 mb-3 mb-sm-0">
+                <label for="first_name" style="margin-bottom: 10px"
+                  >First Name:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="first_name"
+                  name="first_name"
+                  pattern="[A-Za-z][A-Za-z\s]*"
+                  placeholder="Only letters allowed"
+                  required
+                />
+              </div>
+              <div class="col-sm-6">
+                <label for="last_name" style="margin-bottom: 10px"
+                  >Last Name:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="last_name"
+                  name="last_name"
+                  pattern="[A-Za-z][A-Za-z\s]*"
+                  placeholder=" Only letters allowed"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="phone_number" style="margin-bottom: 10px"
+                >Phone Number:</label
+              >
+              <input
+                type="text"
+                class="form-control form-control-user"
+                id="phone_number"
+                name="phone_number"
+                pattern="[0-9][0-9\s]*"
+                placeholder="Only numbers allowed"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email" style="margin-bottom: 10px">Email:</label>
+              <input
+                type="email"
+                class="form-control form-control-user"
+                id="email"
+                name="email"
+                placeholder="This will be your Username"
+                required
+              />
+              <div id="emailAvailabilityMessage" style="display: none"></div>
+            </div>
+
+            <!-- check email availability -->
+
+            <script>
+              document
+                .getElementById("email")
+                .addEventListener("blur", function () {
+                  var email = this.value;
+                  var xhr = new XMLHttpRequest();
+                  xhr.open("POST", "/check_email_availability", true);
+                  xhr.setRequestHeader("Content-Type", "application/json");
+                  xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                      var response = JSON.parse(xhr.responseText);
+                      var messageElement = document.getElementById(
+                        "emailAvailabilityMessage"
+                      );
+                      if (response.available) {
+                        messageElement.textContent =
+                          "This email address is available.";
+                        messageElement.style.color = "green";
+                      } else {
+                        messageElement.textContent =
+                          "This email address has been taken.";
+                        messageElement.style.color = "red";
+                      }
+                      messageElement.style.display = "block"; // Show the message
+                    }
+                  };
+                  xhr.send(JSON.stringify({ email: email }));
+                });
+            </script>
+
+            <div class="form-group">
+              <label for="address" style="margin-bottom: 10px">Address:</label>
+              <input
+                type="text"
+                class="form-control form-control-user"
+                id="address"
+                name="address"
+                pattern="[0-9A-Za-z\s,/]*"
+                placeholder="Address"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="role">Role:</label>
+              <select
+                class="form-control form-control-user"
+                id="role"
+                name="role"
+                required
+              >
+                <option value="Patient">Patient</option>
+                <option value="Healthcare Provider">Healthcare Provider</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="password" style="margin-bottom: 10px"
+                >Password:</label
+              >
+              <input
+                type="password"
+                class="form-control form-control-user"
+                id="password"
+                name="password"
+                pattern="^(?=.*\d)(?=.*[a-zA-Z]).{8,}$"
+                placeholder="At least 8 characters long with BOTH numbers and letters"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="confirm_password" style="margin-bottom: 10px"
+                >Confirm Password:</label
+              >
+              <input
+                type="password"
+                class="form-control form-control-user"
+                id="confirm_password"
+                name="confirm_password"
+                placeholder="Please repeat your password"
+                required
+              />
+              <br />
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary btn-user d-block mx-auto btn-block"
+            >
+              Register Account
+            </button>
+            <br />
+            <button
+              type="button"
+              class="btn btn-danger btn-user d-block mx-auto btn-block"
+              onclick="window.location.href='/'"
+            >
+              Cancel
+            </button>
+
+            <br />
+          </form>
+
+          <div class="text-center">
+            <a
+              class="small"
+              href="{% url 'login'%}"
+              style="text-decoration: none"
+              >Already have an account? Login!</a
+            >
+          </div>
+
+          <!-- check email availability when submitting -->
+
+          <script>
+            function validateForm() {
+              var email = document.getElementById("email").value;
+              var xhr = new XMLHttpRequest();
+              xhr.open("POST", "/check_email_availability", false);
+              xhr.setRequestHeader("Content-Type", "application/json");
+              xhr.send(JSON.stringify({ email: email }));
+              var response = JSON.parse(xhr.responseText);
+              if (!response.available) {
+                var messageElement = document.getElementById(
+                  "emailAvailabilityMessage"
+                );
+                messageElement.textContent =
+                  "This email address has been taken.";
+                messageElement.style.color = "red";
+                return false; // Prevent form submission
+              }
+
+              var password = document.getElementById("password").value;
+              var confirm_password =
+                document.getElementById("confirm_password").value;
+              if (password !== confirm_password) {
+                alert("Passwords do not match.");
+                return false; // Prevent form submission
+              }
+
+              return true; // Allow form submission
+            }
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
