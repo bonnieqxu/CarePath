@@ -1,2 +1,76 @@
 {% extends "CarePath/layout.html" %} {% block title %} Healthcare Provider
-Dashboard {% endblock %} {% block content %} {% endblock %}
+Dashboard {% endblock %} {% block content %}
+
+<!-- dashboard container -->
+
+<div style="display: flex; min-height: 60vh; margin: 0 5px">
+  <!-- Sidebar -->
+  <div
+    class="sidebar"
+    style="
+      position: relative;
+      min-height: 74vh;
+      width: 270px;
+      margin-right: 20px;
+    "
+  >
+    <div class="user-info">
+      <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+      <p>{{ user.role }}</p>
+    </div>
+    <div class="nav flex-column flex-grow-1">
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'home' %}">Home</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">My Profile</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">Change Password</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">My Appointment</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">Search for a Patient</a>
+      </div>
+    </div>
+    <!-- Log Out link -->
+    <form
+      id="logout-form"
+      action="{% url 'logout' %}"
+      method="post"
+      style="display: none"
+    >
+      {% csrf_token %}
+    </form>
+    <a
+      href="#"
+      class="nav-item nav-link"
+      style="
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+        background-color: #2a72b9;
+        color: white;
+        text-decoration: none;
+        border-top: 1px solid #2a72b9;
+        display: block;
+      "
+      onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+      >Log Out</a
+    >
+  </div>
+
+  <!-- Main Content -->
+  <div style="flex-grow: 1; padding: 10px; text-align: left">
+    <h2>
+      Welcome to your Dashboard, {{ user.first_name }} {{ user.last_name }}!
+    </h2>
+    <p>Select an option from the sidebar to get started.</p>
+  </div>
+</div>
+
+{% endblock %}

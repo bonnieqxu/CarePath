@@ -3,6 +3,7 @@ import os
 from django.utils.timezone import datetime
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import Group
 from .models import CustomUser
@@ -28,7 +29,7 @@ from django.contrib.auth import login
 #         return context
 
 
-#----------------------- visitor related views  -------------------------------
+#----------------------- VISITOR related views  -------------------------------
 
 # landing page
 def home(request):
@@ -36,7 +37,7 @@ def home(request):
 
 
 
-# healthcare journey related views
+# Treatment journey related views
 def journey(request):
     return render(request, "CarePath/journey.html")
 
@@ -60,7 +61,7 @@ def discharge(request):
 
 
 
-# informative materials views
+# informative materials related views
 def info(request):
     return render(request, "CarePath/info.html")
 
@@ -116,7 +117,7 @@ def mouthcare_post_pdf(request):
 
 
 
-
+# clinician related views
 def team(request):
     return render(request, "CarePath/team.html")
 
@@ -162,6 +163,10 @@ def register(request):
     return render(request, 'CarePath/register.html')
 
 
+
+
+# --------------------------------- REGISTERED USER VIEWS ------------------------
+
 # user login
 def login(request):
     if request.method == "POST":
@@ -188,12 +193,25 @@ def login(request):
     return render(request, "CarePath/login.html")
 
 
-# dashboards
+# # dashboards
+@login_required
 def patient_dashboard(request):
     return render(request, 'CarePath/patient_dashboard.html')
 
+@login_required
 def provider_dashboard(request):
     return render(request, 'CarePath/provider_dashboard.html')
 
+@login_required
 def admin_dashboard(request):
     return render(request, 'CarePath/admin_dashboard.html')
+
+
+@login_required
+def dashboard(request):
+    if request.user.role == 'Patient':
+        return redirect('patient_dashboard')
+    elif request.user.role == 'Healthcare Provider':
+        return redirect('provider_dashboard')
+    elif request.user.role == 'Admin':
+        return redirect('admin_dashboard')

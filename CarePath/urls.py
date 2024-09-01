@@ -45,6 +45,7 @@ urlpatterns = [
 
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('patient/dashboard/', views.patient_dashboard, name='patient_dashboard'),
     path('provider/dashboard/', views.provider_dashboard, name='provider_dashboard'),
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),

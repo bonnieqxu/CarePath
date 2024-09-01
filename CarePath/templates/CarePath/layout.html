@@ -46,21 +46,17 @@
       rel="stylesheet"
     />
 
-    <!-- Owl Carousel CSS -->
     <!-- <link
-      rel="stylesheet"
-      href="{% static 'CarePath/lib/owlcarousel/owl.carousel.min.css' %}"
-    />
-    <link
-      rel="stylesheet"
-      href="{% static 'CarePath/lib/owlcarousel/owl.theme.default.min.css' %}"
-    /> -->
-
-    <link
       rel="stylesheet"
       type="text/css"
       href="{% static 'CarePath/site.css' %}"
+    /> -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'CarePath/site.css' %}?v={{ STATIC_VERSION }}"
     />
+
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -137,6 +133,11 @@
             <a href="{% url 'login' %}" class="nav-item nav-link">Log In</a>
             {% else %}
 
+            <!-- My Dashboard link -->
+            <a href="{% url 'dashboard' %}" class="nav-item nav-link me-3"
+              >My Dashboard</a
+            >
+
             <!-- Log Out form and link -->
             <form
               id="logout-form"
@@ -202,24 +203,24 @@
       <!-- Footer Start -->
       <footer>
         <div
-          class="container-fluid bg-dark text-light footer mt-5 pt-5 wow fadeIn"
+          class="container-fluid bg-dark text-light footer mt-5 wow fadeIn"
           data-wow-delay="0.1s"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 70px;
+            line-height: 70px;
+            padding: 10px 0;
+          "
         >
-          <div class="container">
-            <div class="copyright">
-              <div class="row">
-                <div
-                  class="col-md-6 d-flex justify-content-md-start justify-content-center align-items-center mb-3 mb-md-0"
-                >
-                  <span style="margin-right: 50px">&copy;2024</span>
-                  <span style="margin-right: 50px"
-                    >Te Whatu Ora, All Rights Reserved.</span
-                  >
-                  <span style="margin-right: 10px">Bonnie Qian Xu</span>
-                  <span>1156270</span>
-                </div>
-              </div>
-            </div>
+          <div class="copyright text-center">
+            <span style="margin-right: 50px">&copy;2024</span>
+            <span style="margin-right: 50px"
+              >Te Whatu Ora, All Rights Reserved.</span
+            >
+            <span style="margin-right: 10px">Bonnie Qian Xu</span>
+            <span>1156270</span>
           </div>
         </div>
       </footer>
