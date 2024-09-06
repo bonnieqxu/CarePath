@@ -1,0 +1,120 @@
+{% extends "CarePath/layout.html" %} {% block title %} Your Speech {% endblock%}
+{% block content %}
+
+<div class="container d-flex justify-content-center">
+  <div class="my-div p-4 bg-light">
+    <h1 style="font-weight: bold">Speech Language Therapy and Exercises</h1>
+    <br />
+    <h4 style="font-weight: bold">Swallowing Exercises</h4>
+
+    <p>
+      The type of cancer you have and the treatment you are having can cause
+      long term swallowingdifficulties. These difficulties can lead to further
+      health complications, such as poor nutrition.In order to maintain your
+      swallowing ability and minimise the possibility of long term
+      swallowingproblems, try to complete the following exercise routine three
+      times a day throughout your treatmentand up to 6 months after your
+      treatment has finished. Following this, your Speech-language Therapistwill
+      provide guidance regarding any ongoing need for swallowing exercises.
+    </p>
+
+    <br />
+    <h6 style="font-weight: bold">Maximum Jaw Stretch</h6>
+
+    <p>
+      Open your mouth as wide as possible (try to get 3 fingers vertically
+      between yourteeth). Hold that stretch for 20-30 seconds. Relax. Repeat 3
+      times.
+    </p>
+
+    <br />
+
+    <h6 style="font-weight: bold">Side to side jaw stretch</h6>
+
+    <p>
+      Stretch your jaw to the right and then to the left repeatedly for 30
+      seconds.
+    </p>
+    <br />
+
+    <h6 style="font-weight: bold">Tongue stretch and strengthen</h6>
+
+    <p>
+      o Hold each stretch for 20-30 seconds <br />
+      Protrude your tongue as far out as you can <br />
+      Move your tongue to the left, then to the right as far as it will go
+      <br />
+      Retract your tongue as if gargling or making a 'k' sound (tongue tip
+      should be flat on floorof mouth) <br />
+      o Gargle with salt and baking soda or plain water for 20-30 seconds.
+    </p>
+    <br />
+    <h6 style="font-weight: bold">Effortful swallow</h6>
+
+    <p>Swallow with greater effort- ( “up and over”). Repeat 3 times.</p>
+    <br />
+    <h6 style="font-weight: bold">Swallow strengthening</h6>
+
+    <p>
+      Hold the tip of your tongue between your teeth and keep it there while you
+      swallow. Repeat 3 times.
+    </p>
+    <br />
+    <h6 style="font-weight: bold">Swallow and hold</h6>
+
+    <p>
+      Try to hold your Adam's apple up for as long as possible while swallowing
+      <br />
+      o Repeat 3 times with a 30 second rest in between.
+    </p>
+
+    <h6 style="font-weight: bold">
+      it is also important to continue eating and drinking as much as you can
+      tolerate throughout yourtreatment. Please speak to your team if you are
+      having difficulties with managing your food. Keep usingthe swallowing
+      muscles to maintain their strength and flexibility.
+    </h6>
+    <br /><br />
+
+    <h4 style="font-weight: bold">Stretching Exercises</h4>
+    <h6 style="font-weight: bold">Stretch 1 for over-active strong side</h6>
+    <p>
+      Step 1: hold fingers down side of nose on strong side <br />
+      Step 2:bring under the nose to the weaker side firmly
+    </p>
+
+    <br />
+
+    <h6 style="font-weight: bold">Stretch 2 for over-active strong side</h6>
+    <p>
+      Step 1: hold fingers under eye on strong side <br />
+      Step 2: bring fingers down to cheek and jaw firmly <br />
+      Step 3: bringing fingers across under the lips to the other side
+    </p>
+
+    <div class="d-flex justify-content-center">
+      <a
+        href="{% url 'speech_pdf' %}"
+        class="btn btn-primary"
+        style="margin-top: 20px; margin-right: 15px"
+        >DOWNLOAD Swallowing PDF</a
+      >
+
+      <a
+        href="{% url 'stretch_pdf' %}"
+        class="btn btn-primary"
+        style="margin-top: 20px; margin-right: 15px"
+        >DOWNLOAD Stretching PDF</a
+      >
+
+      <a
+        href="{% url 'info' %}"
+        class="btn btn-primary"
+        style="margin-top: 20px"
+        >BACK</a
+      >
+    </div>
+  </div>
+</div>
+
+{% endblock %}

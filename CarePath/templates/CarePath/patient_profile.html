@@ -1,0 +1,134 @@
+{% extends "CarePath/layout.html" %} {% block title %} Patient Profile
+{%endblock %} {% block content %}
+
+<div style="display: flex; min-height: 60vh; margin: 0 5px">
+  <!-- Sidebar -->
+  <div
+    class="sidebar"
+    style="
+      position: relative;
+      min-height: 74vh;
+      width: 270px;
+      margin-right: 20px;
+    "
+  >
+    <div class="user-info">
+      <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+      <p>{{ user.role }}</p>
+    </div>
+    <div class="nav flex-column flex-grow-1">
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'home' %}">Home</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'patient_profile' %}">My Profile</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'patient_password' %}">Change Password</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">My Appointment</a>
+      </div>
+    </div>
+    <!-- Log Out link -->
+    <form
+      id="logout-form"
+      action="{% url 'logout' %}"
+      method="post"
+      style="display: none"
+    >
+      {% csrf_token %}
+    </form>
+    <a
+      href="#"
+      class="nav-item nav-link"
+      style="
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+        background-color: #2a72b9;
+        color: white;
+        text-decoration: none;
+        border-top: 1px solid #2a72b9;
+        display: block;
+      "
+      onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+      >Log Out</a
+    >
+  </div>
+
+  <!-- Main Content -->
+
+  <div style="flex-grow: 1; padding: 10px; text-align: left">
+    <h2>Your Profile</h2>
+    <hr />
+    <form method="post" action="{% url 'patient_profile' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="first_name">First Name:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="first_name"
+          name="first_name"
+          value="{{ user.first_name }}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="last_name">Last Name:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="last_name"
+          name="last_name"
+          value="{{ user.last_name }}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          value="{{ user.email }}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="phone_number">Phone Number:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="phone_number"
+          name="phone_number"
+          value="{{ user.phone_number }}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="address">Address:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="address"
+          name="address"
+          value="{{ user.address }}"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+
+    {% if messages %}
+    <div class="alert alert-success mt-3">
+      {% for message in messages %} {{ message }} {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

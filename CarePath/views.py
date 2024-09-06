@@ -1,33 +1,27 @@
 import re
 import os
-from django.utils.timezone import datetime
+
 from django.http import HttpResponse
+from django.contrib import messages
+from django.contrib.auth.models import Group
+from django.contrib.auth.views import PasswordChangeView
+
+from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import Group
-from .models import CustomUser
-from django.contrib import messages
-# from .forms import RegisterForm
 
 from django.conf import settings
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 
-# from CarePath.forms import LogMessageForm
-# from CarePath.models import LogMessage
-# from django.views.generic import ListView
+from .models import CustomUser
 
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
 
-# Replace the existing home function with the one below
-# class HomeListView(ListView):
-#     """Renders the home page, with a list of all messages."""
-#     model = LogMessage
+from django.utils.timezone import datetime
 
-#     def get_context_data(self, **kwargs):
-#         context = super(HomeListView, self).get_context_data(**kwargs)
-#         return context
 
+
+User = get_user_model()
 
 #----------------------- VISITOR related views  -------------------------------
 
@@ -98,10 +92,35 @@ def sideeffect_pdf(request):
         response['Content-Disposition'] = 'attachment; filename="sideeffects.pdf"'
         return response
 
+def speech(request):
+    return render(request, "CarePath/speech.html")
 
+# downland a swallowing exercise
+def speech_pdf(request):
+    file_path = os.path.join(settings.BASE_DIR, 'CarePath', 'static', 'CarePath', 'pdf', 'SLT Swallowing exercise.pdf')
+    with open(file_path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="SLT Swallowing exercise.pdf"'
+        return response
 
+# download a trismus exercise
+def stretch_pdf(request):
+    file_path = os.path.join(settings.BASE_DIR, 'CarePath', 'static', 'CarePath', 'pdf', 'SLT Trismus exersice.pdf')
+    with open(file_path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="SLT Trismus exersice.pdf"'
+        return response
 
+def diet(request):
+    return render(request, "CarePath/diet.html")
 
+# download a diet pdf
+def diet_pdf(request):
+    file_path = os.path.join(settings.BASE_DIR, 'CarePath', 'static', 'CarePath', 'pdf', 'Poor Appetite.pdf')
+    with open(file_path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="Poor Appetite.pdf"'
+        return response
 
 def mouthcare_post(request):
     return render(request, "CarePath/mouthcare_post.html")
@@ -215,3 +234,34 @@ def dashboard(request):
         return redirect('provider_dashboard')
     elif request.user.role == 'Admin':
         return redirect('admin_dashboard')
+
+
+#----------------------------- patient dashboard functions -----------------------
+@login_required
+def patient_profile(request):
+    user = request.user
+
+    if request.method == "POST":
+        # update info
+        user.first_name = request.POST['first_name']
+        user.last_name = request.POST['last_name']
+        user.email = request.POST['email']
+        user.phone_number = request.POST['phone_number']
+        user.address = request.POST['address']
+        user.save()
+
+        messages.success(request, "Your profile has been updated successfully!")
+        return redirect('patient_profile')  
+
+    return render(request, 'CarePath/patient_profile.html', {
+        'user': user,
+    })
+
+
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name = 'CarePath/patient_password.html'
+    success_url = reverse_lazy('patient_profile')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Your password has been updated successfully!')
+        return super().form_valid(form)
