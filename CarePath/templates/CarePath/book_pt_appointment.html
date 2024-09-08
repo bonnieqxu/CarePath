@@ -1,0 +1,230 @@
+{% extends "CarePath/layout.html" %} {% block title %} Book Appointment
+{%endblock %} {% block content %}
+
+<div style="display: flex; min-height: 60vh; margin: 0 5px">
+  <!-- Sidebar -->
+  <div
+    class="sidebar"
+    style="
+      position: relative;
+      min-height: 74vh;
+      width: 270px;
+      margin-right: 20px;
+    "
+  >
+    <div class="user-info">
+      <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+      <p>{{ user.role }}</p>
+    </div>
+    <div class="nav flex-column flex-grow-1">
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'home' %}">Home</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_profile' %}">My Profile</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_password' %}">Change Password</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_appt' %}">My Appointment</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_search_pt' %}">Search for a Patient</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">Book a New Appointment</a>
+      </div>
+    </div>
+    <!-- Log Out link -->
+    <form
+      id="logout-form"
+      action="{% url 'logout' %}"
+      method="post"
+      style="display: none"
+    >
+      {% csrf_token %}
+    </form>
+    <a
+      href="#"
+      class="nav-item nav-link"
+      style="
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+        background-color: #2a72b9;
+        color: white;
+        text-decoration: none;
+        border-top: 1px solid #2a72b9;
+        display: block;
+      "
+      onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+      >Log Out</a
+    >
+  </div>
+
+  <!-- Main Content -->
+  <div style="flex-grow: 1; padding: 10px; text-align: left">
+    <h2>Book Appointment for {{ patient.first_name }} {{ patient.last_name }}</h2>
+    <hr />
+
+
+    
+  <form method="post"  action="{% url 'book_pt_appointment' patient.id %}">
+    {% csrf_token %}
+
+    <!-- <div class="form-group">
+      <label for="provider">Healthcare Provider:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="provider"
+        name="provider"
+        value="{{ request.user.first_name }} {{ request.user.last_name }}"
+        readonly
+      />
+    </div> -->
+
+    <div class="form-group">
+      <label for="provider">Healthcare Provider:</label>
+      <select class="form-control" id="provider" name="provider">
+        {% for provider in providers %}
+          <option value="{{ provider.id }}" 
+            {% if provider.id == request.user.id %} selected {% endif %}>
+            {{ provider.first_name }} {{ provider.last_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+
+    <!-- <div class="form-group">
+      <label for="date">Date:</label>
+      <input type="date" class="form-control" id="date" name="date" required />
+    </div> -->
+
+    <div class="form-group">
+      <label for="date">Date:</label>
+      <input type="date" class="form-control" id="date" name="date" required />
+      <small class="text-danger" id="date-error" style="display: none;">Please select a weekday (Monday to Friday).</small>
+    </div>
+
+    <script>
+      // Get today's date in YYYY-MM-DD format
+      var today = new Date().toISOString().split('T')[0];
+    
+      // Set the min attribute to today's date to restrict past dates
+      document.getElementById("date").setAttribute('min', today);
+    
+      // Add event listener to check if the selected date is a weekday
+      document.getElementById("date").addEventListener("change", function() {
+        var selectedDate = new Date(this.value);
+        var dayOfWeek = selectedDate.getUTCDay(); // 0 = Sunday, 6 = Saturday
+        
+        // Check if the day is Saturday (6) or Sunday (0)
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          // If weekend, show error message and clear the date input
+          document.getElementById("date-error").style.display = "block";
+          this.value = ""; // Clear the input field
+        } else {
+          // If weekday, hide error message
+          document.getElementById("date-error").style.display = "none";
+        }
+      });
+    </script>
+
+
+    <div class="form-group">
+      <label for="start_time">Start Time:</label>
+      <input type="time" class="form-control" id="start_time" name="start_time" required />
+    </div>
+
+    <div class="form-group">
+      <label for="finish_time">Finish Time:</label>
+      <input type="time" class="form-control" id="finish_time" name="finish_time" required />
+    </div>
+
+    <script>
+      const earliestStartTime = '08:00';
+      const latestFinishTime = '16:30';
+    
+      document.getElementById('start_time').addEventListener('input', function () {
+        const startTime = this.value;
+        const finishTimeField = document.getElementById('finish_time');
+    
+        // Validate that the start time is not earlier than 8:00 AM
+        if (startTime < earliestStartTime) {
+          alert('Start time cannot be earlier than 8:00 AM.');
+          this.value = ''; // Clear the invalid input
+        }
+    
+        // Also validate if finish time is set, and ensure finishTime > startTime
+        const finishTime = finishTimeField.value;
+        if (finishTime && startTime >= finishTime) {
+          alert('Finish time must be later than start time.');
+          finishTimeField.value = ''; // Clear the finish time field
+        }
+      });
+    
+      document.getElementById('finish_time').addEventListener('input', function () {
+        const finishTime = this.value;
+        const startTimeField = document.getElementById('start_time');
+        const startTime = startTimeField.value;
+    
+        // Validate that the finish time is not later than 4:30 PM
+        if (finishTime > latestFinishTime) {
+          alert('Finish time cannot be later than 4:30 PM.');
+          this.value = ''; // Clear the invalid input
+        }
+    
+        // Validate that finish time is later than start time
+        if (startTime && finishTime <= startTime) {
+          alert('Finish time must be later than start time.');
+          this.value = ''; // Clear the invalid input
+        }
+      });
+    </script>
+
+    <!-- <div class="form-group">
+      <label for="location">Location:</label>
+      <input type="text" class="form-control" id="location" name="location" required />
+    </div> -->
+
+    <div class="form-group">
+      <label for="location">Location:</label>
+      <select class="form-control" id="location" name="location" required>
+        <option value="" disabled selected>Select a location</option>
+        <option value="Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre, Auckland">
+          Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre, Auckland
+        </option>
+        <option value="Level 2 Outpatient Clinic, Building 1, Auckland City Hospital">
+          Level 2 Outpatient Clinic, Building 1, Auckland City Hospital, Auckland
+        </option>
+      </select>
+    </div>
+    
+
+    <div class="form-group">
+      <label for="notes">Notes (optional):</label>
+      <textarea class="form-control" id="notes" name="notes"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Book Appointment</button>
+
+  </form>
+ <br>
+  <a
+              href="{% url 'provider_search_pt' %}"
+              class="btn btn-secondary"
+              style="margin-right: 15px"
+              >Cancel</a
+            >
+</div>
+
+
+
+  </div>
+</div>
+{% endblock %}

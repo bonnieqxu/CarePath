@@ -30,7 +30,10 @@
         <a href="{% url 'provider_appt' %}">My Appointment</a>
       </div>
       <div class="nav-item" style="text-align: center">
-        <a href="#">Search for a Patient</a>
+        <a href="{% url 'provider_search_pt' %}">Search for a Patient</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">Book a New Appointment</a>
       </div>
     </div>
     <!-- Log Out link -->
@@ -65,20 +68,18 @@
   <!-- Main Content -->
   <div style="flex-grow: 1; padding: 10px; text-align: left">
     <h2>Enter Patient's Name to Search</h2>
+    <hr />
 
-    <!-- Main Content -->
     <div style="flex-grow: 1; padding: 10px; text-align: left">
       <div class="row">
         <div class="col-12 col-md-8 col-lg-6">
           <div style="padding: 8px; text-align: left">
-            <h2>Enter Patient's Name to Search</h2>
-
-            <form method="GET" action="{% url 'search_patient' %}">
+            <form method="GET" action="{% url 'provider_search_pt' %}">
               <div class="form-group">
                 <input
                   type="text"
                   name="q"
-                  placeholder="Enter patient name"
+                  placeholder="Enter patient's name"
                   class="form-control"
                 />
               </div>
@@ -86,6 +87,7 @@
             </form>
 
             {% if patients %}
+            <br /><br />
             <h3>Search Results</h3>
             <table class="table">
               <thead>
@@ -107,8 +109,7 @@
                       >View Info</a
                     >
                     <a
-                     
-                      href="#"
+                      href="{% url 'book_pt_appointment' patient.id %}"
                       class="btn btn-success btn-sm"
                       >Book Appointment</a
                     >

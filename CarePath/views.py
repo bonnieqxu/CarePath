@@ -1,6 +1,6 @@
 import re
 import os
-from datetime import date
+from datetime import date, time
 
 from django.http import HttpResponse
 from django.contrib import messages
@@ -11,6 +11,9 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import PasswordChangeForm
+
+from django.utils import timezone
+from django.utils.timezone import datetime
 from django.utils.translation import gettext as _
 
 from django.contrib.auth import get_user_model
@@ -18,14 +21,14 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
-from .models import CustomUser
+from .models import CustomUser, Appointment
 from django.db.models import Q
 
 
-from django.utils.timezone import datetime
+
 
 
 
@@ -325,34 +328,78 @@ def dashboard(request):
 
 #----------------------------- patient dashboard functions -----------------------
 # view and edit profile info
+# @login_required
+# def patient_profile(request):
+#     user = request.user
+
+#     if request.method == "POST":
+#         # update info
+#         user.first_name = request.POST['first_name']
+#         user.last_name = request.POST['last_name']
+#         date_of_birth_str = request.POST['date_of_birth']
+#         try:
+#             date_of_birth = datetime.strptime(date_of_birth_str, '%d-%m-%Y').date()  # Parse the date
+#             user.date_of_birth = date_of_birth
+#         except ValueError:
+#             messages.error(request, "Invalid date format. Please use DD-MM-YYYY.")
+#             return render(request, 'CarePath/patient_profile.html', {'user': user})
+
+
+#         user.email = request.POST['email']
+#         user.phone_number = request.POST['phone_number']
+#         user.address = request.POST['address']
+#         user.save()
+
+#         messages.success(request, "Your profile has been updated successfully!")
+#         return redirect('patient_profile')  
+
+#     return render(request, 'CarePath/patient_profile.html', {
+#         'user': user,
+#     })
 @login_required
-def patient_profile(request):
-    user = request.user
+def patient_profile(request, id):
+     # Get the patient based on the provided id
+    patient = get_object_or_404(CustomUser, id=id, role='Patient')
 
-    if request.method == "POST":
-        # update info
-        user.first_name = request.POST['first_name']
-        user.last_name = request.POST['last_name']
-        date_of_birth_str = request.POST['date_of_birth']
-        try:
-            date_of_birth = datetime.strptime(date_of_birth_str, '%d-%m-%Y').date()  # Parse the date
-            user.date_of_birth = date_of_birth
-        except ValueError:
-            messages.error(request, "Invalid date format. Please use DD-MM-YYYY.")
-            return render(request, 'CarePath/patient_profile.html', {'user': user})
+    # If the current user is the patient, allow editing; otherwise, restrict to view only
+    if request.user == patient:
+        if request.method == "POST":
+            # Update the patient's profile info
+            patient.first_name = request.POST['first_name']
+            patient.last_name = request.POST['last_name']
+
+            # Parse the date of birth
+            date_of_birth_str = request.POST['date_of_birth']
+            try:
+                date_of_birth = datetime.strptime(date_of_birth_str, '%d-%m-%Y').date()  # Parse the date
+                patient.date_of_birth = date_of_birth
+            except ValueError:
+                messages.error(request, "Invalid date format. Please use DD-MM-YYYY.")
+                return render(request, 'CarePath/patient_profile.html', {'user': patient, 'is_editable': True})
+
+            patient.email = request.POST['email']
+            patient.phone_number = request.POST['phone_number']
+            patient.address = request.POST['address']
+            patient.save()
+
+            messages.success(request, "Your profile has been updated successfully!")
+            return redirect('patient_profile', id=patient.id)
+
+        return render(request, 'CarePath/patient_profile.html', {
+            'user': patient,
+            'is_editable': True
+        })
+    else:
+        # If the logged-in user is not the patient, show the profile as read-only
+        return render(request, 'CarePath/patient_profile.html', {
+            'user': patient,
+            'is_editable': False
+        })
 
 
-        user.email = request.POST['email']
-        user.phone_number = request.POST['phone_number']
-        user.address = request.POST['address']
-        user.save()
 
-        messages.success(request, "Your profile has been updated successfully!")
-        return redirect('patient_profile')  
 
-    return render(request, 'CarePath/patient_profile.html', {
-        'user': user,
-    })
+
 
 # change password
 class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
@@ -411,6 +458,7 @@ def provider_profile(request):
     })
 
 
+
 # change password
 class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'CarePath/provider_password.html'
@@ -441,27 +489,78 @@ def provider_appt(request):
     return render(request, 'CarePath/provider_appt.html')
 
 # search pt
-# def provider_search_pt(request):
-#     query = request.GET.get('q')
-#     patients = []
-    
-#     if query:
-#         patients = Patient.objects.filter(
-#             Q(first_name__icontains=query) | Q(last_name__icontains=query)
-#         )
-    
-#     context = {
-#         'patients': patients,
-#     }
-#     return render(request, 'CarePath/provider_search_pt.html', context)
+@login_required
+def provider_search_pt(request):
+    query = request.GET.get('q')  
+    patients = None
 
-# # view pt profile
-# def view_patient_info(request, id):
-#     patient = Patient.objects.get(id=id)
-#     return render(request, 'CarePath/view_patient_info.html', {'patient': patient})
+    if query:
+        patients = CustomUser.objects.filter(
+            Q(first_name__icontains=query) | Q(last_name__icontains=query),
+            role='Patient'
+        )
 
-# # book appt for this pt
-# def book_patient_appt(request, id):
-#     patient = Patient.objects.get(id=id)
-#     # Add logic for booking an appointment here
-#     return render(request, 'CarePath/book_patient_appt.html', {'patient': patient})
+    context = {
+        'patients': patients
+    }
+
+    return render(request, 'CarePath/provider_search_pt.html', context)
+
+# view pt profile
+# @login_required
+# def provider_view_pt(request, id):
+#     patient = get_object_or_404(CustomUser, id=id, role='Patient')
+#     return render(request, 'CarePath/patient_profile.html', {'user': patient, 'is_editable': False})
+@login_required
+def provider_view_pt(request, id):
+    # Get the patient by ID
+    patient = get_object_or_404(CustomUser, id=id, role='Patient')
+    
+    # Render the template with both the provider (user) and the patient
+    return render(request, 'CarePath/patient_profile.html', {
+        'user': request.user,  # The healthcare provider
+        'patient': patient,    # The patient being viewed
+        'is_editable': False   # No editing allowed for the provider
+    })
+
+
+# choose a patient to book appt
+@login_required
+def book_pt_appointment(request, patient_id):
+    patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+
+     # Get all healthcare providers to populate the dropdown list
+    providers = CustomUser.objects.filter(role='Healthcare Provider')
+
+    if request.method == "POST":
+        date = request.POST['date']
+        start_time = request.POST['start_time']
+        finish_time = request.POST['finish_time']
+        location = request.POST['location']
+        provider_id = request.POST['provider']  # Get selected provider ID
+        notes = request.POST.get('notes', '')  # Optional field
+
+        provider = CustomUser.objects.get(id=provider_id)
+
+        # Validate that start_time < finish_time
+        if time.fromisoformat(start_time) >= time.fromisoformat(finish_time):
+            messages.error(request, "Start time must be earlier than finish time.")
+            return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient})
+
+        # Create a new appointment
+        appointment = Appointment.objects.create(
+            patient=patient,
+            provider=provider,
+            date=date,
+            start_time=start_time,
+            finish_time=finish_time,
+            location=location,
+            notes=notes
+        )
+        appointment.save()
+
+        messages.success(request, "Appointment successfully booked for {}.".format(patient.first_name))
+        # return redirect('provider_view_pt', id=patient.id)
+        return redirect('provider_appt')
+
+    return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient, 'providers': providers })
