@@ -1,7 +1,5 @@
-{% extends "CarePath/layout.html" %} {% block title %} Patient Dashboard
-{%endblock %} {% block content %}
-
-<!-- dashboard container -->
+{% extends "CarePath/layout.html" %} {% block title %} My Appointment
+{%endblock%} {% block content %}
 
 <div style="display: flex; min-height: 60vh; margin: 0 5px">
   <!-- Sidebar -->
@@ -62,12 +60,21 @@
   </div>
 
   <!-- Main Content -->
+
   <div style="flex-grow: 1; padding: 10px; text-align: left">
-    <h2>
-      Welcome to your Dashboard, {{ user.first_name }} {{ user.last_name }}!
-    </h2>
-    <p>Select an option from the sidebar to get started.</p>
+    <div class="row">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div style="padding: 8px; text-align: left">
+          <h2>My Appointments</h2>
+          <p>Click to view more info</p>
+          <hr />
+
+
+
+          
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-
 {% endblock %}

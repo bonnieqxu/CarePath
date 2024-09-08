@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-k9$w0&%on*0fpk3s%2uch0!l*p1%9ejl565#3n+y@i4wti-3yw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['bonnieqxu.pythonanywhere.com']
+ALLOWED_HOSTS = ['bonnieqxu.pythonanywhere.com', '127.0.0.1', 'localhost']
 
 APPEND_SLASH = False
 
@@ -107,6 +107,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',

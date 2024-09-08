@@ -3,8 +3,14 @@ import os
 
 from django.http import HttpResponse
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import password_validators_help_texts
+from django.views.generic import TemplateView
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.forms import PasswordChangeForm
+from django.utils.translation import gettext as _
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login as auth_login
@@ -258,10 +264,37 @@ def patient_profile(request):
     })
 
 
-class CustomPasswordChangeView(PasswordChangeView):
+class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'CarePath/patient_password.html'
     success_url = reverse_lazy('patient_profile')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['password_help_texts'] = password_validators_help_texts()
+        return context
+
+    def form_invalid(self, form):
+        # Check which fields caused validation errors
+        for field in form.errors:
+            if field == 'old_password':
+                messages.error(self.request, _('The old password you entered is incorrect.'))
+            elif field == 'new_password1' or field == 'new_password2':
+                messages.error(self.request, _('The new passwords you entered do not match.'))
+        return super().form_invalid(form)
+
     def form_valid(self, form):
-        messages.success(self.request, 'Your password has been updated successfully!')
+        messages.success(self.request, _('Your password has been updated successfully!'))
         return super().form_valid(form)
+    
+
+# display pt appointments
+@login_required
+def patient_appt(request):
+    return render(request, 'CarePath/patient_appt.html')
+
+
+
+
+
+#----------------------------- healthcare provider dashboard functions -----------------------
+

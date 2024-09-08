@@ -56,6 +56,8 @@ urlpatterns = [
     # patient dashboard functions
     path('patient_profile/', views.patient_profile, name='patient_profile'),
     path('patient_password/', CustomPasswordChangeView.as_view(), name='patient_password'),
+    path('patient_appt/', views.patient_appt, name='patient_appt'),
+    
 
 
  
