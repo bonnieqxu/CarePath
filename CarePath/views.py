@@ -391,7 +391,8 @@ def provider_profile(request):
         user.last_name = request.POST['last_name']
         user.email = request.POST['email']
         user.phone_number = request.POST['phone_number']
-        user.address = request.POST['address']
+        user.department = request.POST['department']
+        user.provider_role = request.POST['provider_role']
         user.save()
 
         messages.success(request, "Your profile has been updated successfully!")

@@ -71,7 +71,7 @@ Profile {% endblock %} {% block content %}
           <h2>Your Profile</h2>
           <p>Click on the field to modify</p>
           <hr />
-          <form method="post" action="{% url 'patient_profile' %}">
+          <form method="post" action="{% url 'provider_profile' %}">
             {% csrf_token %}
             <div class="form-group">
               <label for="first_name">First Name:</label>
@@ -118,6 +118,28 @@ Profile {% endblock %} {% block content %}
               />
             </div>
             <div class="form-group">
+              <label for="department">Department:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="department"
+                name="department"
+                value="{{ user.department }}"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="provider_role">Position:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="provider_role"
+                name="provider_role"
+                value="{{ user.provider_role }}"
+                required
+              />
+            </div>
+            <!-- <div class="form-group">
               <label for="address">Address:</label>
               <input
                 type="text"
@@ -127,7 +149,7 @@ Profile {% endblock %} {% block content %}
                 value="{{ user.address }}"
                 required
               />
-            </div>
+            </div> -->
             <button type="submit" class="btn btn-primary">Save Changes</button>
           </form>
 
