@@ -1,6 +1,6 @@
 {% extends "CarePath/layout.html" %} {% block title %} Register {% endblock %}
 {% block content %}
-<div
+<!-- <div
   class="container d-flex justify-content-center align-items-center"
   style="max-width: 1000px"
 >
@@ -73,11 +73,11 @@
                 required
               />
               <div id="emailAvailabilityMessage" style="display: none"></div>
-            </div>
+            </div> -->
 
-            <!-- check email availability -->
+<!-- check email availability -->
 
-            <script>
+<!-- <script>
               document
                 .getElementById("email")
                 .addEventListener("blur", function () {
@@ -187,11 +187,589 @@
               style="text-decoration: none"
               >Already have an account? Login!</a
             >
+          </div> -->
+
+<!-- check email availability when submitting -->
+
+<!-- <script>
+            function validateForm() {
+              var email = document.getElementById("email").value;
+              var xhr = new XMLHttpRequest();
+              xhr.open("POST", "/check_email_availability", false);
+              xhr.setRequestHeader("Content-Type", "application/json");
+              xhr.send(JSON.stringify({ email: email }));
+              var response = JSON.parse(xhr.responseText);
+              if (!response.available) {
+                var messageElement = document.getElementById(
+                  "emailAvailabilityMessage"
+                );
+                messageElement.textContent =
+                  "This email address has been taken.";
+                messageElement.style.color = "red";
+                return false; // Prevent form submission
+              }
+
+              var password = document.getElementById("password").value;
+              var confirm_password =
+                document.getElementById("confirm_password").value;
+              if (password !== confirm_password) {
+                alert("Passwords do not match.");
+                return false; // Prevent form submission
+              }
+
+              return true; // Allow form submission
+            }
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- ------------------------------------------------------- -->
+
+<!-- <div
+  class="container d-flex justify-content-center align-items-center"
+  style="max-width: 1000px"
+>
+  <div class="card o-hidden border-0 shadow-lg my-5">
+    <div class="card-body p-0">
+      <div class="row mx-auto" style="max-width: 100%">
+        <div class="p-5">
+          <div class="text-center">
+            <h1 class="h4 text-gray-900 mb-4">Create an Account</h1>
           </div>
 
-          <!-- check email availability when submitting -->
+          <hr />
+
+          <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+
+ 
+            <div class="form-group">
+              <label for="role">Role:</label>
+              <select
+                class="form-control form-control-user"
+                id="role"
+                name="role"
+                required
+              >
+                <option value="Patient">Patient</option>
+                <option value="Healthcare Provider">Healthcare Provider</option>
+              </select>
+            </div>
+            <br />
+            
+            <div class="form-group row">
+              <div class="col-sm-6 mb-3 mb-sm-0">
+                <label for="first_name" style="margin-bottom: 10px"
+                  >First Name:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="first_name"
+                  name="first_name"
+                  pattern="[A-Za-z][A-Za-z\s]*"
+                  placeholder="Only letters allowed"
+                  required
+                />
+              </div>
+              <div class="col-sm-6">
+                <label for="last_name" style="margin-bottom: 10px"
+                  >Last Name:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="last_name"
+                  name="last_name"
+                  pattern="[A-Za-z][A-Za-z\s]*"
+                  placeholder="Only letters allowed"
+                  required
+                />
+              </div>
+            </div>
+
+            
+
+            <div class="form-group">
+              <label for="phone_number" style="margin-bottom: 10px"
+                >Phone Number:</label
+              >
+              <input
+                type="text"
+                class="form-control form-control-user"
+                id="phone_number"
+                name="phone_number"
+                pattern="[0-9][0-9\s]*"
+                placeholder="Only numbers allowed"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email" style="margin-bottom: 10px">Email:</label>
+              <input
+                type="email"
+                class="form-control form-control-user"
+                id="email"
+                name="email"
+                placeholder="This will be your Username"
+                required
+              />
+              <div id="emailAvailabilityMessage" style="display: none"></div>
+            </div>
+
+
+            <script>
+              document
+                .getElementById("email")
+                .addEventListener("blur", function () {
+                  var email = this.value;
+                  var xhr = new XMLHttpRequest();
+                  xhr.open("POST", "/check_email_availability", true);
+                  xhr.setRequestHeader("Content-Type", "application/json");
+                  xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                      var response = JSON.parse(xhr.responseText);
+                      var messageElement = document.getElementById(
+                        "emailAvailabilityMessage"
+                      );
+                      if (response.available) {
+                        messageElement.textContent =
+                          "This email address is available.";
+                        messageElement.style.color = "green";
+                      } else {
+                        messageElement.textContent =
+                          "This email address has been taken.";
+                        messageElement.style.color = "red";
+                      }
+                      messageElement.style.display = "block"; // Show the message
+                    }
+                  };
+                  xhr.send(JSON.stringify({ email: email }));
+                });
+            </script>
+
+            <div class="form-group">
+              <label for="address" style="margin-bottom: 10px">Address:</label>
+              <input
+                type="text"
+                class="form-control form-control-user"
+                id="address"
+                name="address"
+                pattern="[0-9A-Za-z\s,/]*"
+                placeholder="Address"
+                required
+              />
+            </div>
+
+            <div id="healthcare-fields" style="display: none">
+              <div class="form-group">
+                <label for="department" style="margin-bottom: 10px"
+                  >Department:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="department"
+                  name="department"
+                  placeholder="e.g., Oncology, Radiology"
+                />
+              </div>
+              <div class="form-group">
+                <label for="provider_role" style="margin-bottom: 10px"
+                  >Position:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="provider_role"
+                  name="provider_role"
+                  placeholder="e.g., Surgeon, Nurse"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password" style="margin-bottom: 10px"
+                >Password:</label
+              >
+              <input
+                type="password"
+                class="form-control form-control-user"
+                id="password"
+                name="password"
+                pattern="^(?=.*\d)(?=.*[a-zA-Z]).{8,}$"
+                placeholder="At least 8 characters long with BOTH numbers and letters"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="confirm_password" style="margin-bottom: 10px"
+                >Confirm Password:</label
+              >
+              <input
+                type="password"
+                class="form-control form-control-user"
+                id="confirm_password"
+                name="confirm_password"
+                placeholder="Please repeat your password"
+                required
+              />
+              <br />
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary btn-user d-block mx-auto btn-block"
+            >
+              Register Account
+            </button>
+            <br />
+            <button
+              type="button"
+              class="btn btn-danger btn-user d-block mx-auto btn-block"
+              onclick="window.location.href='/'"
+            >
+              Cancel
+            </button>
+            <br />
+          </form>
+
+          <div class="text-center">
+            <a
+              class="small"
+              href="{% url 'login'%}"
+              style="text-decoration: none"
+              >Already have an account? Login!</a
+            >
+          </div>
+
 
           <script>
+            document
+              .getElementById("role")
+              .addEventListener("change", function () {
+                var role = this.value;
+                var healthcareFields =
+                  document.getElementById("healthcare-fields");
+                if (role === "Healthcare Provider") {
+                  healthcareFields.style.display = "block";
+                } else {
+                  healthcareFields.style.display = "none";
+                }
+              });
+
+            function validateForm() {
+              var email = document.getElementById("email").value;
+              var xhr = new XMLHttpRequest();
+              xhr.open("POST", "/check_email_availability", false);
+              xhr.setRequestHeader("Content-Type", "application/json");
+              xhr.send(JSON.stringify({ email: email }));
+              var response = JSON.parse(xhr.responseText);
+              if (!response.available) {
+                var messageElement = document.getElementById(
+                  "emailAvailabilityMessage"
+                );
+                messageElement.textContent =
+                  "This email address has been taken.";
+                messageElement.style.color = "red";
+                return false; // Prevent form submission
+              }
+
+              var password = document.getElementById("password").value;
+              var confirm_password =
+                document.getElementById("confirm_password").value;
+              if (password !== confirm_password) {
+                alert("Passwords do not match.");
+                return false; // Prevent form submission
+              }
+
+              return true; // Allow form submission
+            }
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<div
+  class="container d-flex justify-content-center align-items-center"
+  style="max-width: 1000px"
+>
+  <div class="card o-hidden border-0 shadow-lg my-5">
+    <div class="card-body p-0">
+      <div class="row mx-auto" style="max-width: 100%">
+        <div class="p-5">
+          <div class="text-center">
+            <h1 class="h4 text-gray-900 mb-4">Create an Account</h1>
+          </div>
+
+          <hr />
+
+          <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+
+            <!-- Role Selection -->
+            <div class="form-group">
+              <label for="role">Role:</label>
+              <select
+                class="form-control form-control-user"
+                id="role"
+                name="role"
+                required
+              >
+                <option value="" disabled selected>
+                  Please select your role
+                </option>
+                <option value="Patient">Patient</option>
+                <option value="Healthcare Provider">Healthcare Provider</option>
+              </select>
+            </div>
+
+            <br />
+            <div class="form-group row">
+              <div class="col-sm-6 mb-3 mb-sm-0">
+                <label for="first_name" style="margin-bottom: 10px"
+                  >First Name:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="first_name"
+                  name="first_name"
+                  pattern="[A-Za-z][A-Za-z\s]*"
+                  placeholder="Only letters allowed"
+                  required
+                />
+              </div>
+              <div class="col-sm-6">
+                <label for="last_name" style="margin-bottom: 10px"
+                  >Last Name:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="last_name"
+                  name="last_name"
+                  pattern="[A-Za-z][A-Za-z\s]*"
+                  placeholder="Only letters allowed"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Date of Birth for Patients -->
+            <div id="patient-fields" style="display: none">
+              <div class="form-group">
+                <label for="date_of_birth" style="margin-bottom: 10px"
+                  >Date of Birth:</label
+                >
+                <input
+                  type="date"
+                  class="form-control form-control-user"
+                  id="date_of_birth"
+                  name="date_of_birth"
+                  placeholder="YYYY-MM-DD"
+                  max="{{ today_date }}"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="address" style="margin-bottom: 10px"
+                  >Address:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="address"
+                  name="address"
+                  pattern="[0-9A-Za-z\s,/]*"
+                  placeholder="Address"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="phone_number" style="margin-bottom: 10px"
+                >Phone Number:</label
+              >
+              <input
+                type="text"
+                class="form-control form-control-user"
+                id="phone_number"
+                name="phone_number"
+                pattern="[0-9][0-9\s]*"
+                placeholder="Only numbers allowed"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email" style="margin-bottom: 10px">Email:</label>
+              <input
+                type="email"
+                class="form-control form-control-user"
+                id="email"
+                name="email"
+                placeholder="This will be your Username"
+                required
+              />
+              <div id="emailAvailabilityMessage" style="display: none"></div>
+            </div>
+
+            <!-- Check email availability -->
+            <script>
+              document
+                .getElementById("email")
+                .addEventListener("blur", function () {
+                  var email = this.value;
+                  var xhr = new XMLHttpRequest();
+                  xhr.open("POST", "/check_email_availability", true);
+                  xhr.setRequestHeader("Content-Type", "application/json");
+                  xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                      var response = JSON.parse(xhr.responseText);
+                      var messageElement = document.getElementById(
+                        "emailAvailabilityMessage"
+                      );
+                      if (response.available) {
+                        messageElement.textContent =
+                          "This email address is available.";
+                        messageElement.style.color = "green";
+                      } else {
+                        messageElement.textContent =
+                          "This email address has been taken.";
+                        messageElement.style.color = "red";
+                      }
+                      messageElement.style.display = "block"; // Show the message
+                    }
+                  };
+                  xhr.send(JSON.stringify({ email: email }));
+                });
+            </script>
+
+            <!-- Fields for Healthcare Provider -->
+            <div id="healthcare-fields" style="display: none">
+              <div class="form-group">
+                <label for="department" style="margin-bottom: 10px"
+                  >Department:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="department"
+                  name="department"
+                  placeholder="e.g., Cardiology, Radiology"
+                />
+              </div>
+              <div class="form-group">
+                <label for="provider_role" style="margin-bottom: 10px"
+                  >Position:</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-user"
+                  id="provider_role"
+                  name="provider_role"
+                  placeholder="e.g., Surgeon, Nurse"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password" style="margin-bottom: 10px"
+                >Password:</label
+              >
+              <input
+                type="password"
+                class="form-control form-control-user"
+                id="password"
+                name="password"
+                pattern="^(?=.*\d)(?=.*[a-zA-Z]).{8,}$"
+                placeholder="At least 8 characters long with BOTH numbers and letters"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="confirm_password" style="margin-bottom: 10px"
+                >Confirm Password:</label
+              >
+              <input
+                type="password"
+                class="form-control form-control-user"
+                id="confirm_password"
+                name="confirm_password"
+                placeholder="Please repeat your password"
+                required
+              />
+              <br />
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary btn-user d-block mx-auto btn-block"
+            >
+              Register Account
+            </button>
+            <br />
+            <button
+              type="button"
+              class="btn btn-danger btn-user d-block mx-auto btn-block"
+              onclick="window.location.href='/'"
+            >
+              Cancel
+            </button>
+            <br />
+          </form>
+
+          <div class="text-center">
+            <a
+              class="small"
+              href="{% url 'login'%}"
+              style="text-decoration: none"
+              >Already have an account? Login!</a
+            >
+          </div>
+
+          <!-- Validate form and show dynamic fields -->
+          <script>
+            document
+              .getElementById("role")
+              .addEventListener("change", function () {
+                var role = this.value;
+                var patientFields = document.getElementById("patient-fields");
+                var healthcareFields =
+                  document.getElementById("healthcare-fields");
+                if (role === "Patient") {
+                  patientFields.style.display = "block";
+                  healthcareFields.style.display = "none";
+                } else if (role === "Healthcare Provider") {
+                  healthcareFields.style.display = "block";
+                  patientFields.style.display = "none";
+                } else {
+                  patientFields.style.display = "none";
+                  healthcareFields.style.display = "none";
+                }
+              });
+
+            document
+              .getElementById("date_of_birth")
+              .addEventListener("input", function () {
+                var inputDate = new Date(this.value);
+                var today = new Date();
+
+                if (inputDate > today) {
+                  alert("Date of birth cannot be in the future.");
+                  this.value = ""; // Clear the input if the date is invalid
+                }
+              });
+
             function validateForm() {
               var email = document.getElementById("email").value;
               var xhr = new XMLHttpRequest();
@@ -225,4 +803,5 @@
     </div>
   </div>
 </div>
+
 {% endblock %}

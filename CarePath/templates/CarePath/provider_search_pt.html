@@ -1,0 +1,129 @@
+{% extends "CarePath/layout.html" %} {% block title %} Search Patient
+{%endblock%} {% block content %}
+
+<div style="display: flex; min-height: 60vh; margin: 0 5px">
+  <!-- Sidebar -->
+  <div
+    class="sidebar"
+    style="
+      position: relative;
+      min-height: 74vh;
+      width: 270px;
+      margin-right: 20px;
+    "
+  >
+    <div class="user-info">
+      <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+      <p>{{ user.role }}</p>
+    </div>
+    <div class="nav flex-column flex-grow-1">
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'home' %}">Home</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_profile' %}">My Profile</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_password' %}">Change Password</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_appt' %}">My Appointment</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">Search for a Patient</a>
+      </div>
+    </div>
+    <!-- Log Out link -->
+    <form
+      id="logout-form"
+      action="{% url 'logout' %}"
+      method="post"
+      style="display: none"
+    >
+      {% csrf_token %}
+    </form>
+    <a
+      href="#"
+      class="nav-item nav-link"
+      style="
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+        background-color: #2a72b9;
+        color: white;
+        text-decoration: none;
+        border-top: 1px solid #2a72b9;
+        display: block;
+      "
+      onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+      >Log Out</a
+    >
+  </div>
+
+  <!-- Main Content -->
+  <div style="flex-grow: 1; padding: 10px; text-align: left">
+    <h2>Enter Patient's Name to Search</h2>
+
+    <!-- Main Content -->
+    <div style="flex-grow: 1; padding: 10px; text-align: left">
+      <div class="row">
+        <div class="col-12 col-md-8 col-lg-6">
+          <div style="padding: 8px; text-align: left">
+            <h2>Enter Patient's Name to Search</h2>
+
+            <form method="GET" action="{% url 'search_patient' %}">
+              <div class="form-group">
+                <input
+                  type="text"
+                  name="q"
+                  placeholder="Enter patient name"
+                  class="form-control"
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+
+            {% if patients %}
+            <h3>Search Results</h3>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for patient in patients %}
+                <tr>
+                  <td>{{ patient.first_name }}</td>
+                  <td>{{ patient.last_name }}</td>
+                  <td>
+                    <a
+                      href="{% url 'patient_profile' patient.id %}"
+                      class="btn btn-info btn-sm"
+                      >View Info</a
+                    >
+                    <a
+                     
+                      href="#"
+                      class="btn btn-success btn-sm"
+                      >Book Appointment</a
+                    >
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <p>No patients found.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

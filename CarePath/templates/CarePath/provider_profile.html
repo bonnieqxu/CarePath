@@ -1,5 +1,5 @@
-{% extends "CarePath/layout.html" %} {% block title %} Patient Profile
-{%endblock %} {% block content %}
+{% extends "CarePath/layout.html" %} {% block title %} Healthcare Provider
+Profile {% endblock %} {% block content %}
 
 <div style="display: flex; min-height: 60vh; margin: 0 5px">
   <!-- Sidebar -->
@@ -21,13 +21,16 @@
         <a href="{% url 'home' %}">Home</a>
       </div>
       <div class="nav-item" style="text-align: center">
-        <a href="{% url 'patient_profile' %}">My Profile</a>
+        <a href="{% url 'provider_profile' %}">My Profile</a>
       </div>
       <div class="nav-item" style="text-align: center">
-        <a href="{% url 'patient_password' %}">Change Password</a>
+        <a href="{% url 'provider_password' %}">Change Password</a>
       </div>
       <div class="nav-item" style="text-align: center">
-        <a href="{% url 'patient_appt' %}">My Appointment</a>
+        <a href="{% url 'provider_appt' %}">My Appointment</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">Search for a Patient</a>
       </div>
     </div>
     <!-- Log Out link -->
@@ -93,17 +96,6 @@
               />
             </div>
             <div class="form-group">
-              <label for="last_name">Date of Birth:</label>
-              <input
-                type="text"
-                class="form-control"
-                id="date_of_birth"
-                name="date_of_birth"
-                value="{{ user.date_of_birth|date:'d-m-Y' }}"
-                required
-              />
-            </div>
-            <div class="form-group">
               <label for="email">Email:</label>
               <input
                 type="email"
@@ -149,4 +141,5 @@
     </div>
   </div>
 </div>
+
 {% endblock %}
