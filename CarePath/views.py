@@ -238,12 +238,20 @@ def register(request):
 
         # Set additional fields for patients
         if role == 'Patient':
-            user.date_of_birth = date_of_birth
-            user.address = address
+            # user.date_of_birth = date_of_birth
+            # user.address = address
+            if date_of_birth:  # Only set date_of_birth if it is provided
+                user.date_of_birth = date_of_birth
+            if address:
+                user.address = address
 
         if role == 'Healthcare Provider':
-            user.department = department
-            user.provider_role = provider_role
+            # user.department = department
+            # user.provider_role = provider_role
+            if department:
+                user.department = department
+            if provider_role:
+                user.provider_role = provider_role
 
         user.save()
         

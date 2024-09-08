@@ -124,7 +124,7 @@ Profile {% endblock %} {% block content %}
                 class="form-control"
                 id="department"
                 name="department"
-                value="{{ user.department }}"
+                value="{{ user.department|default_if_none:'' }}"
                 required
               />
             </div>
@@ -135,7 +135,7 @@ Profile {% endblock %} {% block content %}
                 class="form-control"
                 id="provider_role"
                 name="provider_role"
-                value="{{ user.provider_role }}"
+                value="{{ user.provider_role|default_if_none:'' }}"
                 required
               />
             </div>

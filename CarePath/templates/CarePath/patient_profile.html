@@ -99,7 +99,8 @@
                 class="form-control"
                 id="date_of_birth"
                 name="date_of_birth"
-                value="{{ user.date_of_birth|date:'d-m-Y' }}"
+                value="{{ user.date_of_birth|default_if_none:''|date:'d-m-Y' }}"
+                placeholder="DD-MM-YYYY"
                 required
               />
             </div>
@@ -132,7 +133,7 @@
                 class="form-control"
                 id="address"
                 name="address"
-                value="{{ user.address }}"
+                value="{{ user.address|default_if_none:'' }}"
                 required
               />
             </div>
