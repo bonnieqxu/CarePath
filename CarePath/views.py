@@ -484,9 +484,67 @@ class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     
 
 # display healthcare provider appointments
+# @login_required
+# def provider_appt(request):
+#     return render(request, 'CarePath/provider_appt.html')
+
+# display healthcare provider appointments
 @login_required
 def provider_appt(request):
-    return render(request, 'CarePath/provider_appt.html')
+    # Get all appointments where the provider is the logged-in user, sorted by date and time
+    appointments = Appointment.objects.filter(provider=request.user).order_by('date', 'start_time')
+
+    # Calculate duration and pass it along with the appointments to the template
+    appointment_data = []
+    for appt in appointments:
+        # Combine date and time to create datetime objects
+        start_datetime = datetime.combine(appt.date, appt.start_time)
+        finish_datetime = datetime.combine(appt.date, appt.finish_time)
+        duration = finish_datetime - start_datetime  # Calculate the duration as timedelta
+
+        # Convert duration to minutes
+        duration_in_minutes = duration.total_seconds() / 60
+
+        appointment_data.append({
+            'date': appt.date,
+            'start_time': appt.start_time,
+            'finish_time': appt.finish_time,
+            'duration': duration_in_minutes,
+            'location': appt.location,
+            'notes': appt.notes,
+            'patient_name': f"{appt.patient.first_name} {appt.patient.last_name}",
+            'patient_id': appt.patient.id,
+            'appointment_id': appt.id
+        })
+
+    return render(request, 'CarePath/provider_appt.html', {
+        'appointment_data': appointment_data
+    })
+
+
+
+#  view more appt info
+@login_required
+def view_more_appt_info(request, patient_id, appointment_id):
+    # Get patient and appointment details
+    patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+    appointment = get_object_or_404(Appointment, id=appointment_id, patient=patient)
+
+    # Combine date and time to create datetime objects
+    start_datetime = datetime.combine(appointment.date, appointment.start_time)
+    finish_datetime = datetime.combine(appointment.date, appointment.finish_time)
+    
+    # Calculate the duration in minutes
+    duration = finish_datetime - start_datetime
+    duration_in_minutes = duration.total_seconds() / 60
+
+    return render(request, 'CarePath/view_more_appt_info.html', {
+        'patient': patient,
+        'appointment': appointment,
+        'duration_in_minutes': duration_in_minutes
+    })
+
+
 
 # search pt
 @login_required

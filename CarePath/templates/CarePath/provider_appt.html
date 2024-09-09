@@ -30,11 +30,9 @@
         <a href="{% url 'provider_appt' %}">My Appointment</a>
       </div>
       <div class="nav-item" style="text-align: center">
-        <a href="{% url 'provider_search_pt' %}">Search for a Patient</a>
+        <a href="{% url 'provider_search_pt' %}">Book a New Appointment</a>
       </div>
-      <div class="nav-item" style="text-align: center">
-        <a href="#">Book a New Appointment</a>
-      </div>
+      
     </div>
     <!-- Log Out link -->
     <form
@@ -72,8 +70,47 @@
       <div class="col-12 col-md-8 col-lg-6">
         <div style="padding: 8px; text-align: left">
           <h2>My Appointments</h2>
-          <p>Click to view more info</p>
-          <hr />
+          
+          
+
+          {% if appointment_data %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Start Time</th>
+        <th>Finish Time</th>
+        <th>Duration</th>
+        <th>Location</th>
+        <th>Notes</th>
+        <th>Patient</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for appointment in appointment_data %}
+      <tr>
+        <td>{{ appointment.date|date:'d-m-Y' }}</td>
+        <td>{{ appointment.start_time }}</td>
+        <td>{{ appointment.finish_time }}</td>
+        <!-- <td>{{ appointment.duration }}</td> -->
+        <td>{{ appointment.duration|floatformat:0 }} minutes</td>
+
+        <td>{{ appointment.location }}</td>
+        <td>{{ appointment.notes|default:"No notes available" }}</td>
+        <td>{{ appointment.patient_name }}</td>
+        <td>
+          <!-- Button to navigate to view patient and appointment info -->
+          <a href="{% url 'view_more_appt_info' appointment.patient_id appointment.appointment_id %}" class="btn btn-info btn-sm">View Info</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No appointments found.</p>
+  {% endif %}
+</div>
         </div>
       </div>
     </div>

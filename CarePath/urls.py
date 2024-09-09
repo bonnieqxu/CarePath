@@ -63,6 +63,10 @@ urlpatterns = [
     path('provider_profile/', views.provider_profile, name='provider_profile'),
     path('provider_password/', CustomPasswordChangeView.as_view(), name='provider_password'),
     path('provider_appt/', views.provider_appt, name='provider_appt'),
+
+    path('view_more_appt_info/<int:patient_id>/<int:appointment_id>/', views.view_more_appt_info, name='view_more_appt_info'),
+
+
     path('provider_search_pt/', views.provider_search_pt, name='provider_search_pt'),
     # path('provider_view_pt/<int:id>/', views.provider_view_pt, name='patient_profile'),
     path('provider_view_pt/<int:patient_id>/', views.provider_view_pt, name='provider_view_pt'),
