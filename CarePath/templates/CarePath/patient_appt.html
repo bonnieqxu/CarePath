@@ -21,7 +21,7 @@
         <a href="{% url 'home' %}">Home</a>
       </div>
       <div class="nav-item" style="text-align: center">
-        <a href="{% url 'patient_profile' %}">My Profile</a>
+        <a href="{% url 'patient_profile' user.id %}">My Profile</a>
       </div>
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_password' %}">Change Password</a>
@@ -60,18 +60,57 @@
   </div>
 
   <!-- Main Content -->
-
   <div style="flex-grow: 1; padding: 10px; text-align: left">
     <div class="row">
       <div class="col-12 col-md-8 col-lg-6">
         <div style="padding: 8px; text-align: left">
           <h2>My Appointments</h2>
           <p>Click to view more info</p>
-          <hr />
 
+          {% if appointment_data %}
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>Finish Time</th>
+                <th>Duration</th>
+                <th>Location</th>
+                <th>Notes</th>
+                <th>Provider</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for appointment in appointment_data %}
+              <tr>
+                <td>{{ appointment.date|date:'d-m-Y' }}</td>
+                <td>{{ appointment.start_time }}</td>
+                <td>{{ appointment.finish_time }}</td>
+                <td>{{ appointment.duration|floatformat:0 }} minutes</td>
+                <td>{{ appointment.location }}</td>
+                <td>{{ appointment.notes|default:"No notes available" }}</td>
+                <td>{{ appointment.provider_name }}</td>
 
-
-          
+                <td>
+                  {% if appointment.provider.id %}
+                  <!-- Button to navigate to view provider details -->
+                  <a
+                    href="{% url 'view_provider_details' appointment.provider.id %}"
+                    class="btn btn-info btn-sm"
+                    >View Provider Details</a
+                  >
+                  {% else %}
+                  <span>No provider assigned</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No appointments found.</p>
+          {% endif %}
         </div>
       </div>
     </div>

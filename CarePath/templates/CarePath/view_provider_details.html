@@ -1,7 +1,5 @@
-{% extends "CarePath/layout.html" %} {% block title %} Patient Dashboard
-{%endblock %} {% block content %}
-
-<!-- dashboard container -->
+{% extends "CarePath/layout.html" %} {% block title %} Healthcare Provider
+Details {% endblock %} {% block content %}
 
 <div style="display: flex; min-height: 60vh; margin: 0 5px">
   <!-- Sidebar -->
@@ -61,13 +59,45 @@
     >
   </div>
 
-  <!-- Main Content -->
   <div style="flex-grow: 1; padding: 10px; text-align: left">
-    <h2>
-      Welcome to your Dashboard, {{ user.first_name }} {{ user.last_name }}!
-    </h2>
-    <p>Select an option from the sidebar to get started.</p>
+    <div class="row">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div style="padding: 8px; text-align: left">
+          <h2>Provider Details</h2>
+          <br /><br />
+          <table class="table table-bordered">
+            <tr>
+              <th>First Name:</th>
+              <td>{{ provider.first_name }}</td>
+            </tr>
+            <tr>
+              <th>Last Name:</th>
+              <td>{{ provider.last_name }}</td>
+            </tr>
+            <tr>
+              <th>Email:</th>
+              <td>{{ provider.email }}</td>
+            </tr>
+            <tr>
+              <th>Phone Number:</th>
+              <td>{{ provider.phone_number }}</td>
+            </tr>
+            <tr>
+              <th>Department:</th>
+              <td>{{ provider.department }}</td>
+            </tr>
+            <tr>
+              <th>Role:</th>
+              <td>{{ provider.provider_role }}</td>
+            </tr>
+          </table>
+          <br />
+          <a href="{% url 'patient_appt' %}" class="btn btn-secondary"
+            >Back to Appointments</a
+          >
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-
 {% endblock %}

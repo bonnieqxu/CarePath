@@ -402,7 +402,7 @@ def patient_profile(request, id):
 
 
 # change password
-class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'CarePath/patient_password.html'
     success_url = reverse_lazy('patient_profile')
 
@@ -426,11 +426,75 @@ class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     
 
 # display pt appointments
+# @login_required
+# def patient_appt(request):
+#     return render(request, 'CarePath/patient_appt.html')
+
+
 @login_required
 def patient_appt(request):
-    return render(request, 'CarePath/patient_appt.html')
+    # Get all appointments where the patient is the logged-in user, sorted by date and time
+    appointments = Appointment.objects.filter(patient=request.user).order_by('date', 'start_time')
+
+    # Calculate duration and pass it along with the appointments to the template
+    appointment_data = []
+    for appt in appointments:
 
 
+
+        # Combine date and time to create datetime objects
+        start_datetime = datetime.combine(appt.date, appt.start_time)
+        finish_datetime = datetime.combine(appt.date, appt.finish_time)
+        duration = finish_datetime - start_datetime  # Calculate the duration as timedelta
+
+        # Convert duration to minutes
+        duration_in_minutes = duration.total_seconds() / 60
+
+        # appointment_data.append({
+        #     'date': appt.date,
+        #     'start_time': appt.start_time,
+        #     'finish_time': appt.finish_time,
+        #     'duration': duration_in_minutes,
+        #     'location': appt.location,
+        #     'notes': appt.notes,
+        #     'provider_name': f"{appt.provider.first_name} {appt.provider.last_name}",
+        #     'appointment_id': appt.id
+        # })
+
+        appointment_data.append({
+            'date': appt.date,
+            'start_time': appt.start_time,
+            'finish_time': appt.finish_time,
+            'duration': duration_in_minutes,
+            'location': appt.location,
+            'notes': appt.notes,
+            'patient_name': f"{appt.patient.first_name} {appt.patient.last_name}",
+            # 'provider': appt.provider,  
+            'provider_name': f"{appt.provider.first_name} {appt.provider.last_name}",
+            'provider': appt.provider,  
+            'patient_id': appt.patient.id,
+            'appointment_id': appt.id
+        })
+
+
+    return render(request, 'CarePath/patient_appt.html', {
+        'appointment_data': appointment_data
+    })
+
+# @login_required
+# def view_provider_details(request, provider_id):
+#     # Get provider details
+#     provider = get_object_or_404(CustomUser, id=provider_id, role='Healthcare Provider')
+#     return render(request, 'CarePath/view_provider_details.html', {
+#         'provider': provider
+#     })
+@login_required
+def view_provider_details(request, provider_id):
+    provider = get_object_or_404(CustomUser, id=provider_id)
+    print(f"Provider ID: {provider.id}, Name: {provider.first_name} {provider.last_name}, Role: {provider.role}")
+    return render(request, 'CarePath/view_provider_details.html', {
+        'provider': provider
+    })
 
 
 
@@ -460,7 +524,7 @@ def provider_profile(request):
 
 
 # change password
-class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+class ProviderPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'CarePath/provider_password.html'
     success_url = reverse_lazy('provider_profile')
 

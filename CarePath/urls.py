@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from CarePath import views
-from .views import CustomPasswordChangeView
+from .views import PatientPasswordChangeView, ProviderPasswordChangeView
 # from CarePath.models import 
 
 
@@ -56,12 +56,13 @@ urlpatterns = [
     # patient dashboard functions
     # path('patient_profile/', views.patient_profile, name='patient_profile'),
     path('patient_profile/<int:id>/', views.patient_profile, name='patient_profile'),
-    path('patient_password/', CustomPasswordChangeView.as_view(), name='patient_password'),
+    path('patient_password/', PatientPasswordChangeView.as_view(), name='patient_password'),
     path('patient_appt/', views.patient_appt, name='patient_appt'),
+    path('view_provider_details/<int:provider_id>/', views.view_provider_details, name='view_provider_details'),
 
     # healthcare provider dashboard functions
     path('provider_profile/', views.provider_profile, name='provider_profile'),
-    path('provider_password/', CustomPasswordChangeView.as_view(), name='provider_password'),
+    path('provider_password/', ProviderPasswordChangeView.as_view(), name='provider_password'),
     path('provider_appt/', views.provider_appt, name='provider_appt'),
 
     path('view_more_appt_info/<int:patient_id>/<int:appointment_id>/', views.view_more_appt_info, name='view_more_appt_info'),
