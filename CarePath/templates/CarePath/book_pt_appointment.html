@@ -35,6 +35,7 @@
       <div class="nav-item" style="text-align: center">
         <a href="#">Book a New Appointment</a>
       </div>
+      
     </div>
     <!-- Log Out link -->
     <form
@@ -70,7 +71,17 @@
     <h2>Book Appointment for {{ patient.first_name }} {{ patient.last_name }}</h2>
     <hr />
 
-
+    {% if messages %}
+    <div>
+      {% for message in messages %}
+      <div class="alert {% if 'error' in message.tags %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  
     
   <form method="post"  action="{% url 'book_pt_appointment' patient.id %}">
     {% csrf_token %}

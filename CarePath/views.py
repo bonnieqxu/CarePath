@@ -547,7 +547,29 @@ def book_pt_appointment(request, patient_id):
             messages.error(request, "Start time must be earlier than finish time.")
             return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient})
 
-        # Create a new appointment
+
+         # Check if the patient already has an appointment at the chosen time
+        patient_conflict = Appointment.objects.filter(
+            patient=patient,
+            date=date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exists()
+
+        # Check if the provider already has an appointment at the chosen time
+        provider_conflict = Appointment.objects.filter(
+            provider=provider,
+            date=date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exists()
+
+        if patient_conflict or provider_conflict:
+            messages.error(request, "The patient or provider already has an appointment at the chosen time.")
+            return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient, 'providers': providers})
+
+
+        # Create a new appointment if there are no conflicts
         appointment = Appointment.objects.create(
             patient=patient,
             provider=provider,
