@@ -90,9 +90,7 @@
                 <td>{{ appointment.date|date:'d-m-Y' }}</td>
                 <td>{{ appointment.start_time }}</td>
                 <td>{{ appointment.finish_time }}</td>
-                <!-- <td>{{ appointment.duration }}</td> -->
                 <td>{{ appointment.duration|floatformat:0 }} minutes</td>
-
                 <td>{{ appointment.location }}</td>
                 <td>{{ appointment.notes|default:"No notes available" }}</td>
                 <td>{{ appointment.patient_name }}</td>

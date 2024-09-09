@@ -154,48 +154,8 @@ def team(request):
 
 
 
-# register a new account
-# def register(request):
-#     if request.method == "POST":
-#         first_name = request.POST['first_name']
-#         last_name = request.POST['last_name']
-#         phone_number = request.POST['phone_number']
-#         email = request.POST['email']
-#         address = request.POST['address']
-#         password = request.POST['password']
-#         confirm_password = request.POST['confirm_password']
-#         role = request.POST['role']
 
-#         if password != confirm_password:
-#             return render(request, 'CarePath/register.html', {'error': "Passwords do not match"})
-
-#         if CustomUser.objects.filter(email=email).exists():
-#             return render(request, 'CarePath/register.html', {'error': "Email already in use"})
-
-#         # Create the new user
-#         user = CustomUser.objects.create_user(
-#             username=email,  # email is used as the username
-#             email=email,
-#             first_name=first_name,
-#             last_name=last_name,
-#             phone_number=phone_number,
-#             address=address,
-#             password=password,
-#             role=role,
-#         )
-
-#         user.save()
-#         group = Group.objects.get(name=role)
-#         user.groups.add(group)
-
-#         return redirect('login')  # Redirect to the login page after successful registration
-
-#     return render(request, 'CarePath/register.html')
-
-
-
-
-
+# create a new account
 def register(request):
     today_date = date.today().strftime('%Y-%m-%d')  # Format today's date as YYYY-MM-DD
     if request.method == "POST":
@@ -241,16 +201,12 @@ def register(request):
 
         # Set additional fields for patients
         if role == 'Patient':
-            # user.date_of_birth = date_of_birth
-            # user.address = address
-            if date_of_birth:  # Only set date_of_birth if it is provided
+            if date_of_birth:  
                 user.date_of_birth = date_of_birth
             if address:
                 user.address = address
 
         if role == 'Healthcare Provider':
-            # user.department = department
-            # user.provider_role = provider_role
             if department:
                 user.department = department
             if provider_role:
@@ -266,7 +222,7 @@ def register(request):
 
     return render(request, 'CarePath/register.html', {'today_date': today_date})
 
-
+# ---------------------------- VISITOR related views ends -----------------------
 
 
 
@@ -328,34 +284,6 @@ def dashboard(request):
 
 #----------------------------- patient dashboard functions -----------------------
 # view and edit profile info
-# @login_required
-# def patient_profile(request):
-#     user = request.user
-
-#     if request.method == "POST":
-#         # update info
-#         user.first_name = request.POST['first_name']
-#         user.last_name = request.POST['last_name']
-#         date_of_birth_str = request.POST['date_of_birth']
-#         try:
-#             date_of_birth = datetime.strptime(date_of_birth_str, '%d-%m-%Y').date()  # Parse the date
-#             user.date_of_birth = date_of_birth
-#         except ValueError:
-#             messages.error(request, "Invalid date format. Please use DD-MM-YYYY.")
-#             return render(request, 'CarePath/patient_profile.html', {'user': user})
-
-
-#         user.email = request.POST['email']
-#         user.phone_number = request.POST['phone_number']
-#         user.address = request.POST['address']
-#         user.save()
-
-#         messages.success(request, "Your profile has been updated successfully!")
-#         return redirect('patient_profile')  
-
-#     return render(request, 'CarePath/patient_profile.html', {
-#         'user': user,
-#     })
 @login_required
 def patient_profile(request, id):
      # Get the patient based on the provided id
@@ -398,9 +326,6 @@ def patient_profile(request, id):
 
 
 
-
-
-
 # change password
 class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'CarePath/patient_password.html'
@@ -426,11 +351,6 @@ class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     
 
 # display pt appointments
-# @login_required
-# def patient_appt(request):
-#     return render(request, 'CarePath/patient_appt.html')
-
-
 @login_required
 def patient_appt(request):
     # Get all appointments where the patient is the logged-in user, sorted by date and time
@@ -439,9 +359,6 @@ def patient_appt(request):
     # Calculate duration and pass it along with the appointments to the template
     appointment_data = []
     for appt in appointments:
-
-
-
         # Combine date and time to create datetime objects
         start_datetime = datetime.combine(appt.date, appt.start_time)
         finish_datetime = datetime.combine(appt.date, appt.finish_time)
@@ -449,17 +366,6 @@ def patient_appt(request):
 
         # Convert duration to minutes
         duration_in_minutes = duration.total_seconds() / 60
-
-        # appointment_data.append({
-        #     'date': appt.date,
-        #     'start_time': appt.start_time,
-        #     'finish_time': appt.finish_time,
-        #     'duration': duration_in_minutes,
-        #     'location': appt.location,
-        #     'notes': appt.notes,
-        #     'provider_name': f"{appt.provider.first_name} {appt.provider.last_name}",
-        #     'appointment_id': appt.id
-        # })
 
         appointment_data.append({
             'date': appt.date,
@@ -469,7 +375,6 @@ def patient_appt(request):
             'location': appt.location,
             'notes': appt.notes,
             'patient_name': f"{appt.patient.first_name} {appt.patient.last_name}",
-            # 'provider': appt.provider,  
             'provider_name': f"{appt.provider.first_name} {appt.provider.last_name}",
             'provider': appt.provider,  
             'patient_id': appt.patient.id,
@@ -481,13 +386,7 @@ def patient_appt(request):
         'appointment_data': appointment_data
     })
 
-# @login_required
-# def view_provider_details(request, provider_id):
-#     # Get provider details
-#     provider = get_object_or_404(CustomUser, id=provider_id, role='Healthcare Provider')
-#     return render(request, 'CarePath/view_provider_details.html', {
-#         'provider': provider
-#     })
+# pt view their healthcare provider details
 @login_required
 def view_provider_details(request, provider_id):
     provider = get_object_or_404(CustomUser, id=provider_id)
@@ -495,6 +394,8 @@ def view_provider_details(request, provider_id):
     return render(request, 'CarePath/view_provider_details.html', {
         'provider': provider
     })
+
+
 
 
 
@@ -548,11 +449,6 @@ class ProviderPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     
 
 # display healthcare provider appointments
-# @login_required
-# def provider_appt(request):
-#     return render(request, 'CarePath/provider_appt.html')
-
-# display healthcare provider appointments
 @login_required
 def provider_appt(request):
     # Get all appointments where the provider is the logged-in user, sorted by date and time
@@ -584,7 +480,6 @@ def provider_appt(request):
     return render(request, 'CarePath/provider_appt.html', {
         'appointment_data': appointment_data
     })
-
 
 
 #  view more appt info
@@ -628,11 +523,8 @@ def provider_search_pt(request):
 
     return render(request, 'CarePath/provider_search_pt.html', context)
 
+
 # view pt profile
-# @login_required
-# def provider_view_pt(request, id):
-#     patient = get_object_or_404(CustomUser, id=id, role='Patient')
-#     return render(request, 'CarePath/patient_profile.html', {'user': patient, 'is_editable': False})
 @login_required
 def provider_view_pt(request, id):
     # Get the patient by ID
@@ -646,7 +538,7 @@ def provider_view_pt(request, id):
     })
 
 
-# choose a patient to book appt
+# book an appt for the chosen pt
 @login_required
 def book_pt_appointment(request, patient_id):
     patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
@@ -668,7 +560,6 @@ def book_pt_appointment(request, patient_id):
         if time.fromisoformat(start_time) >= time.fromisoformat(finish_time):
             messages.error(request, "Start time must be earlier than finish time.")
             return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient})
-
 
          # Check if the patient already has an appointment at the chosen time
         patient_conflict = Appointment.objects.filter(
@@ -708,3 +599,6 @@ def book_pt_appointment(request, patient_id):
         return redirect('provider_appt')
 
     return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient, 'providers': providers })
+
+
+

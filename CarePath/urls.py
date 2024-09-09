@@ -36,8 +36,6 @@ urlpatterns = [
     path('mouthcare_post_pdf/', views.mouthcare_post_pdf, name='mouthcare_post_pdf'),
 
 
-
-
     # team page
     path("team/", views.team, name="team"),
 
@@ -54,7 +52,6 @@ urlpatterns = [
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
 
     # patient dashboard functions
-    # path('patient_profile/', views.patient_profile, name='patient_profile'),
     path('patient_profile/<int:id>/', views.patient_profile, name='patient_profile'),
     path('patient_password/', PatientPasswordChangeView.as_view(), name='patient_password'),
     path('patient_appt/', views.patient_appt, name='patient_appt'),
@@ -64,14 +61,9 @@ urlpatterns = [
     path('provider_profile/', views.provider_profile, name='provider_profile'),
     path('provider_password/', ProviderPasswordChangeView.as_view(), name='provider_password'),
     path('provider_appt/', views.provider_appt, name='provider_appt'),
-
     path('view_more_appt_info/<int:patient_id>/<int:appointment_id>/', views.view_more_appt_info, name='view_more_appt_info'),
-
-
     path('provider_search_pt/', views.provider_search_pt, name='provider_search_pt'),
-    # path('provider_view_pt/<int:id>/', views.provider_view_pt, name='patient_profile'),
     path('provider_view_pt/<int:patient_id>/', views.provider_view_pt, name='provider_view_pt'),
-
     path('book_pt_appointment/<int:patient_id>/', views.book_pt_appointment, name='book_pt_appointment'),
 
 ]
