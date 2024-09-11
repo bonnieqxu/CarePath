@@ -1,0 +1,194 @@
+{% extends "CarePath/layout.html" %} {% block title %} Edit Appointment
+{%endblock %} {% block content %}
+
+<div style="display: flex; min-height: 60vh; margin: 0 5px">
+  <!-- Sidebar -->
+  <div
+    class="sidebar"
+    style="
+      position: relative;
+      min-height: 74vh;
+      width: 270px;
+      margin-right: 20px;
+    "
+  >
+    <div class="user-info">
+      <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+      <p>{{ user.role }}</p>
+    </div>
+    <div class="nav flex-column flex-grow-1">
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'home' %}">Home</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_profile' %}">My Profile</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_password' %}">Change Password</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_appt' %}">My Appointment</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_search_pt' %}">Book a New Appointment</a>
+      </div>
+    </div>
+    <!-- Log Out link -->
+    <form
+      id="logout-form"
+      action="{% url 'logout' %}"
+      method="post"
+      style="display: none"
+    >
+      {% csrf_token %}
+    </form>
+    <a
+      href="#"
+      class="nav-item nav-link"
+      style="
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+        background-color: #2a72b9;
+        color: white;
+        text-decoration: none;
+        border-top: 1px solid #2a72b9;
+        display: block;
+      "
+      onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+      >Log Out</a
+    >
+  </div>
+
+  <!-- Main Content -->
+
+  <div style="flex-grow: 1; padding: 10px; text-align: left">
+    <div class="row">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div style="padding: 8px; text-align: left">
+          <h2>
+            Edit Appointment for {{ patient.first_name }} {{ patient.last_name}}
+          </h2>
+
+          <!-- Display error and success messages -->
+          {% if messages %}
+          <div>
+            {% for message in messages %}
+            <!-- <div
+              class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}"
+            > -->
+            <div
+              class="alert {% if 'error' in message.tags %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}"
+            >
+              {{ message }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label for="date">Date:</label>
+              <input
+                type="date"
+                id="date"
+                name="date"
+                class="form-control"
+                value="{{ appointment.date|date:'Y-m-d' }}"
+                required
+                min="{{ today }}"
+              />
+            </div>
+
+            <script>
+              // Get today's date in YYYY-MM-DD format
+              var today = new Date().toISOString().split("T")[0];
+              // Set the min attribute to today's date to restrict past dates
+              document.getElementById("date").setAttribute("min", today);
+            </script>
+
+            <div class="form-group">
+              <label for="start_time">Start Time:</label>
+              <input
+                type="time"
+                id="start_time"
+                name="start_time"
+                class="form-control"
+                value="{{ appointment.start_time|time:'H:i' }}"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="finish_time">Finish Time:</label>
+              <input
+                type="time"
+                id="finish_time"
+                name="finish_time"
+                class="form-control"
+                value="{{ appointment.finish_time|time:'H:i' }}"
+                required
+              />
+            </div>
+
+            <!-- <div class="form-group">
+              <label for="location">Location:</label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                class="form-control"
+                value="{{ appointment.location }}"
+                required
+              />
+            </div> -->
+            
+            {{ appointment.location }}
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <select id="location" name="location" class="form-control" required>
+                  <option value="Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre, Auckland"
+                    {% if appointment.location == "Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre" %}selected{% endif %}>
+                    Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre, Auckland
+                  </option>
+                  <option value="Level 2 Outpatient Clinic, Building 1, Auckland City Hospital, Auckland"
+                    {% if appointment.location == "Level 2 Outpatient Clinic, Building 1, Auckland City Hospital" %}selected{% endif %}>
+                    Level 2 Outpatient Clinic, Building 1, Auckland City Hospital, Auckland
+                  </option>
+                  <!-- Fallback if location doesn't match any predefined options -->
+                  <!-- <option value="{{ appointment.location }}" 
+                    {% if appointment.location != "Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre, Auckland" and appointment.location != "Level 2 Outpatient Clinic, Building 1, Auckland City Hospital, Auckland" %}selected{% endif %}>
+                    {{ appointment.location }}
+                  </option> -->
+                </select>
+              </div>
+              
+              
+              
+              
+              
+              
+
+            <div class="form-group">
+              <label for="notes">Notes:</label>
+              <textarea id="notes" name="notes" class="form-control">
+{{ appointment.notes }}</textarea
+              >
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'provider_appt' %}" class="btn btn-secondary"
+              >Cancel</a
+            >
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

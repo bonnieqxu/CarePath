@@ -70,7 +70,17 @@
         <div style="padding: 8px; text-align: left">
           <h2>My Appointments</h2>
 
-          {% if appointment_data %}
+          {% if messages %}
+          <div>
+            {% for message in messages %}
+            <div
+              class="alert {% if 'error' in message.tags %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}"
+            >
+              {{ message }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %} {% if appointment_data %}
           <table class="table table-striped">
             <thead>
               <tr>
@@ -93,14 +103,36 @@
                 <td>{{ appointment.duration|floatformat:0 }} minutes</td>
                 <td>{{ appointment.location }}</td>
                 <td>{{ appointment.notes|default:"No notes available" }}</td>
-                <td>{{ appointment.patient_name }}</td>
+                <!-- <td>{{ appointment.patient_name }}</td> -->
                 <td>
-                  <!-- Button to navigate to view patient and appointment info -->
                   <a
                     href="{% url 'view_more_appt_info' appointment.patient_id appointment.appointment_id %}"
-                    class="btn btn-info btn-sm"
-                    >View Info</a
                   >
+                    {{ appointment.patient_name }}
+                  </a>
+                  <!-- <a href="{% url 'patient_profile' appointment.patient_id %}">
+                    {{ appointment.patient_name }}
+                  </a> -->
+                </td>
+
+                <td>
+                  <div class="d-flex">
+                    <!-- Button to navigate to view patient and appointment info -->
+                    <a
+                      href="{% url 'edit_appt' appointment.patient_id appointment.appointment_id %}"
+                      class="btn btn-warning btn-sm"
+                      style="margin-right: 10px"
+                      >Edit</a
+                    >
+
+                    <!-- Cancel appointment button with confirmation -->
+                    <a
+                      href="{% url 'cancel_appt' appointment.appointment_id %}"
+                      class="btn btn-danger btn-sm"
+                      onclick="return confirm('Are you sure you want to cancel this appointment?');"
+                      >Cancel</a
+                    >
+                  </div>
                 </td>
               </tr>
               {% endfor %}

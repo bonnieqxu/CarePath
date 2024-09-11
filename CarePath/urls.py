@@ -62,9 +62,15 @@ urlpatterns = [
     path('provider_password/', ProviderPasswordChangeView.as_view(), name='provider_password'),
     path('provider_appt/', views.provider_appt, name='provider_appt'),
     path('view_more_appt_info/<int:patient_id>/<int:appointment_id>/', views.view_more_appt_info, name='view_more_appt_info'),
+    path('edit_appt/<int:patient_id>/<int:appointment_id>/', views.edit_appt, name='edit_appt'),
+
     path('provider_search_pt/', views.provider_search_pt, name='provider_search_pt'),
     path('provider_view_pt/<int:patient_id>/', views.provider_view_pt, name='provider_view_pt'),
     path('book_pt_appointment/<int:patient_id>/', views.book_pt_appointment, name='book_pt_appointment'),
+    path('cancel_appt/<int:appointment_id>/', views.cancel_appt, name='cancel_appt'),
+
+
+
 
 ]
 

@@ -1,6 +1,6 @@
 import re
 import os
-from datetime import date, time
+from datetime import date, time, datetime
 
 from django.http import HttpResponse
 from django.contrib import messages
@@ -15,14 +15,14 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.utils import timezone
 from django.utils.timezone import datetime
 from django.utils.translation import gettext as _
-
+from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 from .models import CustomUser, Appointment
 from django.db.models import Q
@@ -504,6 +504,135 @@ def view_more_appt_info(request, patient_id, appointment_id):
     })
 
 
+# @login_required
+# def edit_appt(request, patient_id, appointment_id):
+#     # Get patient and appointment details
+#     patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+#     appointment = get_object_or_404(Appointment, id=appointment_id, patient=patient)
+
+#     if request.method == "POST":
+#         # Process the form submission
+#         appointment.date = request.POST['date']
+#         appointment.start_time = request.POST['start_time']
+#         appointment.finish_time = request.POST['finish_time']
+#         appointment.location = request.POST['location']
+#         appointment.notes = request.POST.get('notes', '')
+
+#         # Validate that the start time is before the finish time
+#         start_datetime = datetime.combine(appointment.date, appointment.start_time)
+#         finish_datetime = datetime.combine(appointment.date, appointment.finish_time)
+#         if start_datetime >= finish_datetime:
+#             messages.error(request, "Start time must be earlier than finish time.")
+#             return render(request, 'CarePath/edit_appt.html', {'appointment': appointment, 'patient': patient})
+
+#         # Save updated appointment
+#         appointment.save()
+
+#         # Notify the patient about the updated appointment
+#         patient_message = f"Your appointment on {appointment.date} has been updated. New time: {appointment.start_time} - {appointment.finish_time}. Location: {appointment.location}. Notes: {appointment.notes}"
+#         send_mail(
+#             'Appointment Updated',
+#             patient_message,
+#             'admin@carepath.com',
+#             [patient.email],
+#             fail_silently=False,
+#         )
+
+#         messages.success(request, "Appointment updated and the patient has been notified.")
+#         return redirect('provider_appt')
+
+#     return render(request, 'CarePath/edit_appt.html', {
+#         'appointment': appointment,
+#         'patient': patient,
+#     })
+
+
+
+
+@login_required
+def edit_appt(request, patient_id, appointment_id):
+    # Get patient and appointment details
+    patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+    appointment = get_object_or_404(Appointment, id=appointment_id, patient=patient)
+
+    if request.method == "POST":
+        location = request.POST['location']
+        notes = request.POST.get('notes', '')
+
+        # Convert the date and time from the form into datetime objects
+        try:
+            appointment_date = datetime.strptime(request.POST['date'], '%Y-%m-%d').date()
+            start_time = datetime.strptime(request.POST['start_time'], '%H:%M').time()
+            finish_time = datetime.strptime(request.POST['finish_time'], '%H:%M').time()
+        except ValueError:
+            messages.error(request, "Invalid date or time format.")
+            return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+        # Validation: Date must be a weekday (Mon-Fri)
+        if appointment_date.weekday() >= 5:  # 5 is Saturday, 6 is Sunday
+            messages.error(request, "Appointments can only be scheduled on weekdays (Mon-Fri).")
+            return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+        # Validation: Start time cannot be earlier than 8am, finish time cannot be later than 4:30pm
+        earliest_start_time = time(8, 0)  # 8:00 AM
+        latest_finish_time = time(16, 30)  # 4:30 PM
+
+        if start_time < earliest_start_time:
+            messages.error(request, "Start time cannot be earlier than 8:00 AM.")
+            return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+        if finish_time > latest_finish_time:
+            messages.error(request, "Finish time cannot be later than 4:30 PM.")
+            return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+        # Validation: Finish time must be later than start time
+        if start_time >= finish_time:
+            messages.error(request, "Finish time must be later than start time.")
+            return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+        # Check if the patient has another appointment during the same time
+        patient_conflict = Appointment.objects.filter(
+            patient=patient,
+            date=appointment_date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exclude(id=appointment_id)  # Exclude current appointment
+
+        # Check if the provider has another appointment during the same time
+        provider_conflict = Appointment.objects.filter(
+            provider=appointment.provider,
+            date=appointment_date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exclude(id=appointment_id)  # Exclude current appointment
+
+        if patient_conflict.exists() or provider_conflict.exists():
+            messages.error(request, "The patient or provider already has an appointment at the chosen time.")
+            return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+        # If no conflicts, update the appointment with new values
+        appointment.date = appointment_date
+        appointment.start_time = start_time
+        appointment.finish_time = finish_time
+        appointment.location = location
+        appointment.notes = notes
+        appointment.save()
+
+        messages.success(request, "Appointment updated successfully!")
+
+        # Send a success message to the patient
+        messages.success(request, f"A message has been sent to {patient.first_name}.")
+
+        return redirect('provider_appt')
+
+    # Pre-load current appointment data for the form
+    return render(request, 'CarePath/edit_appt.html', {
+        'patient': patient,
+        'appointment': appointment
+    })
+
+
+
 
 # search pt
 @login_required
@@ -602,3 +731,16 @@ def book_pt_appointment(request, patient_id):
 
 
 
+# cancel appt
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.urls import reverse
+
+@login_required
+def cancel_appt(request, appointment_id):
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+    appointment.delete()
+
+    messages.success(request, "The appointment has been successfully cancelled.")
+
+    return redirect(reverse('provider_appt'))
