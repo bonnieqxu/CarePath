@@ -21,7 +21,7 @@
         <a href="{% url 'home' %}">Home</a>
       </div>
       <div class="nav-item" style="text-align: center">
-        <a href="#">My Profile</a>
+        <a href="{% url 'admin_profile' %}">My Profile</a>
       </div>
       <div class="nav-item" style="text-align: center">
         <a href="#">Change Password</a>
@@ -67,8 +67,14 @@
 
   <!-- Main Content -->
   <div style="flex-grow: 1; padding: 10px; text-align: left">
+    {% if messages %}
+    <div class="alert alert-warning">
+      {% for message in messages %} {{ message }} {% endfor %}
+    </div>
+    {% endif %}
+
     <h2>
-      Welcome to your Dashboard, {{ user.first_name }} {{ user.last_name }}!
+      Welcome to your Dashboard {{ user.first_name }} {{ user.last_name }}!
     </h2>
     <p>Select an option from the sidebar to get started.</p>
   </div>

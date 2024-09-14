@@ -269,6 +269,11 @@ def provider_dashboard(request):
 
 @login_required
 def admin_dashboard(request):
+     # Check if the admin's profile is incomplete
+    if request.user.role == 'Admin' and (not request.user.first_name or not request.user.last_name):
+        messages.warning(request, 'Please complete your profile information.')
+        return redirect('admin_profile')  # Redirect to the profile page to fill in the information
+
     return render(request, 'CarePath/admin_dashboard.html')
 
 
@@ -1019,3 +1024,35 @@ def provider_feedback(request):
     feedbacks = Feedback.objects.filter(provider=request.user).order_by('-created_at')
 
     return render(request, 'CarePath/provider_feedback.html', {'feedbacks': feedbacks})
+
+
+
+
+
+
+
+
+
+# ------------------------------ admin functions -------------------------------
+
+# view and edit profile info
+@login_required
+def admin_profile(request):
+    user = request.user
+
+    if request.method == "POST":
+        # update info
+        user.first_name = request.POST['first_name']
+        user.last_name = request.POST['last_name']
+        user.email = request.POST['email']
+        user.phone_number = request.POST['phone_number']
+        user.department = request.POST['department']
+        user.provider_role = request.POST['provider_role']
+        user.save()
+
+        messages.success(request, "Your profile has been updated successfully!")
+        return redirect('admin_profile')  
+
+    return render(request, 'CarePath/admin_profile.html', {
+        'user': user,
+    })

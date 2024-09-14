@@ -96,7 +96,8 @@ urlpatterns = [
 
 
 
-
+    # admin dashboard functions
+    path('admin_profile/', views.admin_profile, name='admin_profile'),
 
 
 ]
