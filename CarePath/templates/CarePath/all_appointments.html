@@ -1,0 +1,285 @@
+{% extends "CarePath/layout.html" %}
+{% block title %}
+All Appointments
+{% endblock %}
+{% block content %}
+
+
+<div style="display: flex; min-height: 60vh; margin: 0 5px">
+    <!-- Sidebar -->
+    <div
+      class="sidebar"
+      style="
+        position: relative;
+        min-height: 74vh;
+        width: 270px;
+        margin-right: 20px;
+      "
+    >
+      <div class="user-info">
+        <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+        <p>{{ user.role }}</p>
+      </div>
+      <div class="nav flex-column flex-grow-1">
+        <div class="nav-item" style="text-align: center">
+          <a href="{% url 'home' %}">Home</a>
+        </div>
+        <div class="nav-item" style="text-align: center">
+          <a href="{% url 'admin_profile' %}">My Profile</a>
+        </div>
+        <div class="nav-item" style="text-align: center">
+          <a href="{% url 'admin_password' %}">Change Password</a>
+        </div>
+
+        <div class="nav-item" style="text-align: center">
+          <a href="{% url 'all_appointments' %}">View Appointments</a>
+        </div>
+        <div class="nav-item" style="text-align: center">
+          <a href="{% url 'admin_search_pt' %}">Book Appointment</a>
+        </div>
+        <div class="nav-item" style="text-align: center">
+          <a href="#">Manage Users</a>
+        </div>
+      </div>
+      <!-- Log Out link -->
+      <form
+        id="logout-form"
+        action="{% url 'logout' %}"
+        method="post"
+        style="display: none"
+      >
+        {% csrf_token %}
+      </form>
+      <a
+        href="#"
+        class="nav-item nav-link"
+        style="
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          padding: 20px;
+          text-align: center;
+          background-color: #2a72b9;
+          color: white;
+          text-decoration: none;
+          border-top: 1px solid #2a72b9;
+          display: block;
+        "
+        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+        >Log Out</a
+      >
+    </div>
+  
+    <!-- Main Content -->
+    <div style="flex-grow: 1; padding: 10px; text-align: left">
+      <div class="row">
+        <div class="col-12 col-md-8 col-lg-6">
+          <div style="padding: 8px; text-align: left">
+            <h2>All Appointments</h2>
+            <hr />
+
+
+<!-- Filter form -->
+<!-- <form method="GET" action="{% url 'all_appointments' %}" class="mb-4">
+    <div class="row">
+        <div class="col-md-3">
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" value="{{ selected_date }}" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <label for="provider">Healthcare Provider:</label>
+            <select id="provider" name="provider" class="form-control">
+                <option value="">-- Select Provider --</option>
+                {% for provider in providers %}
+                    <option value="{{ provider.id }}" {% if selected_provider == provider.id|stringformat:"s" %}selected{% endif %}>
+                        {{ provider.first_name }} {{ provider.last_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="patient">Patient:</label>
+            <select id="patient" name="patient" class="form-control">
+                <option value="">-- Select Patient --</option>
+                {% for patient in patients %}
+                    <option value="{{ patient.id }}" {% if selected_patient == patient.id|stringformat:"s" %}selected{% endif %}>
+                        {{ patient.first_name }} {{ patient.last_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" value="{{ selected_location }}" class="form-control">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Filter</button>
+</form> -->
+
+<!-- Appointments table -->
+<!-- <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>Finish Time</th>
+            <th>Healthcare Provider</th>
+            <th>Patient</th>
+            <th>Location</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for appointment in appointments %}
+        <tr>
+            <td>{{ appointment.date|date:"d-m-Y" }}</td>
+            <td>{{ appointment.start_time }}</td>
+            <td>{{ appointment.finish_time }}</td>
+            <td>{{ appointment.provider.first_name }} {{ appointment.provider.last_name }}</td>
+            <td>{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</td>
+            <td>{{ appointment.location }}</td>
+            <td>{{ appointment.notes|default:"No notes available" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No appointments found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table> -->
+          
+
+
+
+    <!-- Filter form -->
+    <form id="filter-form" method="GET" action="{% url 'all_appointments' %}" class="mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" value="{{ selected_date }}" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label for="provider">Healthcare Provider:</label>
+                <select id="provider" name="provider" class="form-control">
+                    <option value="">-- Select Provider --</option>
+                    {% for provider in providers %}
+                        <option value="{{ provider.id }}" {% if selected_provider == provider.id|stringformat:"s" %}selected{% endif %}>
+                            {{ provider.first_name }} {{ provider.last_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="patient">Patient:</label>
+                <select id="patient" name="patient" class="form-control">
+                    <option value="">-- Select Patient --</option>
+                    {% for patient in patients %}
+                        <option value="{{ patient.id }}" {% if selected_patient == patient.id|stringformat:"s" %}selected{% endif %}>
+                            {{ patient.first_name }} {{ patient.last_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- <div class="col-md-3">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" value="{{ selected_location }}" class="form-control">
+            </div> -->
+            <div class="col-md-3">
+                <label for="location">Location:</label>
+                <select id="location" name="location" class="form-control">
+                    <option value="">-- Select Location --</option>
+                    <option value="Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre, Auckland"
+                        {% if selected_location == "Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre, Auckland" %}selected{% endif %}>
+                        Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre, Auckland
+                    </option>
+                    <option value="Level 2 Outpatient Clinic, Building 1, Auckland City Hospital, Auckland"
+                        {% if selected_location == "Level 2 Outpatient Clinic, Building 1, Auckland City Hospital, Auckland" %}selected{% endif %}>
+                        Level 2 Outpatient Clinic, Building 1, Auckland City Hospital, Auckland
+                    </option>
+                </select>
+            </div>
+            
+        </div>
+
+        <!-- Clear Filters Button -->
+        <button type="button" id="clear-filters" class="btn btn-secondary mt-3">Clear Filters</button>
+    </form>
+
+    <!-- Appointments Table -->
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>Finish Time</th>
+                <th>Healthcare Provider</th>
+                <th>Patient</th>
+                <th>Location</th>
+                <th>Notes</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.date|date:"d-m-Y" }}</td>
+                <td>{{ appointment.start_time }}</td>
+                <td>{{ appointment.finish_time }}</td>
+                <td>{{ appointment.provider.first_name }} {{ appointment.provider.last_name }}</td>
+                <!-- <td>{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</td> -->
+                <td>
+                    <a href="{% url 'admin_view_pt' appointment.patient.id %}">
+                      {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                    </a>
+                  </td>
+                <td>{{ appointment.location }}</td>
+                <td>{{ appointment.notes|default:"No notes available" }}</td>
+                <td>
+                    <!-- Edit Appointment Button -->
+                    <a href="{% url 'admin_edit_appt' appointment.patient.id appointment.id %}" class="btn btn-primary btn-sm">Edit</a>
+  
+                    <!-- Cancel Appointment Button with confirmation -->
+                    <a href="{% url 'admin_cancel_appt' appointment.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this appointment?');">Cancel</a>
+                  </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No appointments found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+    // Listen for changes in any input field
+    document.querySelectorAll('#filter-form select, #filter-form input').forEach(input => {
+        input.addEventListener('change', function() {
+            // Automatically submit the form when a filter option is changed
+            document.getElementById('filter-form').submit();
+        });
+    });
+
+    // Clear filters button
+    document.getElementById('clear-filters').addEventListener('click', function() {
+        // Reset all form fields
+        document.getElementById('date').value = '';
+        document.getElementById('provider').value = '';
+        document.getElementById('patient').value = '';
+        document.getElementById('location').value = '';
+
+        // Submit the form to clear filters
+        document.getElementById('filter-form').submit();
+    });
+</script>
+
+
+
+
+
+
+{% endblock %}

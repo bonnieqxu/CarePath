@@ -1,0 +1,157 @@
+{% extends "CarePath/layout.html" %} {% block title %} View Patient Info
+{%endblock %} {% block content %}
+
+<div style="display: flex; min-height: 60vh; margin: 0 5px">
+  <!-- Sidebar -->
+  <div
+    class="sidebar"
+    style="
+      position: relative;
+      min-height: 74vh;
+      width: 270px;
+      margin-right: 20px;
+    "
+  >
+    <div class="user-info">
+      <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+      <p>{{ user.role }}</p>
+    </div>
+    <div class="nav flex-column flex-grow-1">
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'home' %}">Home</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'admin_profile' %}">My Profile</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'admin_password' %}">Change Password</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'all_appointments' %}">View Appointments</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'admin_search_pt' %}">Book Appointment</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="#">Manage Users</a>
+      </div>
+    </div>
+    <!-- Log Out link -->
+    <form
+      id="logout-form"
+      action="{% url 'logout' %}"
+      method="post"
+      style="display: none"
+    >
+      {% csrf_token %}
+    </form>
+    <a
+      href="#"
+      class="nav-item nav-link"
+      style="
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+        background-color: #2a72b9;
+        color: white;
+        text-decoration: none;
+        border-top: 1px solid #2a72b9;
+        display: block;
+      "
+      onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+      >Log Out</a
+    >
+  </div>
+
+  <!-- Main Content -->
+
+  <div style="flex-grow: 1; padding: 10px; text-align: left">
+    <div class="row">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div style="padding: 8px; text-align: left">
+          <!-- <h2>
+            Appointment with {{ patient.first_name }} {{ patient.last_name }}
+          </h2>
+
+          <table class="table">
+            <tr>
+              <th>Date:</th>
+
+              <td>{{ appointment.date|date:'d-m-Y' }}</td>
+            </tr>
+            <tr>
+              <th>Start Time:</th>
+              <td>{{ appointment.start_time }}</td>
+            </tr>
+            <tr>
+              <th>Finish Time:</th>
+              <td>{{ appointment.finish_time }}</td>
+            </tr>
+            <tr>
+              <th>Duration:</th>
+              <td>{{ duration_in_minutes|floatformat:0 }} minutes</td>
+            </tr>
+            <tr>
+              <th>Location:</th>
+              <td>{{ appointment.location }}</td>
+            </tr>
+            <tr>
+              <th>Notes:</th>
+              <td>{{ appointment.notes|default:"No notes available" }}</td>
+            </tr>
+          </table> -->
+          <br />
+          <h3>Patient Information</h3>
+          <table class="table">
+            <tr>
+              <th>First Name:</th>
+              <td>{{ patient.first_name }}</td>
+            </tr>
+            <tr>
+              <th>Last Name:</th>
+              <td>{{ patient.last_name }}</td>
+            </tr>
+            <tr>
+              <th>Date of Birth:</th>
+              {% if patient.date_of_birth %}
+              <td>{{ patient.date_of_birth|date:"d-m-Y" }}</td>
+              {% else %}
+              <td></td>
+
+              {% endif %}
+            </tr>
+            <tr>
+              <th>Email:</th>
+              <td>{{ patient.email }}</td>
+            </tr>
+            <tr>
+              <th>Phone Number:</th>
+              <td>{{ patient.phone_number }}</td>
+            </tr>
+            <tr>
+              <th>Address:</th>
+              {% if patient.address %}
+              <td>{{ patient.address }}</td>
+              {% else %}
+              <td></td>
+              {% endif %}
+            </tr>
+          </table>
+
+          <a href="{% url 'admin_search_pt' %}" class="btn btn-secondary"
+            >Back to Search</a
+          >
+
+          <a
+            href="{% url 'admin_book_pt_appointment' patient.id %}"
+            class="btn btn-success"
+            >Book Appointment</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

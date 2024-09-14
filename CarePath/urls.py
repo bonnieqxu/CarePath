@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from CarePath import views
-from .views import PatientPasswordChangeView, ProviderPasswordChangeView
+from .views import PatientPasswordChangeView, ProviderPasswordChangeView, AdminPasswordChangeView
 
 # from .views import patient_communication, mark_as_read, delete_message, submit_feedback
 # from CarePath.models import 
@@ -98,6 +98,18 @@ urlpatterns = [
 
     # admin dashboard functions
     path('admin_profile/', views.admin_profile, name='admin_profile'),
+    path('admin_password/', AdminPasswordChangeView.as_view(), name='admin_password'),
+    path('admin/appointments/', views.all_appointments, name='all_appointments'),
+    # path('admin_search_pt/', views.provider_search_pt, name='provider_search_pt'),
+    path('admin/search_pt/', views.admin_search_pt, name='admin_search_pt'),
+    path('admin/view_pt/<int:id>/', views.admin_view_pt, name='admin_view_pt'),
+    path('admin/book_pt_appointment/<int:patient_id>/', views.admin_book_pt_appointment, name='admin_book_pt_appointment'),
+    path('admin/cancel_appt/<int:appointment_id>/', views.admin_cancel_appt, name='admin_cancel_appt'),
+    path('admin/edit_appt/<int:patient_id>/<int:appointment_id>/', views.admin_edit_appt, name='admin_edit_appt'),
+   
+
+
+
 
 
 ]

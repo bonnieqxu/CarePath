@@ -26,6 +26,8 @@ from django.urls import reverse_lazy, reverse
 
 from .models import CustomUser, Appointment, Message, Feedback
 from django.db.models import Q
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 
 
@@ -1055,4 +1057,281 @@ def admin_profile(request):
 
     return render(request, 'CarePath/admin_profile.html', {
         'user': user,
+    })
+
+# change password
+class AdminPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    template_name = 'CarePath/admin_password.html'
+    success_url = reverse_lazy('admin_profile')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['password_help_texts'] = password_validators_help_texts()
+        return context
+
+    def form_invalid(self, form):
+        # Check which fields caused validation errors
+        for field in form.errors:
+            if field == 'old_password':
+                messages.error(self.request, _('The old password you entered is incorrect.'))
+            elif field == 'new_password1' or field == 'new_password2':
+                messages.error(self.request, _('The new passwords you entered do not match.'))
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, _('Your password has been updated successfully!'))
+        return super().form_valid(form)
+    
+
+# view appts
+# @login_required
+# def all_appointments(request):
+
+#     appointments = Appointment.objects.all()
+
+#     date = request.GET.get('date', None)
+#     provider_id = request.GET.get('provider', None)
+#     patient_id = request.GET.get('patient', None)
+#     location = request.GET.get('location', None)
+
+#     # filters
+#     if date:
+#         appointments = appointments.filter(date=date)
+#     if provider_id:
+#         appointments = appointments.filter(provider__id=provider_id)
+#     if patient_id:
+#         appointments = appointments.filter(patient__id=patient_id)
+#     if location:
+#         appointments = appointments.filter(location__icontains=location)
+
+#     providers = CustomUser.objects.filter(role='Healthcare Provider')
+#     patients = CustomUser.objects.filter(role='Patient')
+
+#     context = {
+#         'appointments': appointments,
+#         'providers': providers,
+#         'patients': patients,
+#         'selected_date': date,
+#         'selected_provider': provider_id,
+#         'selected_patient': patient_id,
+#         'selected_location': location,
+#     }
+
+#     return render(request, 'CarePath/all_appointments.html', context)
+
+
+# view all appts
+@login_required
+def all_appointments(request):
+    appointments = Appointment.objects.all()
+
+    date = request.GET.get('date', None)
+    provider_id = request.GET.get('provider', None)
+    patient_id = request.GET.get('patient', None)
+    location = request.GET.get('location', None)
+
+    if date:
+        appointments = appointments.filter(date=date)
+    if provider_id:
+        appointments = appointments.filter(provider__id=provider_id)
+    if patient_id:
+        appointments = appointments.filter(patient__id=patient_id)
+    if location:
+        appointments = appointments.filter(location__icontains=location)
+
+    appointments = appointments.order_by('date', 'start_time')
+    
+    providers = CustomUser.objects.filter(role='Healthcare Provider')
+    patients = CustomUser.objects.filter(role='Patient')
+
+    context = {
+        'appointments': appointments,
+        'providers': providers,
+        'patients': patients,
+        'selected_date': date,
+        'selected_provider': provider_id,
+        'selected_patient': patient_id,
+        'selected_location': location,
+    }
+
+    return render(request, 'CarePath/all_appointments.html', context)
+
+
+# search pt
+@login_required
+def admin_search_pt(request):
+    query = request.GET.get('q')  
+    patients = None
+
+    if query:
+        patients = CustomUser.objects.filter(
+            Q(first_name__icontains=query) | Q(last_name__icontains=query),
+            role='Patient'
+        )
+
+    context = {
+        'patients': patients
+    }
+
+    return render(request, 'CarePath/admin_search_pt.html', context)
+
+# view pt into
+@login_required
+def admin_view_pt(request, id):
+    # Get the patient by ID
+    patient = get_object_or_404(CustomUser, id=id, role='Patient')
+    
+    # Render the template with both the admin (user) and the patient
+    return render(request, 'CarePath/admin_patient_profile.html', {
+        'user': request.user,  # The admin
+        'patient': patient,    # The patient being viewed
+        'is_editable': False   # No editing allowed for the admin
+    })
+
+# add a new booking
+@login_required
+def admin_book_pt_appointment(request, patient_id):
+    patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+    providers = CustomUser.objects.filter(role='Healthcare Provider')
+
+    if request.method == "POST":
+        date = request.POST['date']
+        start_time = request.POST['start_time']
+        finish_time = request.POST['finish_time']
+        location = request.POST['location']
+        provider_id = request.POST['provider']  
+        notes = request.POST.get('notes', '')
+
+        provider = CustomUser.objects.get(id=provider_id)
+
+        try:
+            appointment_date = datetime.strptime(date, '%Y-%m-%d').date()
+        except ValueError:
+            messages.error(request, "Invalid date format.")
+            return render(request, 'CarePath/admin_book_pt_appointment.html', {'patient': patient, 'providers': providers})
+
+        if time.fromisoformat(start_time) >= time.fromisoformat(finish_time):
+            messages.error(request, "Start time must be earlier than finish time.")
+            return render(request, 'CarePath/admin_book_pt_appointment.html', {'patient': patient})
+
+        # Check conflicts
+        patient_conflict = Appointment.objects.filter(
+            patient=patient,
+            date=date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exists()
+
+        provider_conflict = Appointment.objects.filter(
+            provider=provider,
+            date=date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exists()
+
+        if patient_conflict or provider_conflict:
+            messages.error(request, "The patient or provider already has an appointment at the chosen time.")
+            return render(request, 'CarePath/admin_book_pt_appointment.html', {'patient': patient, 'providers': providers})
+
+        # Create a new appointment
+        appointment = Appointment.objects.create(
+            patient=patient,
+            provider=provider,
+            date=date,
+            start_time=start_time,
+            finish_time=finish_time,
+            location=location,
+            notes=notes
+        )
+        appointment.save()
+
+        formatted_date = appointment_date.strftime('%d-%m-%Y')
+        Message.objects.create(
+            recipient=patient,
+            content=f"Your appointment on {formatted_date} at {appointment.start_time} with Dr {provider.first_name} {provider.last_name} has been successfully booked."
+        )
+
+        messages.success(request, "Appointment successfully booked for {}. A message has been sent to the patient.".format(patient.first_name))
+        return redirect('all_appointments')
+
+    return render(request, 'CarePath/admin_book_pt_appointment.html', {'patient': patient, 'providers': providers})
+
+# cancel appt
+@login_required
+def admin_cancel_appt(request, appointment_id):
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+    patient = appointment.patient
+
+    formatted_date = appointment.date.strftime('%d-%m-%Y')
+    appointment.delete()
+
+    Message.objects.create(
+        recipient=patient,
+        content=f"Your appointment on {formatted_date} at {appointment.start_time} has been cancelled."
+    )
+
+    messages.success(request, "The appointment has been successfully cancelled. A message has been sent to the patient.")
+    return redirect('all_appointments')
+
+# edit appt
+@login_required
+def admin_edit_appt(request, patient_id, appointment_id):
+    patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+    appointment = get_object_or_404(Appointment, id=appointment_id, patient=patient)
+
+    if request.method == "POST":
+        location = request.POST['location']
+        notes = request.POST.get('notes', '')
+
+        try:
+            appointment_date = datetime.strptime(request.POST['date'], '%Y-%m-%d').date()
+            start_time = datetime.strptime(request.POST['start_time'], '%H:%M').time()
+            finish_time = datetime.strptime(request.POST['finish_time'], '%H:%M').time()
+        except ValueError:
+            messages.error(request, "Invalid date or time format.")
+            return render(request, 'CarePath/admin_edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+        # Validations (same as provider)
+        if appointment_date.weekday() >= 5 or start_time < time(8, 0) or finish_time > time(16, 30) or start_time >= finish_time:
+            messages.error(request, "Invalid appointment time or date.")
+            return render(request, 'CarePath/admin_edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+        patient_conflict = Appointment.objects.filter(
+            patient=patient,
+            date=appointment_date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exclude(id=appointment_id)
+
+        provider_conflict = Appointment.objects.filter(
+            provider=appointment.provider,
+            date=appointment_date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exclude(id=appointment_id)
+
+        if patient_conflict.exists() or provider_conflict.exists():
+            messages.error(request, "Conflict with another appointment.")
+            return render(request, 'CarePath/admin_edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+        # Save changes
+        appointment.date = appointment_date
+        appointment.start_time = start_time
+        appointment.finish_time = finish_time
+        appointment.location = location
+        appointment.notes = notes
+        appointment.save()
+
+        formatted_date = appointment.date.strftime('%d-%m-%Y')
+        Message.objects.create(
+            recipient=patient,
+            content=f"Your appointment on {formatted_date} has been updated. Please check the updated information."
+        )
+
+        messages.success(request, "Appointment updated successfully!")
+        return redirect('all_appointments')
+
+    return render(request, 'CarePath/admin_edit_appt.html', {
+        'patient': patient,
+        'appointment': appointment
     })
