@@ -1,4 +1,4 @@
-{% extends "CarePath/layout.html" %} {% block title %} Search Patient
+{% extends "CarePath/layout.html" %} {% block title %} View Feedback
 {%endblock%} {% block content %}
 
 <div style="display: flex; min-height: 60vh; margin: 0 5px">
@@ -65,66 +65,43 @@
     >
   </div>
 
-  <!-- Main Content -->
+  <!-- main content -->
   <div style="flex-grow: 1; padding: 10px; text-align: left">
-    <h2>Enter Patient's Name to Search</h2>
-    <hr />
+    <div class="row">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div style="padding: 8px; text-align: left">
+          <h2>Feedback from Patients</h2>
+          <hr />
 
-    <div style="flex-grow: 1; padding: 10px; text-align: left">
-      <div class="row">
-        <div class="col-12 col-md-8 col-lg-6">
-          <div style="padding: 8px; text-align: left">
-            <form method="GET" action="{% url 'provider_search_pt' %}">
-              <div class="form-group">
-                <input
-                  type="text"
-                  name="q"
-                  placeholder="Enter patient's name"
-                  class="form-control"
-                />
-              </div>
-              <button type="submit" class="btn btn-primary">Search</button>
-            </form>
-
-            {% if patients %}
-            <br /><br />
-            <h3>Search Results</h3>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for patient in patients %}
-                <tr>
-                  <td>{{ patient.first_name }}</td>
-                  <td>{{ patient.last_name }}</td>
-                  <td>
-                    <a
-                      href="{% url 'patient_profile' patient.id %}"
-                      class="btn btn-info btn-sm"
-                      >View Info</a
-                    >
-                    <a
-                      href="{% url 'book_pt_appointment' patient.id %}"
-                      class="btn btn-success btn-sm"
-                      >Book Appointment</a
-                    >
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-            {% else %}
-            <p>No patients found.</p>
-            {% endif %}
-          </div>
+          {% if feedbacks %}
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Patient Name</th>
+                <th>Feedback</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for feedback in feedbacks %}
+              <tr>
+                <td>{{ feedback.created_at|date:"d-m-Y H:i" }}</td>
+                <td>
+                  {{ feedback.patient.first_name }}
+                  {{feedback.patient.last_name}}
+                </td>
+                <td>{{ feedback.feedback }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No feedback received yet.</p>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}

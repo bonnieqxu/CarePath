@@ -1,8 +1,8 @@
 import re
 import os
-from datetime import date, time, datetime
+from datetime import date, time, datetime,  timedelta
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import password_validators_help_texts
@@ -24,7 +24,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 
-from .models import CustomUser, Appointment
+from .models import CustomUser, Appointment, Message, Feedback
 from django.db.models import Q
 
 
@@ -549,6 +549,244 @@ def view_more_appt_info(request, patient_id, appointment_id):
 
 
 
+# @login_required
+# def edit_appt(request, patient_id, appointment_id):
+#     # Get patient and appointment details
+#     patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+#     appointment = get_object_or_404(Appointment, id=appointment_id, patient=patient)
+
+#     if request.method == "POST":
+#         location = request.POST['location']
+#         notes = request.POST.get('notes', '')
+
+#         # Convert the date and time from the form into datetime objects
+#         try:
+#             appointment_date = datetime.strptime(request.POST['date'], '%Y-%m-%d').date()
+#             start_time = datetime.strptime(request.POST['start_time'], '%H:%M').time()
+#             finish_time = datetime.strptime(request.POST['finish_time'], '%H:%M').time()
+#         except ValueError:
+#             messages.error(request, "Invalid date or time format.")
+#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+#         # Validation: Date must be a weekday (Mon-Fri)
+#         if appointment_date.weekday() >= 5:  # 5 is Saturday, 6 is Sunday
+#             messages.error(request, "Appointments can only be scheduled on weekdays (Mon-Fri).")
+#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+#         # Validation: Start time cannot be earlier than 8am, finish time cannot be later than 4:30pm
+#         earliest_start_time = time(8, 0)  # 8:00 AM
+#         latest_finish_time = time(16, 30)  # 4:30 PM
+
+#         if start_time < earliest_start_time:
+#             messages.error(request, "Start time cannot be earlier than 8:00 AM.")
+#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+#         if finish_time > latest_finish_time:
+#             messages.error(request, "Finish time cannot be later than 4:30 PM.")
+#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+#         # Validation: Finish time must be later than start time
+#         if start_time >= finish_time:
+#             messages.error(request, "Finish time must be later than start time.")
+#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+#         # Check if the patient has another appointment during the same time
+#         patient_conflict = Appointment.objects.filter(
+#             patient=patient,
+#             date=appointment_date,
+#             start_time__lt=finish_time,
+#             finish_time__gt=start_time
+#         ).exclude(id=appointment_id)  # Exclude current appointment
+
+#         # Check if the provider has another appointment during the same time
+#         provider_conflict = Appointment.objects.filter(
+#             provider=appointment.provider,
+#             date=appointment_date,
+#             start_time__lt=finish_time,
+#             finish_time__gt=start_time
+#         ).exclude(id=appointment_id)  # Exclude current appointment
+
+#         if patient_conflict.exists() or provider_conflict.exists():
+#             messages.error(request, "The patient or provider already has an appointment at the chosen time.")
+#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
+
+#         # If no conflicts, update the appointment with new values
+#         appointment.date = appointment_date
+#         appointment.start_time = start_time
+#         appointment.finish_time = finish_time
+#         appointment.location = location
+#         appointment.notes = notes
+#         appointment.save()
+
+#         formatted_date = appointment.date.strftime('%d-%m-%Y')
+
+#          # Send message to the patient
+#         Message.objects.create(
+#             recipient=patient,
+#             content=f"Your appointment on {formatted_date} has been updated."
+#         )
+
+#         messages.success(request, "Appointment updated successfully!")
+
+#         # Send a success message to the patient
+#         messages.success(request, f"A message has been sent to {patient.first_name}.")
+
+#         return redirect('provider_appt')
+
+#     # Pre-load current appointment data for the form
+#     return render(request, 'CarePath/edit_appt.html', {
+#         'patient': patient,
+#         'appointment': appointment
+#     })
+
+
+
+
+# search pt
+@login_required
+def provider_search_pt(request):
+    query = request.GET.get('q')  
+    patients = None
+
+    if query:
+        patients = CustomUser.objects.filter(
+            Q(first_name__icontains=query) | Q(last_name__icontains=query),
+            role='Patient'
+        )
+
+    context = {
+        'patients': patients
+    }
+
+    return render(request, 'CarePath/provider_search_pt.html', context)
+
+
+# view pt profile
+@login_required
+def provider_view_pt(request, id):
+    # Get the patient by ID
+    patient = get_object_or_404(CustomUser, id=id, role='Patient')
+    
+    # Render the template with both the provider (user) and the patient
+    return render(request, 'CarePath/patient_profile.html', {
+        'user': request.user,  # The healthcare provider
+        'patient': patient,    # The patient being viewed
+        'is_editable': False   # No editing allowed for the provider
+    })
+
+
+# book an appt for the chosen pt
+@login_required
+def book_pt_appointment(request, patient_id):
+    patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+
+     # Get all healthcare providers to populate the dropdown list
+    providers = CustomUser.objects.filter(role='Healthcare Provider')
+
+    if request.method == "POST":
+        date = request.POST['date']
+        start_time = request.POST['start_time']
+        finish_time = request.POST['finish_time']
+        location = request.POST['location']
+        provider_id = request.POST['provider']  # Get selected provider ID
+        notes = request.POST.get('notes', '')  # Optional field
+
+        provider = CustomUser.objects.get(id=provider_id)
+
+
+        # Convert the date string to a datetime object
+        try:
+            appointment_date = datetime.strptime(date, '%Y-%m-%d').date()
+        except ValueError:
+            messages.error(request, "Invalid date format.")
+            return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient, 'providers': providers})
+
+
+
+
+        # Validate that start_time < finish_time
+        if time.fromisoformat(start_time) >= time.fromisoformat(finish_time):
+            messages.error(request, "Start time must be earlier than finish time.")
+            return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient})
+
+         # Check if the patient already has an appointment at the chosen time
+        patient_conflict = Appointment.objects.filter(
+            patient=patient,
+            date=date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exists()
+
+        # Check if the provider already has an appointment at the chosen time
+        provider_conflict = Appointment.objects.filter(
+            provider=provider,
+            date=date,
+            start_time__lt=finish_time,
+            finish_time__gt=start_time
+        ).exists()
+
+        if patient_conflict or provider_conflict:
+            messages.error(request, "The patient or provider already has an appointment at the chosen time.")
+            return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient, 'providers': providers})
+
+
+        # Create a new appointment if there are no conflicts
+        appointment = Appointment.objects.create(
+            patient=patient,
+            provider=provider,
+            date=date,
+            start_time=start_time,
+            finish_time=finish_time,
+            location=location,
+            notes=notes
+        )
+        appointment.save()
+
+
+
+
+        formatted_date = appointment_date.strftime('%d-%m-%Y')
+
+        # Send a message to the patient
+        Message.objects.create(
+            recipient=patient,
+            content=f"Your appointment on {formatted_date} at {appointment.start_time} with Dr {provider.first_name} {provider.last_name} has been successfully booked."
+        )
+
+
+        messages.success(request, "Appointment successfully booked for {}. A message has been sent to the patient.".format(patient.first_name))
+        # return redirect('provider_view_pt', id=patient.id)
+        return redirect('provider_appt')
+
+    return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient, 'providers': providers })
+
+
+
+# cancel appt
+@login_required
+def cancel_appt(request, appointment_id):
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+
+    patient = appointment.patient
+
+    appointment.delete()
+
+     # Format the date to 'dd-mm-yyyy'
+    formatted_date = appointment.date.strftime('%d-%m-%Y')
+
+
+    # Send a message to the patient
+    Message.objects.create(
+        recipient=patient,
+        content=f"Your appointment on {formatted_date} at {appointment.start_time} has been cancelled."
+    )
+
+    messages.success(request, "The appointment has been successfully cancelled. A message has been sent to the patient.")
+
+    return redirect(reverse('provider_appt'))
+
+
+# edit an appt
 @login_required
 def edit_appt(request, patient_id, appointment_id):
     # Get patient and appointment details
@@ -618,6 +856,14 @@ def edit_appt(request, patient_id, appointment_id):
         appointment.notes = notes
         appointment.save()
 
+        formatted_date = appointment.date.strftime('%d-%m-%Y')
+
+         # Send message to the patient
+        Message.objects.create(
+            recipient=patient,
+            content=f"Your appointment on {formatted_date} has been updated. Please check the updated information."
+        )
+
         messages.success(request, "Appointment updated successfully!")
 
         # Send a success message to the patient
@@ -632,115 +878,144 @@ def edit_appt(request, patient_id, appointment_id):
     })
 
 
+#  ------------------------ communication functions --------------------------
 
 
-# search pt
 @login_required
-def provider_search_pt(request):
-    query = request.GET.get('q')  
-    patients = None
+def patient_communication(request):
+    # Fetch patient's unread messages
+    messages = Message.objects.filter(recipient=request.user).order_by('-created_at')  # Correct field name
 
-    if query:
-        patients = CustomUser.objects.filter(
-            Q(first_name__icontains=query) | Q(last_name__icontains=query),
-            role='Patient'
-        )
+    # Fetch patient's reminders (appointments in the next 3 days)
+    today = date.today()
+    reminders = Appointment.objects.filter(
+        patient=request.user,
+        date__range=[today, today + timedelta(days=3)]
+    )
 
-    context = {
-        'patients': patients
-    }
+    # Get the list of providers for feedback
+    providers = CustomUser.objects.filter(role__in=['Healthcare Provider', 'Admin'])
 
-    return render(request, 'CarePath/provider_search_pt.html', context)
-
-
-# view pt profile
-@login_required
-def provider_view_pt(request, id):
-    # Get the patient by ID
-    patient = get_object_or_404(CustomUser, id=id, role='Patient')
-    
-    # Render the template with both the provider (user) and the patient
-    return render(request, 'CarePath/patient_profile.html', {
-        'user': request.user,  # The healthcare provider
-        'patient': patient,    # The patient being viewed
-        'is_editable': False   # No editing allowed for the provider
+    return render(request, 'CarePath/patient_communication.html', {
+        'messages': messages,
+        'reminders': reminders,
+        'providers': providers,
     })
 
 
-# book an appt for the chosen pt
+
+
+
+def update_recipients_view(request):
+    for message in Message.objects.all():
+        message.recipient = message.user  # Assuming 'user' field stores the correct user
+        message.save()
+
+    return HttpResponse('Recipient fields updated successfully')
+
+
+
+
 @login_required
-def book_pt_appointment(request, patient_id):
-    patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+def patient_messages(request):
+    # Get messages for the logged-in patient
+    messages = Message.objects.filter(user=request.user).order_by('-created_at')
 
-     # Get all healthcare providers to populate the dropdown list
-    providers = CustomUser.objects.filter(role='Healthcare Provider')
+    return render(request, 'CarePath/patient_messages.html', {'messages': messages})
 
-    if request.method == "POST":
-        date = request.POST['date']
-        start_time = request.POST['start_time']
-        finish_time = request.POST['finish_time']
-        location = request.POST['location']
-        provider_id = request.POST['provider']  # Get selected provider ID
-        notes = request.POST.get('notes', '')  # Optional field
 
-        provider = CustomUser.objects.get(id=provider_id)
 
-        # Validate that start_time < finish_time
-        if time.fromisoformat(start_time) >= time.fromisoformat(finish_time):
-            messages.error(request, "Start time must be earlier than finish time.")
-            return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient})
 
-         # Check if the patient already has an appointment at the chosen time
-        patient_conflict = Appointment.objects.filter(
-            patient=patient,
-            date=date,
-            start_time__lt=finish_time,
-            finish_time__gt=start_time
-        ).exists()
+@login_required
+def mark_as_read(request, message_id):
+    try:
+        message = Message.objects.get(id=message_id, recipient=request.user)
+        message.is_read = True
+        message.save()
+        messages.success(request, "Message marked as read.")
+    except Message.DoesNotExist:
+        messages.error(request, "Message not found.")
+    return redirect('patient_communication')
 
-        # Check if the provider already has an appointment at the chosen time
-        provider_conflict = Appointment.objects.filter(
+
+@login_required
+def mark_as_unread(request, message_id):
+    try:
+        message = Message.objects.get(id=message_id, recipient=request.user)
+        message.is_read = False
+        message.save()
+        messages.success(request, "Message marked as unread.")
+    except Message.DoesNotExist:
+        messages.error(request, "Message not found.")
+    return redirect('patient_communication')
+
+
+@login_required
+def delete_message(request, message_id):
+    try:
+        message = Message.objects.get(id=message_id, recipient=request.user)
+        message.delete()
+        messages.success(request, "Message deleted successfully.")
+    except Message.DoesNotExist:
+        messages.error(request, "Message not found.")
+    return redirect('patient_communication')
+
+
+
+@login_required
+def patient_reminders(request):
+    # Get reminders for upcoming appointments in the next 3 days
+    today = date.today()
+    reminders = Appointment.objects.filter(
+        patient=request.user,
+        date__range=[today, today + timedelta(days=3)]
+    )
+    return render(request, 'CarePath/patient_reminders.html', {'reminders': reminders})
+
+
+@login_required
+def patient_feedback(request):
+    if request.method == 'POST':
+        feedback_text = request.POST.get('feedback')
+        provider_id = request.POST.get('provider_id')
+        provider = get_object_or_404(CustomUser, id=provider_id, role__in=['Healthcare Provider', 'Admin'])
+        
+        # Save feedback
+        Feedback.objects.create(
+            patient=request.user,
             provider=provider,
-            date=date,
-            start_time__lt=finish_time,
-            finish_time__gt=start_time
-        ).exists()
-
-        if patient_conflict or provider_conflict:
-            messages.error(request, "The patient or provider already has an appointment at the chosen time.")
-            return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient, 'providers': providers})
-
-
-        # Create a new appointment if there are no conflicts
-        appointment = Appointment.objects.create(
-            patient=patient,
-            provider=provider,
-            date=date,
-            start_time=start_time,
-            finish_time=finish_time,
-            location=location,
-            notes=notes
+            feedback=feedback_text,
         )
-        appointment.save()
+        messages.success(request, 'Feedback sent successfully.')
+        return redirect('patient_feedback')
 
-        messages.success(request, "Appointment successfully booked for {}.".format(patient.first_name))
-        # return redirect('provider_view_pt', id=patient.id)
-        return redirect('provider_appt')
-
-    return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient, 'providers': providers })
-
+    # Get healthcare providers and admins to allow selection
+    providers = CustomUser.objects.filter(role__in=['Healthcare Provider', 'Admin'])
+    return render(request, 'CarePath/patient_feedback.html', {'providers': providers})
 
 
-# cancel appt
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from django.urls import reverse
 
 @login_required
-def cancel_appt(request, appointment_id):
-    appointment = get_object_or_404(Appointment, id=appointment_id)
-    appointment.delete()
+def submit_feedback(request):
+    if request.method == "POST":
+        provider_id = request.POST['provider']
+        feedback_content = request.POST['feedback']
+        provider = CustomUser.objects.get(id=provider_id)
+        
+        Feedback.objects.create(
+            patient=request.user,
+            provider=provider,
+            feedback=feedback_content,
+        )
+        messages.success(request, 'Your feedback has been submitted successfully!')
+    # return redirect('patient_communication') 
+    return HttpResponseRedirect(reverse('patient_communication') + '#feedback')
 
-    messages.success(request, "The appointment has been successfully cancelled.")
 
-    return redirect(reverse('provider_appt'))
+
+@login_required
+def provider_feedback(request):
+    # Get feedback directed at the healthcare provider
+    feedbacks = Feedback.objects.filter(provider=request.user).order_by('-created_at')
+
+    return render(request, 'CarePath/provider_feedback.html', {'feedbacks': feedbacks})

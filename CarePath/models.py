@@ -13,6 +13,8 @@ from datetime import datetime
 
 
 
+
+
 # user info
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
@@ -58,3 +60,57 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"Appointment for {self.patient.first_name} with {self.provider.first_name} on {self.date} at {self.start_time}"
+    
+
+
+
+
+# class Message(models.Model):
+#     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+#     sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='sent_messages')
+#     subject = models.CharField(max_length=255)
+#     body = models.TextField()
+#     sent_at = models.DateTimeField(auto_now_add=True)
+#     is_read = models.BooleanField(default=False)
+
+#     def __str__(self):
+#         return f"{self.subject} - {'Read' if self.is_read else 'Unread'}"
+
+
+# class Reminder(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     appointment = models.ForeignKey('Appointment', on_delete=models.CASCADE)
+#     reminder_at = models.DateTimeField()
+
+#     def __str__(self):
+#         return f"Reminder for {self.appointment.patient} on {self.reminder_at}"
+
+
+# class Feedback(models.Model):
+#     patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='feedbacks')
+#     healthcare_provider = models.ForeignKey(User, on_delete=models.CASCADE, related_name='feedback_received')
+#     feedback_text = models.TextField()
+#     submitted_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f"Feedback by {self.patient} for {self.healthcare_provider}"
+
+
+class Message(models.Model):
+    recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_messages', null=True)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Message to {self.recipient.email} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+class Feedback(models.Model):
+    patient = models.ForeignKey(CustomUser, related_name='patient_feedback', on_delete=models.CASCADE)
+    provider = models.ForeignKey(CustomUser, related_name='provider_feedback', on_delete=models.CASCADE)
+    feedback = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Feedback from {self.patient.first_name} to {self.provider.first_name} on {self.created_at}"

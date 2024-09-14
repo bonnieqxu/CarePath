@@ -2,6 +2,8 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from CarePath import views
 from .views import PatientPasswordChangeView, ProviderPasswordChangeView
+
+# from .views import patient_communication, mark_as_read, delete_message, submit_feedback
 # from CarePath.models import 
 
 
@@ -57,6 +59,24 @@ urlpatterns = [
     path('patient_appt/', views.patient_appt, name='patient_appt'),
     path('view_provider_details/<int:provider_id>/', views.view_provider_details, name='view_provider_details'),
 
+
+    path('patient/communication/', views.patient_communication, name='patient_communication'),
+
+    path('patient_messages/', views.patient_messages, name='patient_messages'),
+    path('mark_as_read/<int:message_id>/', views.mark_as_read, name='mark_as_read'),
+    path('mark_as_unread/<int:message_id>/', views.mark_as_unread, name='mark_as_unread'),
+    path('delete_message/<int:message_id>/', views.delete_message, name='delete_message'),
+
+
+
+    path('patient_reminders/', views.patient_reminders, name='patient_reminders'),
+    path('patient_feedback/', views.patient_feedback, name='patient_feedback'),
+    path('submit_feedback/', views.submit_feedback, name='submit_feedback'),
+
+
+
+
+
     # healthcare provider dashboard functions
     path('provider_profile/', views.provider_profile, name='provider_profile'),
     path('provider_password/', ProviderPasswordChangeView.as_view(), name='provider_password'),
@@ -68,6 +88,13 @@ urlpatterns = [
     path('provider_view_pt/<int:patient_id>/', views.provider_view_pt, name='provider_view_pt'),
     path('book_pt_appointment/<int:patient_id>/', views.book_pt_appointment, name='book_pt_appointment'),
     path('cancel_appt/<int:appointment_id>/', views.cancel_appt, name='cancel_appt'),
+
+
+
+    path('provider/feedback/', views.provider_feedback, name='provider_feedback'),
+
+
+
 
 
 
