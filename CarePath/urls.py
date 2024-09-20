@@ -111,7 +111,7 @@ urlpatterns = [
     path('approve_account/<int:user_id>/', views.approve_account, name='approve_account'),
     path('disable_account/<int:user_id>/', views.disable_account, name='disable_account'),
     path('discharge_patient/<int:patient_id>/', views.discharge_patient, name='discharge_patient'),
-
+    path('activate_patient/<int:patient_id>/', views.activate_patient, name='activate_patient'),
 
 
 

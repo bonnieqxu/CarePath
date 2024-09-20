@@ -174,16 +174,18 @@
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
+              <th>Department</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {% for user in active_users %}
             <tr>
-              <td>{{ user.first_name }}{{ user.last_name }}</td>
+              <td>{{ user.first_name }} {{ user.last_name }}</td>
               <!-- <td></td> -->
               <td>{{ user.email }}</td>
-              <td>{{ user.role }}</td>
+              <td>{{ user.provider_role }}</td>
+              <td>{{ user.department }}</td>
               <!-- <td>
                 <a
                   href="{% url 'disable_account' user.id %}"
@@ -227,33 +229,30 @@
               <th>Last Name</th> -->
               <th>Name</th>
               <th>Email</th>
-              <th>Role</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {% for patient in patients %}
             <tr>
-              <td>{{ patient.first_name }}{{ patient.last_name }}</td>
-              <!-- <td></td> -->
+              <td>{{ patient.first_name }} {{ patient.last_name }}</td>
               <td>{{ patient.email }}</td>
-              <td>{{ patient.role }}</td>
-              <!-- <td>
-                <a
-                  href="{% url 'discharge_patient' patient.id %}"
-                  class="btn btn-danger btn-sm"
-                  >Discharge</a
-                >
-              </td> -->
+              <td>{{ patient.status }}</td>
+              <!-- Display current status -->
               <td>
                 <form
                   method="POST"
-                  action="{% url 'discharge_patient' patient.id %}"
-                  onsubmit="return confirmDischarge();"
+                  action="{% if patient.status == 'Discharged' %}{% url 'activate_patient' patient.id %}{% else %}{% url 'discharge_patient' patient.id %}{% endif %}"
+                  onsubmit="return confirm('{% if patient.status == 'Discharged' %}Activate{% else %}Discharge{% endif %} this patient?');"
                 >
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-danger">
-                    Discharge
+                  <button
+                    type="submit"
+                    class="btn {% if patient.status == 'Discharged' %}btn-success{% else %}btn-danger{% endif %}"
+                  >
+                    {% if patient.status == 'Discharged' %} Activate {% else %}
+                    Discharge {% endif %}
                   </button>
                 </form>
               </td>

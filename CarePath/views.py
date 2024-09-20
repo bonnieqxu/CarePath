@@ -1433,8 +1433,8 @@ def admin_edit_appt(request, patient_id, appointment_id):
 @login_required
 def manage_users(request):
     # get all users
-    pending_users = CustomUser.objects.filter(is_active=False, role__in=['Healthcare Provider', 'Admin'])
-    active_users = CustomUser.objects.filter(is_active=True, role__in=['Healthcare Provider', 'Admin'])
+    pending_users = CustomUser.objects.filter(is_active=False, role__in=['Healthcare Provider'])
+    active_users = CustomUser.objects.filter(is_active=True, role='Healthcare Provider')
     patients = CustomUser.objects.filter(role='Patient')
 
     context = {
@@ -1449,6 +1449,7 @@ def manage_users(request):
 def approve_account(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     user.is_active = True
+    user.status = 'Active'
     user.save()
     messages.success(request, f"The account for {user.first_name} {user.last_name} has been approved.")
     return redirect('manage_users')
@@ -1489,6 +1490,21 @@ def disable_account(request, user_id):
     
     return redirect('manage_users')
 
+# # disable healthcare provider accounts only
+# @login_required
+# def manage_users(request):
+#     # get all users
+#     pending_users = CustomUser.objects.filter(is_active=False, role__in=['Healthcare Provider'])
+#     active_users = CustomUser.objects.filter(is_active=True, role='Healthcare Provider')  # Only Healthcare Providers
+#     patients = CustomUser.objects.filter(role='Patient')
+
+#     context = {
+#         'pending_users': pending_users,
+#         'active_users': active_users,
+#         'patients': patients
+#     }
+
+#     return render(request, 'CarePath/manage_users.html', context)
 
 
 # @login_required
@@ -1525,4 +1541,19 @@ def discharge_patient(request, patient_id):
     else:
         messages.error(request, "You cannot discharge a staff member.")
     
+    return redirect('manage_users')
+
+
+@login_required
+def activate_patient(request, patient_id):
+    patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+
+    if not patient.is_staff:
+        patient.status = 'Active'
+        patient.is_active = True  # Patient can log in again
+        patient.save()
+        messages.success(request, f"{patient.first_name} {patient.last_name} has been activated.")
+    else:
+        messages.error(request, "You cannot activate a staff member.")
+
     return redirect('manage_users')
