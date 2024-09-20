@@ -5,7 +5,7 @@ from datetime import date, time, datetime,  timedelta
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import password_validators_help_texts
+from django.contrib.auth.password_validation import password_validators_help_texts, validate_password
 from django.views.generic import TemplateView
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import PasswordChangeView
@@ -16,6 +16,7 @@ from django.utils import timezone
 from django.utils.timezone import datetime
 from django.utils.translation import gettext as _
 from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
@@ -192,7 +193,7 @@ def register(request):
 
         # Create the new user with the selected role (Patient or Healthcare Provider)
         user = CustomUser.objects.create_user(
-            username=email,
+            # username=email,
             email=email,
             first_name=first_name,
             last_name=last_name,
@@ -223,6 +224,87 @@ def register(request):
         return redirect('login')  # Redirect to login after successful registration
 
     return render(request, 'CarePath/register.html', {'today_date': today_date})
+
+
+
+# create a new account
+# def register(request):
+#     today_date = date.today().strftime('%Y-%m-%d')  # Format today's date as YYYY-MM-DD
+    
+#     if request.method == "POST":
+#         first_name = request.POST['first_name']
+#         last_name = request.POST['last_name']
+#         phone_number = request.POST['phone_number']
+#         email = request.POST['email']
+#         password = request.POST['password']
+#         confirm_password = request.POST['confirm_password']
+#         role = request.POST['role']
+
+#         # For patients only
+#         date_of_birth = request.POST.get('date_of_birth', None)
+#         address = request.POST.get('address', None)
+
+#         # For providers only
+#         department = request.POST.get('department', None)
+#         provider_role = request.POST.get('provider_role', None)
+
+#         # Check if passwords match
+#         if password != confirm_password:
+#             return render(request, 'CarePath/register.html', {'error': "Passwords do not match", 'today_date': today_date})
+
+#         # Check if email is already in use
+#         if CustomUser.objects.filter(email=email).exists():
+#             return render(request, 'CarePath/register.html', {'error': "Email already in use", 'today_date': today_date})
+
+#         # Ensure Admin registration is only possible via Django Admin or superuser
+#         if role == 'Admin':
+#             return render(request, 'CarePath/register.html', {'error': "Admin registration is not allowed via this form.", 'today_date': today_date})
+
+#         # Validate password strength
+#         try:
+#             validate_password(password)
+#         except ValidationError as e:
+#             return render(request, 'CarePath/register.html', {'error': e.messages, 'today_date': today_date})
+
+#         # Create the new user with the selected role (Patient or Healthcare Provider)
+#         user = CustomUser.objects.create_user(
+#             email=email,  # Use email as the unique identifier
+#             first_name=first_name,
+#             last_name=last_name,
+#             phone_number=phone_number,
+#             password=password,
+#             role=role,
+#         )
+
+#         # Set additional fields for patients
+#         if role == 'Patient':
+#             if date_of_birth:
+#                 try:
+#                     # Ensure date format is valid
+#                     user.date_of_birth = date_of_birth
+#                 except ValueError:
+#                     return render(request, 'CarePath/register.html', {'error': "Invalid date of birth format.", 'today_date': today_date})
+#             if address:
+#                 user.address = address
+
+#         # Set additional fields for healthcare providers
+#         if role == 'Healthcare Provider':
+#             if department:
+#                 user.department = department
+#             if provider_role:
+#                 user.provider_role = provider_role
+
+#         user.save()
+
+#         # Assign the user to the appropriate group based on the role
+#         group = Group.objects.get(name=role)
+#         user.groups.add(group)
+
+#         messages.success(request, "Registration successful! Please log in.")
+#         return redirect('login')  # Redirect to login after successful registration
+
+#     return render(request, 'CarePath/register.html', {'today_date': today_date})
+
 
 # ---------------------------- VISITOR related views ends -----------------------
 
@@ -261,9 +343,17 @@ def login(request):
 
 
 # # dashboards
+# @login_required
+# def patient_dashboard(request):
+#     return render(request, 'CarePath/patient_dashboard.html')
 @login_required
 def patient_dashboard(request):
-    return render(request, 'CarePath/patient_dashboard.html')
+    patient = request.user  
+    context = {
+        'is_discharged': patient.status == 'Discharged'
+    }
+    return render(request, 'CarePath/patient_dashboard.html', context)
+
 
 @login_required
 def provider_dashboard(request):
@@ -1335,3 +1425,104 @@ def admin_edit_appt(request, patient_id, appointment_id):
         'patient': patient,
         'appointment': appointment
     })
+
+
+# admin manages users
+
+
+@login_required
+def manage_users(request):
+    # get all users
+    pending_users = CustomUser.objects.filter(is_active=False, role__in=['Healthcare Provider', 'Admin'])
+    active_users = CustomUser.objects.filter(is_active=True, role__in=['Healthcare Provider', 'Admin'])
+    patients = CustomUser.objects.filter(role='Patient')
+
+    context = {
+        'pending_users': pending_users,
+        'active_users': active_users,
+        'patients': patients
+    }
+
+    return render(request, 'CarePath/manage_users.html', context)
+
+@login_required
+def approve_account(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    user.is_active = True
+    user.save()
+    messages.success(request, f"The account for {user.first_name} {user.last_name} has been approved.")
+    return redirect('manage_users')
+
+# @login_required
+# def disable_account(request, user_id):
+#     user = get_object_or_404(CustomUser, id=user_id)
+#     user.is_active = False
+#     user.save()
+#     messages.success(request, f"The account for {user.first_name} {user.last_name} has been disabled.")
+#     return redirect('manage_users')
+
+# @login_required
+# def disable_account(request, user_id):
+#     user = get_object_or_404(CustomUser, id=user_id)
+
+#     if request.method == 'POST':
+#         user.is_active = False  # Mark the user as inactive (disabled)
+#         user.save()
+#         messages.success(request, f"{user.first_name} {user.last_name}'s account has been disabled.")
+#         return redirect('manage_users')
+
+#     return render(request, 'CarePath/manage_users.html')
+
+
+# Disable account (for Healthcare Provider or Admin)
+@login_required
+def disable_account(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    
+    if user.is_staff:
+        user.status = 'Disabled'
+        user.is_active = False
+        user.save()
+        messages.success(request, f"{user.first_name} {user.last_name}'s account has been disabled.")
+    else:
+        messages.error(request, "You cannot disable a non-staff account.")
+    
+    return redirect('manage_users')
+
+
+
+# @login_required
+# def discharge_patient(request, patient_id):
+#     patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+#     patient.delete()
+#     messages.success(request, f"The patient {patient.first_name} {patient.last_name} has been discharged.")
+#     return redirect('manage_users')
+
+# @login_required
+# def discharge_patient(request, patient_id):
+#     patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+
+#     if request.method == 'POST':
+#         # patient.role = 'Discharged'  # Mark the patient as discharged
+#         patient.status = 'Discharged'
+#         patient.is_active = True
+#         patient.save()
+#         messages.success(request, f"{patient.first_name} {patient.last_name} has been discharged.")
+#         return redirect('manage_users')
+
+#     return render(request, 'CarePath/manage_users.html')
+
+# Discharge patient
+@login_required
+def discharge_patient(request, patient_id):
+    patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
+
+    if not patient.is_staff:
+        patient.status = 'Discharged'
+        patient.is_active = True  # Patient can still log in
+        patient.save()
+        messages.success(request, f"{patient.first_name} {patient.last_name} has been discharged.")
+    else:
+        messages.error(request, "You cannot discharge a staff member.")
+    
+    return redirect('manage_users')

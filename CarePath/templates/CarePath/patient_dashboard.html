@@ -66,6 +66,11 @@
 
   <!-- Main Content -->
   <div style="flex-grow: 1; padding: 10px; text-align: left">
+    {% if user.status == 'Discharged' %}
+    <div class="alert alert-danger" role="alert">
+      <strong>You have been discharged.</strong>
+    </div>
+    {% endif %}
     <h2>
       Welcome to your Dashboard, {{ user.first_name }} {{ user.last_name }}!
     </h2>

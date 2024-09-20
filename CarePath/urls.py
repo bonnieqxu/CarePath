@@ -107,6 +107,10 @@ urlpatterns = [
     path('admin/cancel_appt/<int:appointment_id>/', views.admin_cancel_appt, name='admin_cancel_appt'),
     path('admin/edit_appt/<int:patient_id>/<int:appointment_id>/', views.admin_edit_appt, name='admin_edit_appt'),
    
+    path('manage_users/', views.manage_users, name='manage_users'),
+    path('approve_account/<int:user_id>/', views.approve_account, name='approve_account'),
+    path('disable_account/<int:user_id>/', views.disable_account, name='disable_account'),
+    path('discharge_patient/<int:patient_id>/', views.discharge_patient, name='discharge_patient'),
 
 
 

@@ -1,0 +1,327 @@
+{% extends "CarePath/layout.html" %} {% block title %} Manage Users {%endblock%}
+{% block content %}
+<div style="display: flex; min-height: 60vh; margin: 0 5px">
+  <div
+    class="sidebar"
+    style="
+      position: relative;
+      min-height: 74vh;
+      width: 270px;
+      margin-right: 20px;
+    "
+  >
+    <div class="user-info">
+      <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+      <p>{{ user.role }}</p>
+    </div>
+    <div class="nav flex-column flex-grow-1">
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'home' %}">Home</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'admin_profile' %}">My Profile</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'admin_password' %}">Change Password</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'all_appointments' %}">View Appointments</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'admin_search_pt' %}">Book Appointment</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'manage_users' %}">Manage Users</a>
+      </div>
+    </div>
+    <form
+      id="logout-form"
+      action="{% url 'logout' %}"
+      method="post"
+      style="display: none"
+    >
+      {% csrf_token %}
+    </form>
+    <a
+      href="#"
+      class="nav-item nav-link"
+      style="
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+        background-color: #2a72b9;
+        color: white;
+        text-decoration: none;
+        border-top: 1px solid #2a72b9;
+      "
+      onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+    >
+      Log Out
+    </a>
+  </div>
+
+  <div style="flex-grow: 1; padding: 10px; text-align: left">
+    <h2>Manage Users</h2>
+    <ul class="nav nav-tabs" id="manageUsersTabs" role="tablist">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          id="approve-tab"
+          data-toggle="tab"
+          href="#approve"
+          role="tab"
+          aria-controls="approve"
+          aria-selected="false"
+          >Approve Accounts</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          id="disable-tab"
+          data-toggle="tab"
+          href="#disable"
+          role="tab"
+          aria-controls="disable"
+          aria-selected="false"
+          >Disable Accounts</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          id="discharge-tab"
+          data-toggle="tab"
+          href="#discharge"
+          role="tab"
+          aria-controls="discharge"
+          aria-selected="false"
+          >Discharge Patients</a
+        >
+      </li>
+    </ul>
+
+    <div class="tab-content" id="manageUsersTabsContent">
+      <!-- Approve Accounts Tab -->
+      <div
+        class="tab-pane fade"
+        id="approve"
+        role="tabpanel"
+        aria-labelledby="approve-tab"
+      >
+        <br />
+        <h3>Approve Pending Accounts</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <!-- <th>First Name</th>
+              <th>Last Name</th> -->
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in pending_users %}
+            <tr>
+              <td>{{ user.first_name }} {{ user.last_name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.role }}</td>
+              <!-- <td>
+                <a
+                  href="{% url 'approve_account' user.id %}"
+                  class="btn btn-success btn-sm"
+                  >Approve</a
+                >
+              </td> -->
+              <td>
+                <form
+                  method="POST"
+                  action="{% url 'approve_account' user.id %}"
+                  onsubmit="return confirmApprove();"
+                >
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-success">Approve</button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5">No pending accounts.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Disable Accounts Tab -->
+      <div
+        class="tab-pane fade"
+        id="disable"
+        role="tabpanel"
+        aria-labelledby="disable-tab"
+      >
+        <br />
+        <h3>Disable Active Accounts</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <!-- <th>First Name</th>
+              <th>Last Name</th> -->
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in active_users %}
+            <tr>
+              <td>{{ user.first_name }}{{ user.last_name }}</td>
+              <!-- <td></td> -->
+              <td>{{ user.email }}</td>
+              <td>{{ user.role }}</td>
+              <!-- <td>
+                <a
+                  href="{% url 'disable_account' user.id %}"
+                  class="btn btn-warning btn-sm"
+                  >Disable</a
+                >
+              </td> -->
+              <td>
+                <form
+                  method="POST"
+                  action="{% url 'disable_account' user.id %}"
+                  onsubmit="return confirmDisable();"
+                >
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-warning">Disable</button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5">No active accounts.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Discharge Patients Tab -->
+      <div
+        class="tab-pane fade"
+        id="discharge"
+        role="tabpanel"
+        aria-labelledby="discharge-tab"
+      >
+        <br />
+        <h3>Discharge Patients</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <!-- <th>First Name</th>
+              <th>Last Name</th> -->
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for patient in patients %}
+            <tr>
+              <td>{{ patient.first_name }}{{ patient.last_name }}</td>
+              <!-- <td></td> -->
+              <td>{{ patient.email }}</td>
+              <td>{{ patient.role }}</td>
+              <!-- <td>
+                <a
+                  href="{% url 'discharge_patient' patient.id %}"
+                  class="btn btn-danger btn-sm"
+                  >Discharge</a
+                >
+              </td> -->
+              <td>
+                <form
+                  method="POST"
+                  action="{% url 'discharge_patient' patient.id %}"
+                  onsubmit="return confirmDischarge();"
+                >
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">
+                    Discharge
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5">No patients found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // On page load, check if a tab is stored in localStorage
+  document.addEventListener("DOMContentLoaded", function () {
+    var activeTab = localStorage.getItem("activeTab");
+
+    if (activeTab) {
+      // If there's an active tab in storage, activate it
+      var tabToActivate = document.querySelector(activeTab);
+      if (tabToActivate) {
+        tabToActivate.click();
+      }
+    }
+
+    // Save the active tab to localStorage on tab click
+    document.querySelectorAll(".nav-tabs .nav-link").forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        localStorage.setItem("activeTab", "#" + this.getAttribute("id"));
+      });
+    });
+  });
+</script>
+
+<script>
+  function confirmApprove() {
+    return confirm("Are you sure you want to approve this account?");
+  }
+
+  function confirmDisable() {
+    return confirm("Are you sure you want to disable this account?");
+  }
+
+  function confirmDischarge() {
+    return confirm("Are you sure you want to discharge this patient?");
+  }
+
+  // JavaScript for returning to the correct tab after refresh or form submission
+  document.addEventListener("DOMContentLoaded", function () {
+    var activeTab = localStorage.getItem("activeTab");
+    if (activeTab) {
+      var triggerEl = document.querySelector(
+        '#manageUsersTabs a[href="' + activeTab + '"]'
+      );
+      var tab = new bootstrap.Tab(triggerEl);
+      tab.show();
+    }
+
+    document.querySelectorAll("#manageUsersTabs a").forEach(function (tabLink) {
+      tabLink.addEventListener("shown.bs.tab", function (event) {
+        localStorage.setItem("activeTab", event.target.getAttribute("href"));
+      });
+    });
+  });
+</script>
+
+{% endblock %}
