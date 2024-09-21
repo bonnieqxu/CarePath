@@ -46,7 +46,6 @@
       rel="stylesheet"
     />
 
-   
     <link
       rel="stylesheet"
       type="text/css"
@@ -60,10 +59,59 @@
   </head>
 
   <body>
+    <div style="position: fixed; right: 20px; bottom: 100px; z-index: 1000">
+      <button
+        onclick="zoomIn()"
+        style="
+          padding: 10px 20px;
+          font-size: 16px;
+          background-color: #b31398;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          display: block;
+          margin-bottom: 10px;
+        "
+      >
+        Zoom In
+      </button>
+      <button
+        onclick="zoomOut()"
+        style="
+          padding: 10px 20px;
+          font-size: 16px;
+          background-color: #3e18e9;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          display: block;
+          margin-bottom: 10px;
+        "
+      >
+        Zoom Out
+      </button>
+      <button
+        onclick="toggleDarkMode()"
+        style="
+          padding: 10px 20px;
+          font-size: 16px;
+          background-color: #080514;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          display: block;
+        "
+      >
+        Dark Mode
+      </button>
+    </div>
+
     <!-- Top Bar starts -->
 
     <div class="container-fluid bg-light p-0 wow fadeIn" data-wow-delay="0.1s">
-      
       <div class="row gx-0 align-items-center justify-content-between">
         <div class="col-lg-7 px-5 text-start d-flex flex-wrap">
           <a
@@ -249,7 +297,7 @@
       <script src="{% static 'CarePath/lib/easing/easing.min.js' %}"></script>
       <script src="{% static 'CarePath/lib/waypoints/waypoints.min.js' %}"></script>
       <script src="{% static 'CarePath/lib/counterup/counterup.min.js' %}"></script>
-      <!-- <script src="{% static 'CarePath/lib/owlcarousel/owl.carousel.min.js' %}"></script> -->
+
       <script src="{% static 'CarePath/lib/tempusdominus/js/moment.min.js' %}"></script>
       <script src="{% static 'CarePath/lib/tempusdominus/js/moment-timezone.min.js' %}"></script>
       <script src="{% static 'CarePath/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js' %}"></script>
@@ -258,4 +306,59 @@
       <script src="{% static 'CarePath/main.js' %}"></script>
     </div>
   </body>
+
+  <script>
+    let zoomLevel = 1;
+
+    function zoomIn() {
+      zoomLevel += 0.1; // 10%
+      document.body.style.zoom = zoomLevel;
+    }
+
+    function zoomOut() {
+      zoomLevel -= 0.1; // 10%
+      document.body.style.zoom = zoomLevel;
+    }
+
+    function toggleDarkMode() {
+      
+
+      // Toggle dark mode for the body
+      document.body.classList.toggle("dark-mode");
+
+      console.log('Dark mode activated:', document.body.classList.contains("dark-mode"));
+
+      // Define elements that need dark mode toggle
+      const elementsToToggle = [".sidebar", ".nav-link", ".badge-danger"];
+
+      // Toggle dark mode for all specified elements
+      elementsToToggle.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((element) => {
+          element.classList.toggle("dark-mode");
+        });
+      });
+
+      // Store dark mode preference in localStorage
+      if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("darkMode", "enabled");
+      } else {
+        localStorage.setItem("darkMode", "disabled");
+      }
+    }
+
+    window.onload = function () {
+      if (localStorage.getItem("darkMode") === "enabled") {
+        document.body.classList.add("dark-mode");
+
+        // Define elements that need dark mode toggle
+        const elementsToToggle = [".sidebar", ".nav-link", ".badge-danger"];
+
+        elementsToToggle.forEach((selector) => {
+          document.querySelectorAll(selector).forEach((element) => {
+            element.classList.add("dark-mode");
+          });
+        });
+      }
+    };
+  </script>
 </html>

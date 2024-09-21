@@ -1,3 +1,4 @@
+from django.conf.urls.i18n import set_language
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from CarePath import views
@@ -107,6 +108,7 @@ urlpatterns = [
 
 
 
+    path('i18n/setlang/', set_language, name='set_language'),
 
 ]
 

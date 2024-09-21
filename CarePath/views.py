@@ -30,6 +30,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
+from django.utils.translation import gettext as _
 
 
 
