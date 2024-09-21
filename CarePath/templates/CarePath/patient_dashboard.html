@@ -36,8 +36,7 @@
       </div> -->
       <div class="nav-item" style="text-align: center; position: relative">
         <a href="{% url 'patient_communication' %}">
-          Communication {% if unread_messages_count > 0 or
-          unread_reminders_count > 0 %}
+          Communication {% if unread_messages_count > 0 or unread_reminders_count > 0 %}
           <span
             class="badge badge-danger"
             style="position: absolute; top: -5px; right: -10px"
