@@ -48,6 +48,14 @@
   font-weight: 900 !important;
 }
 
+.badge-danger {
+  background-color: red;
+  color: white;
+  font-size: 10px;
+  padding: 3px;
+  border-radius: 50%;
+}
+
 /*** Button ***/
 .btn {
   font-weight: 500;

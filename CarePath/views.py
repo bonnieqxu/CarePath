@@ -200,6 +200,7 @@ def register(request):
             phone_number=phone_number,
             password=password,
             role=role,
+            is_active=True
         )
 
         # Set additional fields for patients
@@ -214,6 +215,7 @@ def register(request):
                 user.department = department
             if provider_role:
                 user.provider_role = provider_role
+            user.status = 'Disabled'
 
         user.save()
         
@@ -317,6 +319,33 @@ def register(request):
 # --------------------------------- REGISTERED USER VIEWS ------------------------
 
 # user login
+# def login(request):
+#     if request.method == "POST":
+#         email = request.POST['email']
+#         password = request.POST['password']
+
+#         user = authenticate(request, username=email, password=password)
+
+#         if user is not None:
+#             auth_login(request, user)
+
+#             # log into role appropriate Dashboard
+#             if user.role == 'Patient':
+#                 return redirect('patient_dashboard')
+#             elif user.role == 'Healthcare Provider':
+#                 return redirect('provider_dashboard')
+#             elif user.role == 'Admin':
+#                 return redirect('admin_dashboard')
+#         else:
+#             # return error message
+#             messages.error(request, 'Invalid email or password.')
+#             return redirect('login')
+        
+#     return render(request, "CarePath/login.html")
+
+
+
+
 def login(request):
     if request.method == "POST":
         email = request.POST['email']
@@ -325,21 +354,33 @@ def login(request):
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
+            
+            if user.role == 'Healthcare Provider':
+                if not user.is_active:
+
+                    messages.error(request, 'Your account has been disabled. Please contact the admin.')
+                    return redirect('login')
+                elif user.status == 'Disabled':
+                    
+                    return render(request, 'CarePath/account_pending.html')
+
+           
             auth_login(request, user)
 
-            # log into role appropriate Dashboard
             if user.role == 'Patient':
                 return redirect('patient_dashboard')
-            elif user.role == 'Healthcare Provider':
+            elif user.role == 'Healthcare Provider' and user.status == 'Active':
                 return redirect('provider_dashboard')
             elif user.role == 'Admin':
                 return redirect('admin_dashboard')
         else:
-            # return error message
+           
             messages.error(request, 'Invalid email or password.')
             return redirect('login')
         
     return render(request, "CarePath/login.html")
+
+
 
 
 # # dashboards
@@ -355,18 +396,52 @@ def patient_dashboard(request):
     return render(request, 'CarePath/patient_dashboard.html', context)
 
 
+# @login_required
+# def provider_dashboard(request):
+#     return render(request, 'CarePath/provider_dashboard.html')
+
 @login_required
 def provider_dashboard(request):
-    return render(request, 'CarePath/provider_dashboard.html')
+    
+    if request.user.role == 'Healthcare Provider' and request.user.status != 'Active':
+        return render(request, 'CarePath/account_pending.html')  
+    
+    unread_feedback_count = Feedback.objects.filter(provider=request.user, is_read=False).count()
+
+    context = {
+        'unread_feedback_count': unread_feedback_count
+    }
+
+    return render(request, 'CarePath/provider_dashboard.html', context)
+
+
+# @login_required
+# def admin_dashboard(request):
+#      # Check if the admin's profile is incomplete
+#     if request.user.role == 'Admin' and (not request.user.first_name or not request.user.last_name):
+#         messages.warning(request, 'Please complete your profile information.')
+#         return redirect('admin_profile')  # Redirect to the profile page to fill in the information
+
+#     return render(request, 'CarePath/admin_dashboard.html')
 
 @login_required
 def admin_dashboard(request):
-     # Check if the admin's profile is incomplete
+
     if request.user.role == 'Admin' and (not request.user.first_name or not request.user.last_name):
         messages.warning(request, 'Please complete your profile information.')
-        return redirect('admin_profile')  # Redirect to the profile page to fill in the information
+        return redirect('admin_profile')  
 
-    return render(request, 'CarePath/admin_dashboard.html')
+
+    pending_users = CustomUser.objects.filter(role='Healthcare Provider', status='Disabled')
+
+    pending_users_count = pending_users.count()
+
+    context = {
+        'pending_users_count': pending_users_count,
+    }
+
+    return render(request, 'CarePath/admin_dashboard.html', context)
+
 
 
 @login_required
@@ -978,10 +1053,32 @@ def edit_appt(request, patient_id, appointment_id):
 #  ------------------------ communication functions --------------------------
 
 
+# @login_required
+# def patient_communication(request):
+#     # Fetch patient's unread messages
+#     messages = Message.objects.filter(recipient=request.user).order_by('-created_at')  # Correct field name
+
+#     # Fetch patient's reminders (appointments in the next 3 days)
+#     today = date.today()
+#     reminders = Appointment.objects.filter(
+#         patient=request.user,
+#         date__range=[today, today + timedelta(days=3)]
+#     )
+
+#     # Get the list of providers for feedback
+#     providers = CustomUser.objects.filter(role__in=['Healthcare Provider', 'Admin'])
+
+#     return render(request, 'CarePath/patient_communication.html', {
+#         'messages': messages,
+#         'reminders': reminders,
+#         'providers': providers,
+#     })
+
+
 @login_required
 def patient_communication(request):
-    # Fetch patient's unread messages
-    messages = Message.objects.filter(recipient=request.user).order_by('-created_at')  # Correct field name
+    # Fetch patient's messages
+    messages = Message.objects.filter(recipient=request.user).order_by('-created_at')
 
     # Fetch patient's reminders (appointments in the next 3 days)
     today = date.today()
@@ -990,6 +1087,18 @@ def patient_communication(request):
         date__range=[today, today + timedelta(days=3)]
     )
 
+    
+
+   
+
+    # Count unread messages
+    unread_messages_count = Message.objects.filter(recipient=request.user, is_read=False).count()
+
+    # Since reminders are not marked as read/unread, use the number of reminders as the count
+    # unread_reminders_count = reminders.count()
+
+    unread_reminders_count = Appointment.objects.filter(patient=request.user, is_read=False, date__range=[today, today + timedelta(days=3)]).count()
+
     # Get the list of providers for feedback
     providers = CustomUser.objects.filter(role__in=['Healthcare Provider', 'Admin'])
 
@@ -997,6 +1106,8 @@ def patient_communication(request):
         'messages': messages,
         'reminders': reminders,
         'providers': providers,
+        'unread_messages_count': unread_messages_count,
+        'unread_reminders_count': unread_reminders_count
     })
 
 
@@ -1069,6 +1180,29 @@ def patient_reminders(request):
     )
     return render(request, 'CarePath/patient_reminders.html', {'reminders': reminders})
 
+@login_required
+def mark_reminder_as_read(request, reminder_id):
+    reminder = get_object_or_404(Appointment, id=reminder_id, patient=request.user)
+    reminder.is_read = True
+    reminder.save()
+    messages.success(request, 'Reminder marked as read.')
+    return redirect('patient_communication')
+
+@login_required
+def mark_reminder_as_unread(request, reminder_id):
+    reminder = get_object_or_404(Appointment, id=reminder_id, patient=request.user)
+    reminder.is_read = False
+    reminder.save()
+    messages.success(request, 'Reminder marked as unread.')
+    return redirect('patient_communication')
+
+@login_required
+def delete_reminder(request, reminder_id):
+    reminder = get_object_or_404(Appointment, id=reminder_id, patient=request.user)
+    reminder.delete()
+    messages.success(request, 'Reminder deleted.')
+    return redirect('patient_communication')
+
 
 @login_required
 def patient_feedback(request):
@@ -1112,14 +1246,43 @@ def submit_feedback(request):
 
 @login_required
 def provider_feedback(request):
+    
     # Get feedback directed at the healthcare provider
     feedbacks = Feedback.objects.filter(provider=request.user).order_by('-created_at')
 
-    return render(request, 'CarePath/provider_feedback.html', {'feedbacks': feedbacks})
+    unread_feedback_count = Feedback.objects.filter(provider=request.user, is_read=False).count()
+    
+    context = {
+        'feedbacks': feedbacks,
+        'unread_feedback_count': unread_feedback_count  
+    }
+
+    return render(request, 'CarePath/provider_feedback.html', context)
 
 
 
+@login_required
+def mark_feedback_as_read(request, feedback_id):
+    feedback = get_object_or_404(Feedback, id=feedback_id)
+    feedback.is_read = True
+    feedback.save()
+    messages.success(request, 'Feedback marked as read.')
+    return redirect('provider_feedback')
 
+@login_required
+def mark_feedback_as_unread(request, feedback_id):
+    feedback = get_object_or_404(Feedback, id=feedback_id)
+    feedback.is_read = False
+    feedback.save()
+    messages.success(request, 'Feedback marked as unread.')
+    return redirect('provider_feedback')
+
+@login_required
+def delete_feedback(request, feedback_id):
+    feedback = get_object_or_404(Feedback, id=feedback_id)
+    feedback.delete()
+    messages.success(request, 'Feedback has been deleted.')
+    return redirect('provider_feedback')
 
 
 
@@ -1433,14 +1596,17 @@ def admin_edit_appt(request, patient_id, appointment_id):
 @login_required
 def manage_users(request):
     # get all users
-    pending_users = CustomUser.objects.filter(is_active=False, role__in=['Healthcare Provider'])
-    active_users = CustomUser.objects.filter(is_active=True, role='Healthcare Provider')
+    pending_users = CustomUser.objects.filter(role='Healthcare Provider', status='Disabled')
+    active_users = CustomUser.objects.filter(is_active=True, role='Healthcare Provider', status='Active')
     patients = CustomUser.objects.filter(role='Patient')
+
+    pending_users_count = pending_users.count()
 
     context = {
         'pending_users': pending_users,
         'active_users': active_users,
-        'patients': patients
+        'patients': patients,
+        'pending_users_count': pending_users_count,
     }
 
     return render(request, 'CarePath/manage_users.html', context)

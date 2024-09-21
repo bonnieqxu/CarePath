@@ -29,8 +29,19 @@
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_appt' %}">My Appointment</a>
       </div>
-      <div class="nav-item" style="text-align: center">
+      <!-- <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_communication' %}">Communication</a>
+      </div> -->
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'patient_communication' %}" style="position: relative">
+          Communication {% if unread_messages_count > 0 or unread_reminders_count > 0 %}
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+        </a>
       </div>
     </div>
     <!-- Log Out link -->
@@ -103,9 +114,12 @@
         >
       </li>
     </ul> -->
+    <p>Unread messages: {{ unread_messages_count }}</p>
+    <p>Unread reminders: {{ unread_reminders_count }}</p>
 
     <ul class="nav nav-tabs" id="communicationTabs" role="tablist">
-      <li class="nav-item">
+      
+      <li class="nav-item" style="position: relative">
         <a
           class="nav-link"
           id="messages-tab"
@@ -114,10 +128,17 @@
           role="tab"
           aria-controls="messages"
           aria-selected="false"
-          >Messages</a
         >
+          Messages {% if unread_messages_count > 0 %}
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+        </a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item" style="position: relative">
         <a
           class="nav-link"
           id="reminders-tab"
@@ -126,9 +147,17 @@
           role="tab"
           aria-controls="reminders"
           aria-selected="false"
-          >Reminders</a
         >
+          Reminders {% if unread_reminders_count > 0 %}
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+        </a>
       </li>
+      
       <li class="nav-item">
         <a
           class="nav-link"
@@ -142,6 +171,8 @@
         >
       </li>
     </ul>
+ 
+  
 
     <div class="tab-content" id="communicationTabsContent">
       <!-- Messages Tab -->
@@ -216,7 +247,7 @@
       <hr />
 
       <!-- Reminders Tab -->
-      <div
+      <!-- <div
         class="tab-pane fade"
         id="reminders"
         role="tabpanel"
@@ -235,7 +266,47 @@
         </div>
         <hr />
         {% endfor %}
-      </div>
+      </div> -->
+
+     
+      <div class="tab-pane fade" id="reminders" role="tabpanel" aria-labelledby="reminders-tab">
+        <br />
+        <h3>Your Reminders</h3>
+        <br />
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reminder in reminders %}
+                <tr class="{% if not reminder.is_read %}font-weight-bold{% endif %}">
+                    <td>{{ reminder.date|date:"d-m-Y" }}</td>
+                    <td>{{ reminder.start_time }}</td>
+                    <td>{{ reminder.location }}</td>
+                    <td>
+                        {% if reminder.is_read %}
+                        <a href="{% url 'mark_reminder_as_unread' reminder.id %}#reminders" class="btn btn-warning btn-sm">Mark as Unread</a>
+                        {% else %}
+                        <a href="{% url 'mark_reminder_as_read' reminder.id %}#reminders" class="btn btn-success btn-sm">Mark as Read</a>
+                        {% endif %}
+                        <a href="{% url 'delete_reminder' reminder.id %}#reminders" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this reminder?');">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No reminders found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    
 
       <!-- Leave Feedback Tab -->
       <div

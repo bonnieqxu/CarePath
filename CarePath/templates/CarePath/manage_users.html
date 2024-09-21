@@ -30,8 +30,19 @@
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'admin_search_pt' %}">Book Appointment</a>
       </div>
-      <div class="nav-item" style="text-align: center">
+      <!-- <div class="nav-item" style="text-align: center">
         <a href="{% url 'manage_users' %}">Manage Users</a>
+      </div> -->
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'manage_users' %}" style="position: relative">
+          Manage Users {% if pending_users_count > 0 %}
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+        </a>
       </div>
     </div>
     <form
@@ -65,7 +76,7 @@
   <div style="flex-grow: 1; padding: 10px; text-align: left">
     <h2>Manage Users</h2>
     <ul class="nav nav-tabs" id="manageUsersTabs" role="tablist">
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a
           class="nav-link"
           id="approve-tab"
@@ -75,8 +86,27 @@
           aria-controls="approve"
           aria-selected="false"
           >Approve Accounts</a
+        > -->
+      <li class="nav-item" style="position: relative">
+        <a
+          class="nav-link"
+          id="approve-tab"
+          data-toggle="tab"
+          href="#approve"
+          role="tab"
+          aria-controls="approve"
+          aria-selected="false"
         >
+          Approve Accounts {% if pending_users_count > 0 %}
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+        </a>
       </li>
+
       <li class="nav-item">
         <a
           class="nav-link"
@@ -113,6 +143,14 @@
       >
         <br />
         <h3>Approve Pending Accounts</h3>
+        {% if messages %}
+        <div class="alert alert-info">
+          <ul>
+            {% for message in messages %} {{ message }} {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
         <table class="table table-striped">
           <thead>
             <tr>
@@ -121,6 +159,7 @@
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
+              <th>Department</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -129,7 +168,9 @@
             <tr>
               <td>{{ user.first_name }} {{ user.last_name }}</td>
               <td>{{ user.email }}</td>
-              <td>{{ user.role }}</td>
+
+              <td>{{ user.provider_role }}</td>
+              <td>{{ user.department }}</td>
               <!-- <td>
                 <a
                   href="{% url 'approve_account' user.id %}"
@@ -166,6 +207,14 @@
       >
         <br />
         <h3>Disable Active Accounts</h3>
+        {% if messages %}
+        <div class="alert alert-info">
+          <ul>
+            {% for message in messages %} {{ message }} {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
         <table class="table table-striped">
           <thead>
             <tr>
@@ -222,6 +271,14 @@
       >
         <br />
         <h3>Discharge Patients</h3>
+        {% if messages %}
+        <div class="alert alert-info">
+          <ul>
+            {% for message in messages %} {{ message }} {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
         <table class="table table-striped">
           <thead>
             <tr>

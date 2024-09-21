@@ -70,6 +70,12 @@ urlpatterns = [
 
 
     path('patient_reminders/', views.patient_reminders, name='patient_reminders'),
+
+    path('reminder/read/<int:reminder_id>/', views.mark_reminder_as_read, name='mark_reminder_as_read'),
+    path('reminder/unread/<int:reminder_id>/', views.mark_reminder_as_unread, name='mark_reminder_as_unread'),
+    path('reminder/delete/<int:reminder_id>/', views.delete_reminder, name='delete_reminder'),
+
+
     path('patient_feedback/', views.patient_feedback, name='patient_feedback'),
     path('submit_feedback/', views.submit_feedback, name='submit_feedback'),
 
@@ -92,6 +98,10 @@ urlpatterns = [
 
 
     path('provider/feedback/', views.provider_feedback, name='provider_feedback'),
+    path('feedback/read/<int:feedback_id>/', views.mark_feedback_as_read, name='mark_feedback_as_read'),
+    path('feedback/unread/<int:feedback_id>/', views.mark_feedback_as_unread, name='mark_feedback_as_unread'),
+    path('feedback/delete/<int:feedback_id>/', views.delete_feedback, name='delete_feedback'),
+
 
 
 

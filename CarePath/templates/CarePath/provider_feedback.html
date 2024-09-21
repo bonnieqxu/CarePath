@@ -1,6 +1,5 @@
 {% extends "CarePath/layout.html" %} {% block title %} View Feedback
 {%endblock%} {% block content %}
-
 <div style="display: flex; min-height: 60vh; margin: 0 5px">
   <!-- Sidebar -->
   <div
@@ -32,8 +31,20 @@
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'provider_search_pt' %}">Book a New Appointment</a>
       </div>
-      <div class="nav-item" style="text-align: center">
+      <!-- <div class="nav-item" style="text-align: center">
         <a href="{% url 'provider_feedback' %}">View Feedback</a>
+      </div> -->
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_feedback' %}" style="position: relative">
+          View Feedback {% if unread_feedback_count > 0 %}
+          <!-- Red dot styled to be positioned at the top-right of the text -->
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+        </a>
       </div>
     </div>
     <!-- Log Out link -->
@@ -71,7 +82,6 @@
       <div class="col-12 col-md-8 col-lg-6">
         <div style="padding: 8px; text-align: left">
           <h2>Feedback from Patients</h2>
-          <hr />
 
           {% if feedbacks %}
           <table class="table table-striped">
@@ -80,17 +90,41 @@
                 <th>Date</th>
                 <th>Patient Name</th>
                 <th>Feedback</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {% for feedback in feedbacks %}
-              <tr>
+              <tr
+                class="{% if not feedback.is_read %}font-weight-bold{% endif %}"
+              >
                 <td>{{ feedback.created_at|date:"d-m-Y H:i" }}</td>
                 <td>
                   {{ feedback.patient.first_name }}
                   {{feedback.patient.last_name}}
                 </td>
                 <td>{{ feedback.feedback }}</td>
+                <td>
+                  {% if feedback.is_read %}
+                  <a
+                    href="{% url 'mark_feedback_as_unread' feedback.id %}"
+                    class="btn btn-warning btn-sm"
+                    >Mark as Unread</a
+                  >
+                  {% else %}
+                  <a
+                    href="{% url 'mark_feedback_as_read' feedback.id %}"
+                    class="btn btn-success btn-sm"
+                    >Mark as Read</a
+                  >
+                  {% endif %}
+                  <a
+                    href="{% url 'delete_feedback' feedback.id %}"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure you want to delete this feedback?');"
+                    >Delete</a
+                  >
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -103,5 +137,4 @@
     </div>
   </div>
 </div>
-
 {% endblock %}

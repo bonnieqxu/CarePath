@@ -1,0 +1,15 @@
+{% extends "CarePath/layout.html" %} {% block title %} Account Pending
+{%endblock %} {% block content %}
+<div class="container text-center" style="margin-top: 50px">
+  <div class="card" style="max-width: 600px; margin: 0 auto; padding: 30px">
+    <div class="card-body">
+      <h2 class="card-title text-danger">Your Account is Pending Approval</h2>
+      <p class="card-text">
+        Your account has been successfully created, but it is currently pending
+        approval by an administrator. Please check back later.
+      </p>
+      <a href="{% url 'home' %}" class="btn btn-primary mt-3">Go to Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
