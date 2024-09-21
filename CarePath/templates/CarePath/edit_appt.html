@@ -76,9 +76,7 @@
           {% if messages %}
           <div>
             {% for message in messages %}
-            <!-- <div
-              class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}"
-            > -->
+            
             <div
               class="alert {% if 'error' in message.tags %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}"
             >
@@ -135,17 +133,6 @@
               />
             </div>
 
-            <!-- <div class="form-group">
-              <label for="location">Location:</label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                class="form-control"
-                value="{{ appointment.location }}"
-                required
-              />
-            </div> -->
             
             {{ appointment.location }}
             <div class="form-group">
@@ -159,18 +146,14 @@
                     {% if appointment.location == "Level 2 Outpatient Clinic, Building 1, Auckland City Hospital" %}selected{% endif %}>
                     Level 2 Outpatient Clinic, Building 1, Auckland City Hospital, Auckland
                   </option>
-                  <!-- Fallback if location doesn't match any predefined options -->
-                  <!-- <option value="{{ appointment.location }}" 
-                    {% if appointment.location != "Level 1 Hospital Specialist Dentistry, Building 4, Greenlane Clinical Centre, Auckland" and appointment.location != "Level 2 Outpatient Clinic, Building 1, Auckland City Hospital, Auckland" %}selected{% endif %}>
-                    {{ appointment.location }}
-                  </option> -->
+                  
                 </select>
               </div>
               
               
               
               
-              
+            
               
 
             <div class="form-group">

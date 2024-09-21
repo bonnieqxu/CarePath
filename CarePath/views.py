@@ -229,85 +229,6 @@ def register(request):
 
 
 
-# create a new account
-# def register(request):
-#     today_date = date.today().strftime('%Y-%m-%d')  # Format today's date as YYYY-MM-DD
-    
-#     if request.method == "POST":
-#         first_name = request.POST['first_name']
-#         last_name = request.POST['last_name']
-#         phone_number = request.POST['phone_number']
-#         email = request.POST['email']
-#         password = request.POST['password']
-#         confirm_password = request.POST['confirm_password']
-#         role = request.POST['role']
-
-#         # For patients only
-#         date_of_birth = request.POST.get('date_of_birth', None)
-#         address = request.POST.get('address', None)
-
-#         # For providers only
-#         department = request.POST.get('department', None)
-#         provider_role = request.POST.get('provider_role', None)
-
-#         # Check if passwords match
-#         if password != confirm_password:
-#             return render(request, 'CarePath/register.html', {'error': "Passwords do not match", 'today_date': today_date})
-
-#         # Check if email is already in use
-#         if CustomUser.objects.filter(email=email).exists():
-#             return render(request, 'CarePath/register.html', {'error': "Email already in use", 'today_date': today_date})
-
-#         # Ensure Admin registration is only possible via Django Admin or superuser
-#         if role == 'Admin':
-#             return render(request, 'CarePath/register.html', {'error': "Admin registration is not allowed via this form.", 'today_date': today_date})
-
-#         # Validate password strength
-#         try:
-#             validate_password(password)
-#         except ValidationError as e:
-#             return render(request, 'CarePath/register.html', {'error': e.messages, 'today_date': today_date})
-
-#         # Create the new user with the selected role (Patient or Healthcare Provider)
-#         user = CustomUser.objects.create_user(
-#             email=email,  # Use email as the unique identifier
-#             first_name=first_name,
-#             last_name=last_name,
-#             phone_number=phone_number,
-#             password=password,
-#             role=role,
-#         )
-
-#         # Set additional fields for patients
-#         if role == 'Patient':
-#             if date_of_birth:
-#                 try:
-#                     # Ensure date format is valid
-#                     user.date_of_birth = date_of_birth
-#                 except ValueError:
-#                     return render(request, 'CarePath/register.html', {'error': "Invalid date of birth format.", 'today_date': today_date})
-#             if address:
-#                 user.address = address
-
-#         # Set additional fields for healthcare providers
-#         if role == 'Healthcare Provider':
-#             if department:
-#                 user.department = department
-#             if provider_role:
-#                 user.provider_role = provider_role
-
-#         user.save()
-
-#         # Assign the user to the appropriate group based on the role
-#         group = Group.objects.get(name=role)
-#         user.groups.add(group)
-
-#         messages.success(request, "Registration successful! Please log in.")
-#         return redirect('login')  # Redirect to login after successful registration
-
-#     return render(request, 'CarePath/register.html', {'today_date': today_date})
-
-
 # ---------------------------- VISITOR related views ends -----------------------
 
 
@@ -319,33 +240,6 @@ def register(request):
 # --------------------------------- REGISTERED USER VIEWS ------------------------
 
 # user login
-# def login(request):
-#     if request.method == "POST":
-#         email = request.POST['email']
-#         password = request.POST['password']
-
-#         user = authenticate(request, username=email, password=password)
-
-#         if user is not None:
-#             auth_login(request, user)
-
-#             # log into role appropriate Dashboard
-#             if user.role == 'Patient':
-#                 return redirect('patient_dashboard')
-#             elif user.role == 'Healthcare Provider':
-#                 return redirect('provider_dashboard')
-#             elif user.role == 'Admin':
-#                 return redirect('admin_dashboard')
-#         else:
-#             # return error message
-#             messages.error(request, 'Invalid email or password.')
-#             return redirect('login')
-        
-#     return render(request, "CarePath/login.html")
-
-
-
-
 def login(request):
     if request.method == "POST":
         email = request.POST['email']
@@ -383,10 +277,8 @@ def login(request):
 
 
 
-# # dashboards
-# @login_required
-# def patient_dashboard(request):
-#     return render(request, 'CarePath/patient_dashboard.html')
+# dashboards
+
 @login_required
 def patient_dashboard(request):
     patient = request.user  
@@ -395,10 +287,6 @@ def patient_dashboard(request):
     }
     return render(request, 'CarePath/patient_dashboard.html', context)
 
-
-# @login_required
-# def provider_dashboard(request):
-#     return render(request, 'CarePath/provider_dashboard.html')
 
 @login_required
 def provider_dashboard(request):
@@ -414,15 +302,6 @@ def provider_dashboard(request):
 
     return render(request, 'CarePath/provider_dashboard.html', context)
 
-
-# @login_required
-# def admin_dashboard(request):
-#      # Check if the admin's profile is incomplete
-#     if request.user.role == 'Admin' and (not request.user.first_name or not request.user.last_name):
-#         messages.warning(request, 'Please complete your profile information.')
-#         return redirect('admin_profile')  # Redirect to the profile page to fill in the information
-
-#     return render(request, 'CarePath/admin_dashboard.html')
 
 @login_required
 def admin_dashboard(request):
@@ -452,6 +331,7 @@ def dashboard(request):
         return redirect('provider_dashboard')
     elif request.user.role == 'Admin':
         return redirect('admin_dashboard')
+
 
 
 #----------------------------- patient dashboard functions -----------------------
@@ -674,143 +554,6 @@ def view_more_appt_info(request, patient_id, appointment_id):
         'appointment': appointment,
         'duration_in_minutes': duration_in_minutes
     })
-
-
-# @login_required
-# def edit_appt(request, patient_id, appointment_id):
-#     # Get patient and appointment details
-#     patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
-#     appointment = get_object_or_404(Appointment, id=appointment_id, patient=patient)
-
-#     if request.method == "POST":
-#         # Process the form submission
-#         appointment.date = request.POST['date']
-#         appointment.start_time = request.POST['start_time']
-#         appointment.finish_time = request.POST['finish_time']
-#         appointment.location = request.POST['location']
-#         appointment.notes = request.POST.get('notes', '')
-
-#         # Validate that the start time is before the finish time
-#         start_datetime = datetime.combine(appointment.date, appointment.start_time)
-#         finish_datetime = datetime.combine(appointment.date, appointment.finish_time)
-#         if start_datetime >= finish_datetime:
-#             messages.error(request, "Start time must be earlier than finish time.")
-#             return render(request, 'CarePath/edit_appt.html', {'appointment': appointment, 'patient': patient})
-
-#         # Save updated appointment
-#         appointment.save()
-
-#         # Notify the patient about the updated appointment
-#         patient_message = f"Your appointment on {appointment.date} has been updated. New time: {appointment.start_time} - {appointment.finish_time}. Location: {appointment.location}. Notes: {appointment.notes}"
-#         send_mail(
-#             'Appointment Updated',
-#             patient_message,
-#             'admin@carepath.com',
-#             [patient.email],
-#             fail_silently=False,
-#         )
-
-#         messages.success(request, "Appointment updated and the patient has been notified.")
-#         return redirect('provider_appt')
-
-#     return render(request, 'CarePath/edit_appt.html', {
-#         'appointment': appointment,
-#         'patient': patient,
-#     })
-
-
-
-
-# @login_required
-# def edit_appt(request, patient_id, appointment_id):
-#     # Get patient and appointment details
-#     patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
-#     appointment = get_object_or_404(Appointment, id=appointment_id, patient=patient)
-
-#     if request.method == "POST":
-#         location = request.POST['location']
-#         notes = request.POST.get('notes', '')
-
-#         # Convert the date and time from the form into datetime objects
-#         try:
-#             appointment_date = datetime.strptime(request.POST['date'], '%Y-%m-%d').date()
-#             start_time = datetime.strptime(request.POST['start_time'], '%H:%M').time()
-#             finish_time = datetime.strptime(request.POST['finish_time'], '%H:%M').time()
-#         except ValueError:
-#             messages.error(request, "Invalid date or time format.")
-#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
-
-#         # Validation: Date must be a weekday (Mon-Fri)
-#         if appointment_date.weekday() >= 5:  # 5 is Saturday, 6 is Sunday
-#             messages.error(request, "Appointments can only be scheduled on weekdays (Mon-Fri).")
-#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
-
-#         # Validation: Start time cannot be earlier than 8am, finish time cannot be later than 4:30pm
-#         earliest_start_time = time(8, 0)  # 8:00 AM
-#         latest_finish_time = time(16, 30)  # 4:30 PM
-
-#         if start_time < earliest_start_time:
-#             messages.error(request, "Start time cannot be earlier than 8:00 AM.")
-#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
-
-#         if finish_time > latest_finish_time:
-#             messages.error(request, "Finish time cannot be later than 4:30 PM.")
-#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
-
-#         # Validation: Finish time must be later than start time
-#         if start_time >= finish_time:
-#             messages.error(request, "Finish time must be later than start time.")
-#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
-
-#         # Check if the patient has another appointment during the same time
-#         patient_conflict = Appointment.objects.filter(
-#             patient=patient,
-#             date=appointment_date,
-#             start_time__lt=finish_time,
-#             finish_time__gt=start_time
-#         ).exclude(id=appointment_id)  # Exclude current appointment
-
-#         # Check if the provider has another appointment during the same time
-#         provider_conflict = Appointment.objects.filter(
-#             provider=appointment.provider,
-#             date=appointment_date,
-#             start_time__lt=finish_time,
-#             finish_time__gt=start_time
-#         ).exclude(id=appointment_id)  # Exclude current appointment
-
-#         if patient_conflict.exists() or provider_conflict.exists():
-#             messages.error(request, "The patient or provider already has an appointment at the chosen time.")
-#             return render(request, 'CarePath/edit_appt.html', {'patient': patient, 'appointment': appointment})
-
-#         # If no conflicts, update the appointment with new values
-#         appointment.date = appointment_date
-#         appointment.start_time = start_time
-#         appointment.finish_time = finish_time
-#         appointment.location = location
-#         appointment.notes = notes
-#         appointment.save()
-
-#         formatted_date = appointment.date.strftime('%d-%m-%Y')
-
-#          # Send message to the patient
-#         Message.objects.create(
-#             recipient=patient,
-#             content=f"Your appointment on {formatted_date} has been updated."
-#         )
-
-#         messages.success(request, "Appointment updated successfully!")
-
-#         # Send a success message to the patient
-#         messages.success(request, f"A message has been sent to {patient.first_name}.")
-
-#         return redirect('provider_appt')
-
-#     # Pre-load current appointment data for the form
-#     return render(request, 'CarePath/edit_appt.html', {
-#         'patient': patient,
-#         'appointment': appointment
-#     })
-
 
 
 
@@ -1053,28 +796,6 @@ def edit_appt(request, patient_id, appointment_id):
 #  ------------------------ communication functions --------------------------
 
 
-# @login_required
-# def patient_communication(request):
-#     # Fetch patient's unread messages
-#     messages = Message.objects.filter(recipient=request.user).order_by('-created_at')  # Correct field name
-
-#     # Fetch patient's reminders (appointments in the next 3 days)
-#     today = date.today()
-#     reminders = Appointment.objects.filter(
-#         patient=request.user,
-#         date__range=[today, today + timedelta(days=3)]
-#     )
-
-#     # Get the list of providers for feedback
-#     providers = CustomUser.objects.filter(role__in=['Healthcare Provider', 'Admin'])
-
-#     return render(request, 'CarePath/patient_communication.html', {
-#         'messages': messages,
-#         'reminders': reminders,
-#         'providers': providers,
-#     })
-
-
 @login_required
 def patient_communication(request):
     # Fetch patient's messages
@@ -1086,10 +807,6 @@ def patient_communication(request):
         patient=request.user,
         date__range=[today, today + timedelta(days=3)]
     )
-
-    
-
-   
 
     # Count unread messages
     unread_messages_count = Message.objects.filter(recipient=request.user, is_read=False).count()
@@ -1109,7 +826,6 @@ def patient_communication(request):
         'unread_messages_count': unread_messages_count,
         'unread_reminders_count': unread_reminders_count
     })
-
 
 
 
@@ -1336,41 +1052,6 @@ class AdminPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
         return super().form_valid(form)
     
 
-# view appts
-# @login_required
-# def all_appointments(request):
-
-#     appointments = Appointment.objects.all()
-
-#     date = request.GET.get('date', None)
-#     provider_id = request.GET.get('provider', None)
-#     patient_id = request.GET.get('patient', None)
-#     location = request.GET.get('location', None)
-
-#     # filters
-#     if date:
-#         appointments = appointments.filter(date=date)
-#     if provider_id:
-#         appointments = appointments.filter(provider__id=provider_id)
-#     if patient_id:
-#         appointments = appointments.filter(patient__id=patient_id)
-#     if location:
-#         appointments = appointments.filter(location__icontains=location)
-
-#     providers = CustomUser.objects.filter(role='Healthcare Provider')
-#     patients = CustomUser.objects.filter(role='Patient')
-
-#     context = {
-#         'appointments': appointments,
-#         'providers': providers,
-#         'patients': patients,
-#         'selected_date': date,
-#         'selected_provider': provider_id,
-#         'selected_patient': patient_id,
-#         'selected_location': location,
-#     }
-
-#     return render(request, 'CarePath/all_appointments.html', context)
 
 
 # view all appts
@@ -1620,28 +1301,10 @@ def approve_account(request, user_id):
     messages.success(request, f"The account for {user.first_name} {user.last_name} has been approved.")
     return redirect('manage_users')
 
-# @login_required
-# def disable_account(request, user_id):
-#     user = get_object_or_404(CustomUser, id=user_id)
-#     user.is_active = False
-#     user.save()
-#     messages.success(request, f"The account for {user.first_name} {user.last_name} has been disabled.")
-#     return redirect('manage_users')
-
-# @login_required
-# def disable_account(request, user_id):
-#     user = get_object_or_404(CustomUser, id=user_id)
-
-#     if request.method == 'POST':
-#         user.is_active = False  # Mark the user as inactive (disabled)
-#         user.save()
-#         messages.success(request, f"{user.first_name} {user.last_name}'s account has been disabled.")
-#         return redirect('manage_users')
-
-#     return render(request, 'CarePath/manage_users.html')
 
 
-# Disable account (for Healthcare Provider or Admin)
+
+# Disable account (for Healthcare Provider)
 @login_required
 def disable_account(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
@@ -1656,43 +1319,7 @@ def disable_account(request, user_id):
     
     return redirect('manage_users')
 
-# # disable healthcare provider accounts only
-# @login_required
-# def manage_users(request):
-#     # get all users
-#     pending_users = CustomUser.objects.filter(is_active=False, role__in=['Healthcare Provider'])
-#     active_users = CustomUser.objects.filter(is_active=True, role='Healthcare Provider')  # Only Healthcare Providers
-#     patients = CustomUser.objects.filter(role='Patient')
 
-#     context = {
-#         'pending_users': pending_users,
-#         'active_users': active_users,
-#         'patients': patients
-#     }
-
-#     return render(request, 'CarePath/manage_users.html', context)
-
-
-# @login_required
-# def discharge_patient(request, patient_id):
-#     patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
-#     patient.delete()
-#     messages.success(request, f"The patient {patient.first_name} {patient.last_name} has been discharged.")
-#     return redirect('manage_users')
-
-# @login_required
-# def discharge_patient(request, patient_id):
-#     patient = get_object_or_404(CustomUser, id=patient_id, role='Patient')
-
-#     if request.method == 'POST':
-#         # patient.role = 'Discharged'  # Mark the patient as discharged
-#         patient.status = 'Discharged'
-#         patient.is_active = True
-#         patient.save()
-#         messages.success(request, f"{patient.first_name} {patient.last_name} has been discharged.")
-#         return redirect('manage_users')
-
-#     return render(request, 'CarePath/manage_users.html')
 
 # Discharge patient
 @login_required

@@ -3,8 +3,7 @@ from django.contrib.auth import views as auth_views
 from CarePath import views
 from .views import PatientPasswordChangeView, ProviderPasswordChangeView, AdminPasswordChangeView
 
-# from .views import patient_communication, mark_as_read, delete_message, submit_feedback
-# from CarePath.models import 
+
 
 
 
@@ -59,29 +58,19 @@ urlpatterns = [
     path('patient_appt/', views.patient_appt, name='patient_appt'),
     path('view_provider_details/<int:provider_id>/', views.view_provider_details, name='view_provider_details'),
 
-
     path('patient/communication/', views.patient_communication, name='patient_communication'),
-
     path('patient_messages/', views.patient_messages, name='patient_messages'),
     path('mark_as_read/<int:message_id>/', views.mark_as_read, name='mark_as_read'),
     path('mark_as_unread/<int:message_id>/', views.mark_as_unread, name='mark_as_unread'),
     path('delete_message/<int:message_id>/', views.delete_message, name='delete_message'),
 
-
-
     path('patient_reminders/', views.patient_reminders, name='patient_reminders'),
-
     path('reminder/read/<int:reminder_id>/', views.mark_reminder_as_read, name='mark_reminder_as_read'),
     path('reminder/unread/<int:reminder_id>/', views.mark_reminder_as_unread, name='mark_reminder_as_unread'),
     path('reminder/delete/<int:reminder_id>/', views.delete_reminder, name='delete_reminder'),
 
-
     path('patient_feedback/', views.patient_feedback, name='patient_feedback'),
     path('submit_feedback/', views.submit_feedback, name='submit_feedback'),
-
-
-
-
 
     # healthcare provider dashboard functions
     path('provider_profile/', views.provider_profile, name='provider_profile'),
@@ -95,22 +84,15 @@ urlpatterns = [
     path('book_pt_appointment/<int:patient_id>/', views.book_pt_appointment, name='book_pt_appointment'),
     path('cancel_appt/<int:appointment_id>/', views.cancel_appt, name='cancel_appt'),
 
-
-
     path('provider/feedback/', views.provider_feedback, name='provider_feedback'),
     path('feedback/read/<int:feedback_id>/', views.mark_feedback_as_read, name='mark_feedback_as_read'),
     path('feedback/unread/<int:feedback_id>/', views.mark_feedback_as_unread, name='mark_feedback_as_unread'),
     path('feedback/delete/<int:feedback_id>/', views.delete_feedback, name='delete_feedback'),
 
-
-
-
-
     # admin dashboard functions
     path('admin_profile/', views.admin_profile, name='admin_profile'),
     path('admin_password/', AdminPasswordChangeView.as_view(), name='admin_password'),
     path('admin/appointments/', views.all_appointments, name='all_appointments'),
-    # path('admin_search_pt/', views.provider_search_pt, name='provider_search_pt'),
     path('admin/search_pt/', views.admin_search_pt, name='admin_search_pt'),
     path('admin/view_pt/<int:id>/', views.admin_view_pt, name='admin_view_pt'),
     path('admin/book_pt_appointment/<int:patient_id>/', views.admin_book_pt_appointment, name='admin_book_pt_appointment'),
