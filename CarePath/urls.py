@@ -50,8 +50,7 @@ urlpatterns = [
     path('activate/<uidb64>/<token>/', activate_user, name='activate'),
     path('activate/<uidb64>/<token>/', views.activate_user, name='activate_user'),
     path('confirm-activation/<int:user_id>/', views.confirm_account_activation, name='confirm_account_activation'),
-    # path('account_pending/', views.account_pending, name='account_pending'),
-
+    
     # dashboards
     path('dashboard/', views.dashboard, name='dashboard'),
     path('patient/dashboard/', views.patient_dashboard, name='patient_dashboard'),

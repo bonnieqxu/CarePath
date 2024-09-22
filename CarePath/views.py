@@ -1,36 +1,31 @@
-import re
+
 import os
 from datetime import date, time, datetime,  timedelta
 
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
-from django.contrib.auth.password_validation import password_validators_help_texts, validate_password
+from django.contrib.auth.password_validation import password_validators_help_texts
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.forms import PasswordChangeForm
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator as token_generator
 from django.contrib.sites.shortcuts import get_current_site
 
 from django.urls import reverse_lazy, reverse
-from django.utils import timezone
-from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeError
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode, urlencode
+
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.timezone import datetime
 from django.utils.translation import gettext as _
-from django.core.mail import send_mail
-from django.core.exceptions import ValidationError
+
 
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 
-from django.views.generic import TemplateView
-
 from django.db.models import Q
-
-from django.template.loader import render_to_string
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -162,79 +157,7 @@ def team(request):
 
 
 
-
-
-# create a new account
-# def register(request):
-#     today_date = date.today().strftime('%Y-%m-%d')  # Format today's date as YYYY-MM-DD
-#     if request.method == "POST":
-#         first_name = request.POST['first_name']
-#         last_name = request.POST['last_name']
-#         phone_number = request.POST['phone_number']
-#         email = request.POST['email']
-#         password = request.POST['password']
-#         confirm_password = request.POST['confirm_password']
-#         role = request.POST['role']
-
-#          # For patients only
-#         date_of_birth = request.POST.get('date_of_birth', None)
-#         address = request.POST.get('address', None)
-
-#         # for providers only
-#         department = request.POST.get('department', None)
-#         provider_role = request.POST.get('provider_role', None)
-
-
-#         # Check if passwords match
-#         if password != confirm_password:
-#             return render(request, 'CarePath/register.html', {'error': "Passwords do not match"})
-
-#         # Check if email is already in use
-#         if CustomUser.objects.filter(email=email).exists():
-#             return render(request, 'CarePath/register.html', {'error': "Email already in use"})
-
-#         # Ensure Admin registration is only possible via Django Admin or superuser
-#         if role == 'Admin':
-#             return render(request, 'CarePath/register.html', {'error': "Admin registration is not allowed via this form."})
-
-#         # Create the new user with the selected role (Patient or Healthcare Provider)
-#         user = CustomUser.objects.create_user(
-#             # username=email,
-#             email=email,
-#             first_name=first_name,
-#             last_name=last_name,
-#             phone_number=phone_number,
-#             password=password,
-#             role=role,
-#             is_active=True
-#         )
-
-#         # Set additional fields for patients
-#         if role == 'Patient':
-#             if date_of_birth:  
-#                 user.date_of_birth = date_of_birth
-#             if address:
-#                 user.address = address
-
-#         if role == 'Healthcare Provider':
-#             if department:
-#                 user.department = department
-#             if provider_role:
-#                 user.provider_role = provider_role
-#             user.status = 'Disabled'
-
-#         user.save()
-        
-#         # Assign the user to the appropriate group based on the role
-#         group = Group.objects.get(name=role)
-#         user.groups.add(group)
-
-#         return redirect('login')  # Redirect to login after successful registration
-
-#     return render(request, 'CarePath/register.html', {'today_date': today_date})
-
-
-
+# create an account
 def register(request):
     today_date = date.today().strftime('%Y-%m-%d')  # Format today's date as YYYY-MM-DD
     if request.method == "POST":
@@ -322,11 +245,7 @@ def send_activation_email(request, user):
     activation_link = reverse('activate_user', kwargs={'uidb64': uidb64, 'token': token})
     activation_url = f'http://{current_site.domain}{activation_link}'
     
-    # # Creating the email content from the template
-    # message_body = render_to_string('CarePath/activation_email.html', {
-    #     'user': user,
-    #     'activation_url': activation_url,
-    # })
+    
     
     # Sending email with SendGrid
     email_message = Mail(
@@ -337,23 +256,10 @@ def send_activation_email(request, user):
         html_content=f'<p>Hi {user.first_name},</p><p>Please click the following link to activate your account: <a href="{activation_url}">Activate Account</a></p>'
     )
 
-    # try:
-    #     sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY')) 
-    #     print(f'Email sent: {response.status_code}')
-    # except Exception as e:
-    #     print(f'Error sending email: {str(e)}')
-
-    # # Create SendGrid email message
-    # message = Mail(
-    #     from_email='bonnieoht@gmail.com',  # Replace with your actual email
-    #     to_emails=user.email,
-    #     subject=mail_subject,
-    #     html_content=message_body
-    # )
+    
 
     try:
         # Retrieve the SendGrid API key securely from environment variable
-        # sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
         response = sg.send(email_message)
         print(response.status_code)
@@ -363,26 +269,6 @@ def send_activation_email(request, user):
         print(f'Error sending email: {str(e)}')
 
 
-# # handle email activation
-# def activate_user(request, uidb64, token):
-#     try:
-#         uid = force_str(urlsafe_base64_decode(uidb64))
-#         user = CustomUser.objects.get(pk=uid)
-#     except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
-#         user = None
-
-#     if user is not None and token_generator.check_token(user, token):
-#         user.is_active = True  # Activate the account
-#         user.save()
-
-#         # If the user is a healthcare provider, notify them that admin approval is needed
-#         if user.role == 'Healthcare Provider':
-#             return render(request, 'CarePath/account_pending.html')
-#         else:
-#             return redirect('login')  # For patients, they can directly log in
-
-#     else:
-#         return render(request, 'CarePath/activation_invalid.html')  # Handle invalid token or user
 
 # handle email activation
 def activate_user(request, uidb64, token):
@@ -809,9 +695,6 @@ def book_pt_appointment(request, patient_id):
             messages.error(request, "Invalid date format.")
             return render(request, 'CarePath/book_pt_appointment.html', {'patient': patient, 'providers': providers})
 
-
-
-
         # Validate that start_time < finish_time
         if time.fromisoformat(start_time) >= time.fromisoformat(finish_time):
             messages.error(request, "Start time must be earlier than finish time.")
@@ -849,8 +732,6 @@ def book_pt_appointment(request, patient_id):
             notes=notes
         )
         appointment.save()
-
-
 
 
         formatted_date = appointment_date.strftime('%d-%m-%Y')

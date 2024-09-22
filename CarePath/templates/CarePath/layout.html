@@ -321,12 +321,13 @@
     }
 
     function toggleDarkMode() {
-      
-
       // Toggle dark mode for the body
       document.body.classList.toggle("dark-mode");
 
-      console.log('Dark mode activated:', document.body.classList.contains("dark-mode"));
+      console.log(
+        "Dark mode activated:",
+        document.body.classList.contains("dark-mode")
+      );
 
       // Define elements that need dark mode toggle
       const elementsToToggle = [".sidebar", ".nav-link", ".badge-danger"];
