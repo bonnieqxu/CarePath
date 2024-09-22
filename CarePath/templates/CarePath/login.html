@@ -1,82 +1,78 @@
-{% extends "CarePath/layout.html" %}  {% load static %} {% block title %} Login {% endblock %}
-{%block content %} 
-<br><br> <br>
+{% extends "CarePath/layout.html" %} {% load static %} {% block title %} Login
+{% endblock %} {%block content %} <br /><br />
+<br />
 
-<div class="container flex-column" style="transform: scale(1.3); min-height: 65vh; max-height: 90vh;">
-    <!-- Outer Row -->
+<div
+  class="container flex-column"
+  style="transform: scale(1.3); min-height: 65vh; max-height: 90vh"
+>
+  <!-- Outer Row -->
   <div class="row justify-content-center">
     <div class="col-xl-10 col-lg-12 col-md-9">
       <div class="card o-hidden border-0 shadow-lg my-5">
         <div class="card-body p-0">
-
           <div class="row">
+            <div class="col-lg-6 d-none d-lg-block" style="background-image:
+            url('{% static "CarePath/images/holding_flower.jpg" %}');
+            background-size: cover;" >
+          </div>
 
-            <div
-              class="col-lg-6 d-none d-lg-block"
-              style="background-image: url('{% static "CarePath/images/holding_flower.jpg" %}'); background-size: cover;"
-            ></div>
+          <div class="col-lg-6">
+            <div class="p-5">
+              <div class="text-center">
+                <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+              </div>
 
-            <div class="col-lg-6">
-              <div class="p-5">
-                <div class="text-center">
-                  <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+              {% if form.errors %}
+              <div class="alert alert-danger">
+                {% for field in form %} {% for error in field.errors %}
+                <p>{{ error }}</p>
+                {% endfor %} {% endfor %}
+              </div>
+              {% endif %} {% if messages %} {% for message in messages %}
+              <div
+                class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+              >
+                {{ message }}
+              </div>
+              {% endfor %} {% endif %}
+
+              <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    placeholder="Enter Email Address..."
+                    required
+                  />
+                </div>
+                <div class="form-group mb-3">
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                  />
                 </div>
 
-                {% if form.errors %}
-                    <div class="alert alert-danger">
-                        {% for field in form %}
-                        {% for error in field.errors %}
-                        <p>{{ error }}</p>
-                        {% endfor %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                <button type="submit" class="btn btn-primary d-block mx-auto">
+                  Login
+                </button>
+              </form>
+              <hr />
 
-                {% if messages %}
-                    <div class="alert alert-danger">
-                        {% for message in messages %}
-                        {{ message }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <form action="{% url 'login' %}" method="post">
-                    {% csrf_token %}
-                  <div class="form-group mb-3">
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="email"
-                      name="email"
-                      placeholder="Enter Email Address..."
-                      required
-                    />
-                  </div>
-                  <div class="form-group mb-3">
-                    <input
-                      type="password"
-                      class="form-control"
-                      id="password"
-                      name="password"
-                      placeholder="Password"
-                      required
-                    />
-                  </div>
-
-                  <button type="submit" class="btn btn-primary d-block mx-auto">
-                    Login
-                  </button>
-                </form>
-                <hr />
-
-                <div class="text-center">
-                  <a
-                    class="small"
-                    href="{% url 'register' %}"
-                    style="text-decoration: none"
-                    >Create an Account!</a
-                  >
-                </div>
+              <div class="text-center">
+                <a
+                  class="small"
+                  href="{% url 'register' %}"
+                  style="text-decoration: none"
+                  >Create an Account!</a
+                >
               </div>
             </div>
           </div>
@@ -85,4 +81,5 @@
     </div>
   </div>
 </div>
+
 {% endblock %}

@@ -2,7 +2,7 @@ from django.conf.urls.i18n import set_language
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from CarePath import views
-from .views import PatientPasswordChangeView, ProviderPasswordChangeView, AdminPasswordChangeView
+from .views import PatientPasswordChangeView, ProviderPasswordChangeView, AdminPasswordChangeView, activate_user
 
 
 
@@ -46,6 +46,11 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+
+    path('activate/<uidb64>/<token>/', activate_user, name='activate'),
+    path('activate/<uidb64>/<token>/', views.activate_user, name='activate_user'),
+    path('confirm-activation/<int:user_id>/', views.confirm_account_activation, name='confirm_account_activation'),
+    # path('account_pending/', views.account_pending, name='account_pending'),
 
     # dashboards
     path('dashboard/', views.dashboard, name='dashboard'),

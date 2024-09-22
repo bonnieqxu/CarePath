@@ -2,38 +2,43 @@ import re
 import os
 from datetime import date, time, datetime,  timedelta
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.contrib.auth.password_validation import password_validators_help_texts, validate_password
-from django.views.generic import TemplateView
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.tokens import default_token_generator as token_generator
+from django.contrib.sites.shortcuts import get_current_site
 
+from django.urls import reverse_lazy, reverse
 from django.utils import timezone
+from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeError
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode, urlencode
 from django.utils.timezone import datetime
 from django.utils.translation import gettext as _
 from django.core.mail import send_mail
 from django.core.exceptions import ValidationError
-from django.contrib.auth import get_user_model
-from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy, reverse
 
-from .models import CustomUser, Appointment, Message, Feedback
+from django.views.generic import TemplateView
+
 from django.db.models import Q
-from django.http import JsonResponse
+
 from django.template.loader import render_to_string
 
-from django.utils.translation import gettext as _
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 
 
+
+from .models import CustomUser, Appointment, Message, Feedback
 
 
 User = get_user_model()
@@ -160,6 +165,76 @@ def team(request):
 
 
 # create a new account
+# def register(request):
+#     today_date = date.today().strftime('%Y-%m-%d')  # Format today's date as YYYY-MM-DD
+#     if request.method == "POST":
+#         first_name = request.POST['first_name']
+#         last_name = request.POST['last_name']
+#         phone_number = request.POST['phone_number']
+#         email = request.POST['email']
+#         password = request.POST['password']
+#         confirm_password = request.POST['confirm_password']
+#         role = request.POST['role']
+
+#          # For patients only
+#         date_of_birth = request.POST.get('date_of_birth', None)
+#         address = request.POST.get('address', None)
+
+#         # for providers only
+#         department = request.POST.get('department', None)
+#         provider_role = request.POST.get('provider_role', None)
+
+
+#         # Check if passwords match
+#         if password != confirm_password:
+#             return render(request, 'CarePath/register.html', {'error': "Passwords do not match"})
+
+#         # Check if email is already in use
+#         if CustomUser.objects.filter(email=email).exists():
+#             return render(request, 'CarePath/register.html', {'error': "Email already in use"})
+
+#         # Ensure Admin registration is only possible via Django Admin or superuser
+#         if role == 'Admin':
+#             return render(request, 'CarePath/register.html', {'error': "Admin registration is not allowed via this form."})
+
+#         # Create the new user with the selected role (Patient or Healthcare Provider)
+#         user = CustomUser.objects.create_user(
+#             # username=email,
+#             email=email,
+#             first_name=first_name,
+#             last_name=last_name,
+#             phone_number=phone_number,
+#             password=password,
+#             role=role,
+#             is_active=True
+#         )
+
+#         # Set additional fields for patients
+#         if role == 'Patient':
+#             if date_of_birth:  
+#                 user.date_of_birth = date_of_birth
+#             if address:
+#                 user.address = address
+
+#         if role == 'Healthcare Provider':
+#             if department:
+#                 user.department = department
+#             if provider_role:
+#                 user.provider_role = provider_role
+#             user.status = 'Disabled'
+
+#         user.save()
+        
+#         # Assign the user to the appropriate group based on the role
+#         group = Group.objects.get(name=role)
+#         user.groups.add(group)
+
+#         return redirect('login')  # Redirect to login after successful registration
+
+#     return render(request, 'CarePath/register.html', {'today_date': today_date})
+
+
+
 def register(request):
     today_date = date.today().strftime('%Y-%m-%d')  # Format today's date as YYYY-MM-DD
     if request.method == "POST":
@@ -179,7 +254,6 @@ def register(request):
         department = request.POST.get('department', None)
         provider_role = request.POST.get('provider_role', None)
 
-
         # Check if passwords match
         if password != confirm_password:
             return render(request, 'CarePath/register.html', {'error': "Passwords do not match"})
@@ -194,14 +268,13 @@ def register(request):
 
         # Create the new user with the selected role (Patient or Healthcare Provider)
         user = CustomUser.objects.create_user(
-            # username=email,
             email=email,
             first_name=first_name,
             last_name=last_name,
             phone_number=phone_number,
             password=password,
             role=role,
-            is_active=True
+            is_active=False  # User account is inactive until email is verified
         )
 
         # Set additional fields for patients
@@ -216,7 +289,7 @@ def register(request):
                 user.department = department
             if provider_role:
                 user.provider_role = provider_role
-            user.status = 'Disabled'
+            user.status = 'Disabled'  # Provider will still need admin approval after email activation
 
         user.save()
         
@@ -224,11 +297,127 @@ def register(request):
         group = Group.objects.get(name=role)
         user.groups.add(group)
 
-        return redirect('login')  # Redirect to login after successful registration
+        # Send activation email
+        send_activation_email(request, user)
+
+        # Inform the user that the activation email has been sent
+        return render(request, 'CarePath/activation_sent.html')
 
     return render(request, 'CarePath/register.html', {'today_date': today_date})
 
 
+
+
+
+# Helper function to send activation email using SendGrid
+def send_activation_email(request, user):
+    current_site = get_current_site(request)
+    mail_subject = 'Activate your CarePath account'
+    
+    # Encoding user ID and generating token
+    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+    token = token_generator.make_token(user)
+    
+    # Generating activation link
+    activation_link = reverse('activate_user', kwargs={'uidb64': uidb64, 'token': token})
+    activation_url = f'http://{current_site.domain}{activation_link}'
+    
+    # # Creating the email content from the template
+    # message_body = render_to_string('CarePath/activation_email.html', {
+    #     'user': user,
+    #     'activation_url': activation_url,
+    # })
+    
+    # Sending email with SendGrid
+    email_message = Mail(
+        from_email='bonnieoht@gmail.com',  
+        to_emails=user.email,  # User's email
+        subject=mail_subject,
+        # html_content=message
+        html_content=f'<p>Hi {user.first_name},</p><p>Please click the following link to activate your account: <a href="{activation_url}">Activate Account</a></p>'
+    )
+
+    # try:
+    #     sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY')) 
+    #     print(f'Email sent: {response.status_code}')
+    # except Exception as e:
+    #     print(f'Error sending email: {str(e)}')
+
+    # # Create SendGrid email message
+    # message = Mail(
+    #     from_email='bonnieoht@gmail.com',  # Replace with your actual email
+    #     to_emails=user.email,
+    #     subject=mail_subject,
+    #     html_content=message_body
+    # )
+
+    try:
+        # Retrieve the SendGrid API key securely from environment variable
+        # sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        response = sg.send(email_message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(f'Error sending email: {str(e)}')
+
+
+# # handle email activation
+# def activate_user(request, uidb64, token):
+#     try:
+#         uid = force_str(urlsafe_base64_decode(uidb64))
+#         user = CustomUser.objects.get(pk=uid)
+#     except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+#         user = None
+
+#     if user is not None and token_generator.check_token(user, token):
+#         user.is_active = True  # Activate the account
+#         user.save()
+
+#         # If the user is a healthcare provider, notify them that admin approval is needed
+#         if user.role == 'Healthcare Provider':
+#             return render(request, 'CarePath/account_pending.html')
+#         else:
+#             return redirect('login')  # For patients, they can directly log in
+
+#     else:
+#         return render(request, 'CarePath/activation_invalid.html')  # Handle invalid token or user
+
+# handle email activation
+def activate_user(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        user = None
+
+    if user is not None and token_generator.check_token(user, token):
+        user.is_active = True  # Activate the account but wait for user confirmation
+        user.save()
+
+        # Navigate to the activate_account.html page for the user to confirm activation
+        return render(request, 'CarePath/activate_account.html', {'user': user})
+
+    else:
+        return render(request, 'CarePath/activation_invalid.html')  # Handle invalid token or user
+
+
+# handle account activation after user confirms
+def confirm_account_activation(request, user_id):
+    try:
+        user = CustomUser.objects.get(pk=user_id)
+    except CustomUser.DoesNotExist:
+        return render(request, 'CarePath/activation_invalid.html')  # Handle invalid user
+
+    # Add success message after activation
+    messages.success(request, 'Your account is activated successfully!')
+
+    # Redirect based on the user role
+    if user.role == 'Healthcare Provider':
+        return render(request, 'CarePath/account_pending.html')  # Navigate to account pending
+    else:
+        return redirect('login')  # For patients, navigate to login
 
 # ---------------------------- VISITOR related views ends -----------------------
 
@@ -256,11 +445,14 @@ def login(request):
                     messages.error(request, 'Your account has been disabled. Please contact the admin.')
                     return redirect('login')
                 elif user.status == 'Disabled':
-                    
+                    messages.info(request, 'Your account is pending admin approval.')
                     return render(request, 'CarePath/account_pending.html')
 
            
             auth_login(request, user)
+
+            # Set success message
+            messages.success(request, 'Your account is activated successfully!')
 
             if user.role == 'Patient':
                 return redirect('patient_dashboard')

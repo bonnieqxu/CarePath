@@ -1,0 +1,12 @@
+{% extends "CarePath/layout.html" %} {% block title %}Activate
+Account{%endblock%} {% block content %}
+<div class="container" style="text-align: center">
+  <h3>Please click the button below to complete the activation process.</h3>
+  <p>Thank you!</p>
+
+  <form method="post" action="{% url 'confirm_account_activation' user.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Activate Account</button>
+  </form>
+</div>
+{% endblock %}
