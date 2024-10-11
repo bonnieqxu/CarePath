@@ -1,11 +1,27 @@
 {% extends "CarePath/layout.html" %} {% block title %} Activation Email Sent
 {%endblock %} {% block content %}
-<div class="container">
-  <h1>Activation Email Sent</h1>
-  <p>
-    Please check your email inbox to activate your account. If you don't see the
-    email, check your spam folder.
-  </p>
+
+<div class="container text-center" style="margin-top: 50px">
+  <div class="card" style="max-width: 600px; margin: 0 auto; padding: 30px">
+    <div class="card-body">
+      <!-- Display messages -->
+
+      <div class="alert alert-success">
+        <h1>Activation Email Sent</h1>
+      </div>
+
+      <!-- <h2 class="card-title text-danger">Your Account is Pending Approval</h2> -->
+      <p class="card-text">
+        Please check your email inbox to activate your account. If you don't see
+        the email, check your spam folder.
+      </p>
+      <a href="{% url 'home' %}" class="btn btn-primary mt-3">Go to Home</a>
+    </div>
+  </div>
 </div>
+
+<br /><br /><br /><br />
+<br /><br /><br /><br />
+<br /><br /><br /><br />
 
 {% endblock %}

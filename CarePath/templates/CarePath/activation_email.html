@@ -1,11 +1,53 @@
-{% extends "CarePath/layout.html" %} {% block title %} Account Activation
-{%endblock %} {% block content %}
 
-<p>Hello {{ user.first_name }},</p>
+
+<p>Hello {{ user.first_name }} {{ user.last_name }},</p>
+
+<p>Welcome to CarePath!</p>
+
 <p>
-  Thank you for registering. Please click the link below to activate your
-  account:
+  Thank you for signing up with CarePath. To complete your registration and
+  activate your account, please click the link below:
 </p>
-<p><a href="{{ activation_url }}">Activate Account</a></p>
 
-{% endblock %}
+<br />
+<!-- <p><a href="{{ activation_url }}">Activate Account</a></p> -->
+<p>
+  <a href="{{ activation_url }}" style="font-weight: bold; color: #0463fa"
+    >Activate Account</a
+  >
+</p>
+
+<p>
+  Once your account is activated, you'll be able to access the CarePath platform
+  and use its features:
+</p>
+
+<ul>
+  <li>
+    <strong>For Patients:</strong> View your appointments, communicate with
+    healthcare providers, and access important health information.
+  </li>
+  <li>
+    <strong>For Healthcare Providers:</strong> Manage patient appointments,
+    provide feedback, and collaborate with your healthcare team.
+  </li>
+</ul>
+
+<p>
+  If you have any questions or need assistance, please do not hesitate to
+  contact our support team.
+</p>
+
+<p>We look forward to supporting your journey on CarePath.</p>
+
+<br />
+<p>Best regards,</p>
+<p>The CarePath Team</p>
+
+<hr />
+<p style="font-size: 12px; color: #888">
+  Please note: This is an automated message. Do not reply to this email. If you
+  didn't register for a CarePath account, please disregard this message.
+</p>
+
+

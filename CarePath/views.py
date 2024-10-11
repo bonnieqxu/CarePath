@@ -4,6 +4,7 @@ from datetime import date, time, datetime,  timedelta
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.contrib.auth.password_validation import password_validators_help_texts
 from django.contrib.auth.models import Group
@@ -26,6 +27,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 
 from django.db.models import Q
+from django.template.loader import render_to_string
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -246,14 +248,21 @@ def send_activation_email(request, user):
     activation_url = f'http://{current_site.domain}{activation_link}'
     
     
+    # Render the email content using the template
+    email_content = render_to_string('CarePath/activation_email.html', {
+        'user': user,
+        'activation_url': activation_url,
+    })
+
     
     # Sending email with SendGrid
     email_message = Mail(
         from_email='bonnieoht@gmail.com',  
         to_emails=user.email,  # User's email
         subject=mail_subject,
-        # html_content=message
-        html_content=f'<p>Hi {user.first_name},</p><p>Please click the following link to activate your account: <a href="{activation_url}">Activate Account</a></p>'
+        
+        # html_content=f'<p>Hi {user.first_name},</p><p>Please click the following link to activate your account: <a href="{activation_url}">Activate Account</a></p>'
+        html_content=email_content
     )
 
     
@@ -458,9 +467,37 @@ def patient_profile(request, id):
 
 
 # change password
+# class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+#     template_name = 'CarePath/patient_password.html'
+#     success_url = reverse_lazy('patient_profile')
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['password_help_texts'] = password_validators_help_texts()
+#         return context
+
+#     def form_invalid(self, form):
+#         # Check which fields caused validation errors
+#         for field in form.errors:
+#             if field == 'old_password':
+#                 messages.error(self.request, _('The old password you entered is incorrect.'))
+#             elif field == 'new_password1' or field == 'new_password2':
+#                 messages.error(self.request, _('The new passwords you entered do not match.'))
+#         return super().form_invalid(form)
+
+#     def form_valid(self, form):
+#         messages.success(self.request, _('Your password has been updated successfully!'))
+#         return super().form_valid(form)
+    
+
+
+
 class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'CarePath/patient_password.html'
-    success_url = reverse_lazy('patient_profile')
+
+    def get_success_url(self):
+        # Return the URL for the patient's profile page with the user ID
+        return reverse('patient_profile', kwargs={'id': self.request.user.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -472,14 +509,14 @@ class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
         for field in form.errors:
             if field == 'old_password':
                 messages.error(self.request, _('The old password you entered is incorrect.'))
-            elif field == 'new_password1' or field == 'new_password2':
+            elif field in ['new_password1', 'new_password2']:
                 messages.error(self.request, _('The new passwords you entered do not match.'))
         return super().form_invalid(form)
 
     def form_valid(self, form):
         messages.success(self.request, _('Your password has been updated successfully!'))
         return super().form_valid(form)
-    
+
 
 # display pt appointments
 @login_required
@@ -1016,6 +1053,24 @@ def patient_feedback(request):
 
 
 
+# @login_required
+# def submit_feedback(request):
+#     if request.method == "POST":
+#         provider_id = request.POST['provider']
+#         feedback_content = request.POST['feedback']
+#         provider = CustomUser.objects.get(id=provider_id)
+        
+#         Feedback.objects.create(
+#             patient=request.user,
+#             provider=provider,
+#             feedback=feedback_content,
+#         )
+#         messages.success(request, 'Your feedback has been submitted successfully!', extra_tags='feedback_success')
+    
+
+#     return HttpResponseRedirect(reverse('patient_communication') + '#feedback')
+
+
 @login_required
 def submit_feedback(request):
     if request.method == "POST":
@@ -1023,13 +1078,21 @@ def submit_feedback(request):
         feedback_content = request.POST['feedback']
         provider = CustomUser.objects.get(id=provider_id)
         
+        # Create feedback entry in the database
         Feedback.objects.create(
             patient=request.user,
             provider=provider,
             feedback=feedback_content,
         )
-        messages.success(request, 'Your feedback has been submitted successfully!')
-    # return redirect('patient_communication') 
+
+        # Clear any existing messages
+        storage = get_messages(request)
+        for _ in storage:
+            pass  # This will clear the messages queue
+
+        # Add only the feedback submission success message
+        messages.success(request, 'Your feedback has been submitted successfully!', extra_tags='feedback_success')
+    
     return HttpResponseRedirect(reverse('patient_communication') + '#feedback')
 
 
