@@ -15,7 +15,7 @@
 
           <hr />
 
-          <form method="post" action="{% url 'register' %}">
+          <form id="registerForm" method="post" action="{% url 'register' %}">
             {% csrf_token %}
 
             <!-- Role Selection -->
@@ -127,16 +127,20 @@
             </div>
 
             <!-- Check email availability -->
-            <script>
+            <!-- <script>
               document
                 .getElementById("email")
                 .addEventListener("blur", function () {
                   var email = this.value;
                   var xhr = new XMLHttpRequest();
-                  xhr.open("POST", "/check_email_availability", true);
+                  xhr.open("POST", "/check_email_availability/", true);
                   xhr.setRequestHeader("Content-Type", "application/json");
+                  xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}"); // Include CSRF token
                   xhr.onreadystatechange = function () {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (
+                      xhr.readyState === XMLHttpRequest.DONE &&
+                      xhr.status === 200
+                    ) {
                       var response = JSON.parse(xhr.responseText);
                       var messageElement = document.getElementById(
                         "emailAvailabilityMessage"
@@ -154,6 +158,44 @@
                     }
                   };
                   xhr.send(JSON.stringify({ email: email }));
+                });
+            </script> -->
+
+            <script>
+              document
+                .getElementById("email")
+                .addEventListener("blur", function () {
+                  var email = this.value;
+                  var xhr = new XMLHttpRequest();
+                  xhr.open("POST", "/check_email_availability/", true);
+                  xhr.setRequestHeader(
+                    "Content-Type",
+                    "application/x-www-form-urlencoded"
+                  ); // Send data as form data
+                  xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}"); // Include CSRF token
+
+                  xhr.onreadystatechange = function () {
+                    if (
+                      xhr.readyState === XMLHttpRequest.DONE &&
+                      xhr.status === 200
+                    ) {
+                      var response = JSON.parse(xhr.responseText);
+                      var messageElement = document.getElementById(
+                        "emailAvailabilityMessage"
+                      );
+                      if (response.available) {
+                        messageElement.textContent =
+                          "This email address is available.";
+                        messageElement.style.color = "green";
+                      } else {
+                        messageElement.textContent =
+                          "This email address has been taken.";
+                        messageElement.style.color = "red";
+                      }
+                      messageElement.style.display = "block"; // Show the message
+                    }
+                  };
+                  xhr.send("email=" + encodeURIComponent(email)); // Send the email data properly
                 });
             </script>
 
@@ -242,7 +284,7 @@
           </div>
 
           <!-- Validate form and show dynamic fields -->
-          <script>
+          <!-- <script>
             document
               .getElementById("role")
               .addEventListener("change", function () {
@@ -301,6 +343,92 @@
 
               return true; // Allow form submission
             }
+          </script> -->
+
+          <script>
+            // Role-based field visibility
+            document
+              .getElementById("role")
+              .addEventListener("change", function () {
+                var role = this.value;
+                var patientFields = document.getElementById("patient-fields");
+                var healthcareFields =
+                  document.getElementById("healthcare-fields");
+                if (role === "Patient") {
+                  patientFields.style.display = "block";
+                  healthcareFields.style.display = "none";
+                } else if (role === "Healthcare Provider") {
+                  healthcareFields.style.display = "block";
+                  patientFields.style.display = "none";
+                } else {
+                  patientFields.style.display = "none";
+                  healthcareFields.style.display = "none";
+                }
+              });
+
+            // Validate date of birth
+            document
+              .getElementById("date_of_birth")
+              .addEventListener("input", function () {
+                var inputDate = new Date(this.value);
+                var today = new Date();
+
+                if (inputDate > today) {
+                  alert("Date of birth cannot be in the future.");
+                  this.value = ""; // Clear the input if the date is invalid
+                }
+              });
+
+            // Validate the form on submission
+            document
+              .getElementById("registerForm")
+              .addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                var email = document.getElementById("email").value;
+                var password = document.getElementById("password").value;
+                var confirmPassword =
+                  document.getElementById("confirm_password").value;
+                var emailAvailabilityMessage = document.getElementById(
+                  "emailAvailabilityMessage"
+                );
+
+                // Check email availability synchronously
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/check_email_availability/", false);
+                xhr.setRequestHeader(
+                  "Content-Type",
+                  "application/x-www-form-urlencoded"
+                );
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}"); // Include the CSRF token
+                xhr.send("email=" + encodeURIComponent(email));
+
+                var response = JSON.parse(xhr.responseText);
+
+                if (!response.available) {
+                  emailAvailabilityMessage.textContent =
+                    "This email address has been taken.";
+                  emailAvailabilityMessage.style.color = "red";
+                  emailAvailabilityMessage.style.display = "block";
+                  return; // Prevent form submission if email is taken
+                } else {
+                  emailAvailabilityMessage.textContent =
+                    "This email address is available.";
+                  emailAvailabilityMessage.style.color = "green";
+                  emailAvailabilityMessage.style.display = "block";
+                }
+
+                // Validate password match
+                if (password !== confirmPassword) {
+                  alert(
+                    "Passwords do not match. Please re-enter your passwords."
+                  );
+                  return; // Prevent form submission if passwords do not match
+                }
+
+                // If everything is valid, submit the form
+                this.submit();
+              });
           </script>
         </div>
       </div>

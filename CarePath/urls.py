@@ -44,6 +44,7 @@ urlpatterns = [
 
     # auth
     path('register/', views.register, name='register'),
+    path('check_email_availability/', views.check_email_availability, name='check_email_availability'),
     path('login/', views.login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 

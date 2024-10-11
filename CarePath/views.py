@@ -2,7 +2,7 @@
 import os
 from datetime import date, time, datetime,  timedelta
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
@@ -232,7 +232,21 @@ def register(request):
 
 
 
-
+# def check_email_availability(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         available = not CustomUser.objects.filter(email=email).exists()
+#         return JsonResponse({'available': available})
+    
+def check_email_availability(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if email:
+            available = not CustomUser.objects.filter(email=email).exists()
+            return JsonResponse({'available': available})
+        else:
+            return JsonResponse({'error': 'Invalid email input'}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 # Helper function to send activation email using SendGrid
 def send_activation_email(request, user):
