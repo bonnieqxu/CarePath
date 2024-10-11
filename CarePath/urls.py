@@ -86,6 +86,7 @@ urlpatterns = [
     path('edit_appt/<int:patient_id>/<int:appointment_id>/', views.edit_appt, name='edit_appt'),
 
     path('provider_search_pt/', views.provider_search_pt, name='provider_search_pt'),
+    path('view_patient_details/<int:id>/', views.view_patient_details, name='view_patient_details'),
     path('provider_view_pt/<int:patient_id>/', views.provider_view_pt, name='provider_view_pt'),
     path('book_pt_appointment/<int:patient_id>/', views.book_pt_appointment, name='book_pt_appointment'),
     path('cancel_appt/<int:appointment_id>/', views.cancel_appt, name='cancel_appt'),

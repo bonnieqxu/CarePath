@@ -719,6 +719,11 @@ def provider_view_pt(request, id):
         'is_editable': False   # No editing allowed for the provider
     })
 
+@login_required
+def view_patient_details(request, id):
+    patient = get_object_or_404(CustomUser, id=id, role='Patient')
+    return render(request, 'CarePath/view_patient_details.html', {'patient': patient})
+
 
 # book an appt for the chosen pt
 @login_required

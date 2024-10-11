@@ -1,0 +1,127 @@
+{% extends "CarePath/layout.html" %} {% block title %} More Appointment Info
+{%endblock %} {% block content %}
+<div style="display: flex; min-height: 60vh; margin: 0 5px">
+  <!-- Sidebar -->
+  <div
+    class="sidebar"
+    style="
+      position: relative;
+      min-height: 74vh;
+      width: 270px;
+      margin-right: 20px;
+    "
+  >
+    <div class="user-info">
+      <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+      <p>{{ user.role }}</p>
+    </div>
+    <div class="nav flex-column flex-grow-1">
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'home' %}">Home</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_profile' %}">My Profile</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_password' %}">Change Password</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_appt' %}">My Appointment</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_search_pt' %}">Book a New Appointment</a>
+      </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_feedback' %}">View Feedback</a>
+      </div>
+    </div>
+    <!-- Log Out link -->
+    <form
+      id="logout-form"
+      action="{% url 'logout' %}"
+      method="post"
+      style="display: none"
+    >
+      {% csrf_token %}
+    </form>
+    <a
+      href="#"
+      class="nav-item nav-link"
+      style="
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+        background-color: #2a72b9;
+        color: white;
+        text-decoration: none;
+        border-top: 1px solid #2a72b9;
+        display: block;
+      "
+      onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+      >Log Out</a
+    >
+  </div>
+
+  <!-- Main Content -->
+
+  <div style="flex-grow: 1; padding: 10px; text-align: left">
+    <div class="row">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div style="padding: 8px; text-align: left">
+          <br />
+          <h3>Patient Information</h3>
+          <table class="table">
+            <tr>
+              <th>First Name:</th>
+              <td>{{ patient.first_name }}</td>
+            </tr>
+            <tr>
+              <th>Last Name:</th>
+              <td>{{ patient.last_name }}</td>
+            </tr>
+            <tr>
+              <th>Date of Birth:</th>
+              {% if patient.date_of_birth %}
+              <td>{{ patient.date_of_birth|date:"d-m-Y" }}</td>
+              {% else %}
+              <td></td>
+
+              {% endif %}
+            </tr>
+            <tr>
+              <th>Email:</th>
+              <td>{{ patient.email }}</td>
+            </tr>
+            <tr>
+              <th>Phone Number:</th>
+              <td>{{ patient.phone_number }}</td>
+            </tr>
+            <tr>
+              <th>Address:</th>
+              {% if patient.address %}
+              <td>{{ patient.address }}</td>
+              {% else %}
+              <td></td>
+              {% endif %}
+            </tr>
+          </table>
+
+          <a
+            href="{% url 'provider_search_pt' %}"
+            class="btn btn-secondary"
+            style="margin-right: 15px"
+            >Back to Search</a
+          >
+          <a
+            href="{% url 'book_pt_appointment' patient.id %}"
+            class="btn btn-success"
+            >Book Appointment</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

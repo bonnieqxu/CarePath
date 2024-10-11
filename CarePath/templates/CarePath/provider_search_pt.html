@@ -104,10 +104,11 @@
                   <td>{{ patient.last_name }}</td>
                   <td>
                     <a
-                      href="{% url 'patient_profile' patient.id %}"
+                      href="{% url 'view_patient_details' patient.id %}"
                       class="btn btn-info btn-sm"
                       >View Info</a
                     >
+
                     <a
                       href="{% url 'book_pt_appointment' patient.id %}"
                       class="btn btn-success btn-sm"
