@@ -1,16 +1,9 @@
-:root {
+/* :root {
   --primary: #0463fa;
   --light: #eff5ff;
   --dark: #1b2c51;
 
-  /* Dark Mode */
-  /* --dark-bg: #181818;
-  --dark-text: #e0e0e0;
-  --dark-secondary-text: #b0b0b0;
-  --dark-sidebar-bg: #252525;
-  --dark-sidebar-text: #ffffff;
-  --dark-primary: #90caf9;
-  --dark-hover: #64b5f6; */
+
   --dark-bg: #0a0a0a;
   --dark-text: #000000;
   --dark-secondary-text: #333333;
@@ -18,6 +11,20 @@
   --dark-sidebar-text: #000000;
   --dark-primary: #90caf9;
   --dark-hover: #64b5f6;
+} */
+
+:root {
+  --primary: #0463fa;
+  --light: #eff5ff;
+  --dark: #1b2c51;
+
+  /* Dark Mode */
+  --dark-bg: #121212;
+  --dark-secondary-text: #b0b0b0;
+  --dark-sidebar-bg: #1e1e1e;
+  --dark-sidebar-text: #ffffff;
+  --dark-primary: #64b5f6;
+  --dark-hover: #42a5f5;
 }
 
 /*** Base Styles ***/
