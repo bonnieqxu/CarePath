@@ -29,9 +29,7 @@
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_appt' %}">My Appointment</a>
       </div>
-      <!-- <div class="nav-item" style="text-align: center">
-        <a href="{% url 'patient_communication' %}">Communication</a>
-      </div> -->
+      
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_communication' %}" style="position: relative">
           Communication 
@@ -196,11 +194,7 @@
             {% endif %}
           </form>
 
-          <!-- {% if messages %}
-          <div class="alert alert-success mt-3">
-            {% for message in messages %} {{ message }} {% endfor %}
-          </div>
-          {% endif %} -->
+          
 
           {% if messages %}
           <div class="mt-3">

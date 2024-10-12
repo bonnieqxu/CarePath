@@ -7,8 +7,6 @@ from .views import PatientPasswordChangeView, ProviderPasswordChangeView, AdminP
 
 
 
-
-
 urlpatterns = [
     path('', views.home, name='home'),
 

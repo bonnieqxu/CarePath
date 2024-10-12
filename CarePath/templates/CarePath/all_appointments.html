@@ -98,76 +98,6 @@ All Appointments
             <hr />
 
 
-<!-- Filter form -->
-<!-- <form method="GET" action="{% url 'all_appointments' %}" class="mb-4">
-    <div class="row">
-        <div class="col-md-3">
-            <label for="date">Date:</label>
-            <input type="date" id="date" name="date" value="{{ selected_date }}" class="form-control">
-        </div>
-        <div class="col-md-3">
-            <label for="provider">Healthcare Provider:</label>
-            <select id="provider" name="provider" class="form-control">
-                <option value="">-- Select Provider --</option>
-                {% for provider in providers %}
-                    <option value="{{ provider.id }}" {% if selected_provider == provider.id|stringformat:"s" %}selected{% endif %}>
-                        {{ provider.first_name }} {{ provider.last_name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="patient">Patient:</label>
-            <select id="patient" name="patient" class="form-control">
-                <option value="">-- Select Patient --</option>
-                {% for patient in patients %}
-                    <option value="{{ patient.id }}" {% if selected_patient == patient.id|stringformat:"s" %}selected{% endif %}>
-                        {{ patient.first_name }} {{ patient.last_name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="location">Location:</label>
-            <input type="text" id="location" name="location" value="{{ selected_location }}" class="form-control">
-        </div>
-    </div>
-    <button type="submit" class="btn btn-primary mt-3">Filter</button>
-</form> -->
-
-<!-- Appointments table -->
-<!-- <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Start Time</th>
-            <th>Finish Time</th>
-            <th>Healthcare Provider</th>
-            <th>Patient</th>
-            <th>Location</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for appointment in appointments %}
-        <tr>
-            <td>{{ appointment.date|date:"d-m-Y" }}</td>
-            <td>{{ appointment.start_time }}</td>
-            <td>{{ appointment.finish_time }}</td>
-            <td>{{ appointment.provider.first_name }} {{ appointment.provider.last_name }}</td>
-            <td>{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</td>
-            <td>{{ appointment.location }}</td>
-            <td>{{ appointment.notes|default:"No notes available" }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7">No appointments found.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table> -->
-          
-
 
 
     <!-- Filter form -->
@@ -183,7 +113,7 @@ All Appointments
                 class="form-control"
                 min="{{ today_date }}"
             >
-                <!-- <input type="date" id="date" name="date" value="{{ selected_date }}" class="form-control"> -->
+                
             </div>
             <div class="col-md-3">
                 <label for="provider">Healthcare Provider:</label>
@@ -207,10 +137,7 @@ All Appointments
                     {% endfor %}
                 </select>
             </div>
-            <!-- <div class="col-md-3">
-                <label for="location">Location:</label>
-                <input type="text" id="location" name="location" value="{{ selected_location }}" class="form-control">
-            </div> -->
+            
             <div class="col-md-3">
                 <label for="location">Location:</label>
                 <select id="location" name="location" class="form-control">
@@ -319,9 +246,6 @@ All Appointments
         document.getElementById('filter-form').submit();
     });
 </script>
-
-
-
 
 
 

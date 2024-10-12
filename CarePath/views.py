@@ -22,7 +22,6 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.timezone import datetime
 from django.utils.translation import gettext as _
 
-
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -31,8 +30,6 @@ from django.template.loader import render_to_string
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-
-
 
 from .tokens import token_generator
 from .models import CustomUser, Appointment, Message, Feedback
@@ -232,11 +229,6 @@ def register(request):
 
 
 
-# def check_email_availability(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
-#         available = not CustomUser.objects.filter(email=email).exists()
-#         return JsonResponse({'available': available})
     
 def check_email_availability(request):
     if request.method == 'POST':
@@ -275,11 +267,8 @@ def send_activation_email(request, user):
         to_emails=user.email,  # User's email
         subject=mail_subject,
         
-        # html_content=f'<p>Hi {user.first_name},</p><p>Please click the following link to activate your account: <a href="{activation_url}">Activate Account</a></p>'
         html_content=email_content
     )
-
-    
 
     try:
         # Retrieve the SendGrid API key securely from environment variable
@@ -323,22 +312,6 @@ def activate_user(request, uidb64, token):
         # If the token is invalid, render an error page
         return render(request, 'CarePath/activation_invalid.html', {'message': 'Invalid activation link or link expired.'})
 
-# def activate_user(request, uidb64, token):
-#     try:
-#         uid = force_str(urlsafe_base64_decode(uidb64))
-#         user = CustomUser.objects.get(pk=uid)
-#     except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
-#         user = None
-
-#     if user is not None and token_generator.check_token(user, token):
-#         user.is_active = True  # Activate the account but wait for user confirmation
-#         user.save()
-
-#         # Navigate to the activate_account.html page for the user to confirm activation
-#         return render(request, 'CarePath/activate_account.html', {'user': user})
-
-#     else:
-#         return render(request, 'CarePath/activation_invalid.html')  # Handle invalid token or user
 
 
 # handle account activation after user confirms
@@ -467,47 +440,6 @@ def dashboard(request):
 
 #----------------------------- patient dashboard functions -----------------------
 # view and edit profile info
-# @login_required
-# def patient_profile(request, id):
-#      # Get the patient based on the provided id
-#     patient = get_object_or_404(CustomUser, id=id, role='Patient')
-
-#     # If the current user is the patient, allow editing; otherwise, restrict to view only
-#     if request.user == patient:
-#         if request.method == "POST":
-#             # Update the patient's profile info
-#             patient.first_name = request.POST['first_name']
-#             patient.last_name = request.POST['last_name']
-
-#             # Parse the date of birth
-#             date_of_birth_str = request.POST['date_of_birth']
-#             try:
-#                 date_of_birth = datetime.strptime(date_of_birth_str, '%d-%m-%Y').date()  # Parse the date
-#                 patient.date_of_birth = date_of_birth
-#             except ValueError:
-#                 messages.error(request, "Invalid date format. Please use DD-MM-YYYY.")
-#                 return render(request, 'CarePath/patient_profile.html', {'user': patient, 'is_editable': True})
-
-#             patient.email = request.POST['email']
-#             patient.phone_number = request.POST['phone_number']
-#             patient.address = request.POST['address']
-#             patient.save()
-
-#             messages.success(request, "Your profile has been updated successfully!")
-#             return redirect('patient_profile', id=patient.id)
-
-#         return render(request, 'CarePath/patient_profile.html', {
-#             'user': patient,
-#             'is_editable': True
-#         })
-#     else:
-#         # If the logged-in user is not the patient, show the profile as read-only
-#         return render(request, 'CarePath/patient_profile.html', {
-#             'user': patient,
-#             'is_editable': False
-#         })
-
-
 @login_required
 def patient_profile(request, id):
     # Get the patient based on the provided id
@@ -558,30 +490,6 @@ def patient_profile(request, id):
 
 
 # change password
-# class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
-#     template_name = 'CarePath/patient_password.html'
-#     success_url = reverse_lazy('patient_profile')
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['password_help_texts'] = password_validators_help_texts()
-#         return context
-
-#     def form_invalid(self, form):
-#         # Check which fields caused validation errors
-#         for field in form.errors:
-#             if field == 'old_password':
-#                 messages.error(self.request, _('The old password you entered is incorrect.'))
-#             elif field == 'new_password1' or field == 'new_password2':
-#                 messages.error(self.request, _('The new passwords you entered do not match.'))
-#         return super().form_invalid(form)
-
-#     def form_valid(self, form):
-#         messages.success(self.request, _('Your password has been updated successfully!'))
-#         return super().form_valid(form)
-    
-
-
 
 class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'CarePath/patient_password.html'
@@ -610,7 +518,6 @@ class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
 
 
 # display pt appointments
-from datetime import datetime
 
 @login_required
 def patient_appt(request):
@@ -649,40 +556,7 @@ def patient_appt(request):
         'appointment_data': appointment_data
     })
 
-# @login_required
-# def patient_appt(request):
-#     # Get all appointments where the patient is the logged-in user, sorted by date and time
-#     appointments = Appointment.objects.filter(patient=request.user).order_by('date', 'start_time')
 
-#     # Calculate duration and pass it along with the appointments to the template
-#     appointment_data = []
-#     for appt in appointments:
-#         # Combine date and time to create datetime objects
-#         start_datetime = datetime.combine(appt.date, appt.start_time)
-#         finish_datetime = datetime.combine(appt.date, appt.finish_time)
-#         duration = finish_datetime - start_datetime  # Calculate the duration as timedelta
-
-#         # Convert duration to minutes
-#         duration_in_minutes = duration.total_seconds() / 60
-
-#         appointment_data.append({
-#             'date': appt.date,
-#             'start_time': appt.start_time,
-#             'finish_time': appt.finish_time,
-#             'duration': duration_in_minutes,
-#             'location': appt.location,
-#             'notes': appt.notes,
-#             'patient_name': f"{appt.patient.first_name} {appt.patient.last_name}",
-#             'provider_name': f"{appt.provider.first_name} {appt.provider.last_name}",
-#             'provider': appt.provider,  
-#             'patient_id': appt.patient.id,
-#             'appointment_id': appt.id
-#         })
-
-
-#     return render(request, 'CarePath/patient_appt.html', {
-#         'appointment_data': appointment_data
-#     })
 
 # pt view their healthcare provider details
 @login_required
@@ -782,37 +656,6 @@ def provider_appt(request):
         'appointment_data': appointment_data
     })
 
-# @login_required
-# def provider_appt(request):
-#     # Get all appointments where the provider is the logged-in user, sorted by date and time
-#     appointments = Appointment.objects.filter(provider=request.user).order_by('date', 'start_time')
-
-#     # Calculate duration and pass it along with the appointments to the template
-#     appointment_data = []
-#     for appt in appointments:
-#         # Combine date and time to create datetime objects
-#         start_datetime = datetime.combine(appt.date, appt.start_time)
-#         finish_datetime = datetime.combine(appt.date, appt.finish_time)
-#         duration = finish_datetime - start_datetime  # Calculate the duration as timedelta
-
-#         # Convert duration to minutes
-#         duration_in_minutes = duration.total_seconds() / 60
-
-#         appointment_data.append({
-#             'date': appt.date,
-#             'start_time': appt.start_time,
-#             'finish_time': appt.finish_time,
-#             'duration': duration_in_minutes,
-#             'location': appt.location,
-#             'notes': appt.notes,
-#             'patient_name': f"{appt.patient.first_name} {appt.patient.last_name}",
-#             'patient_id': appt.patient.id,
-#             'appointment_id': appt.id
-#         })
-
-#     return render(request, 'CarePath/provider_appt.html', {
-#         'appointment_data': appointment_data
-#     })
 
 
 
@@ -1225,23 +1068,6 @@ def patient_feedback(request):
 
 
 
-# @login_required
-# def submit_feedback(request):
-#     if request.method == "POST":
-#         provider_id = request.POST['provider']
-#         feedback_content = request.POST['feedback']
-#         provider = CustomUser.objects.get(id=provider_id)
-        
-#         Feedback.objects.create(
-#             patient=request.user,
-#             provider=provider,
-#             feedback=feedback_content,
-#         )
-#         messages.success(request, 'Your feedback has been submitted successfully!', extra_tags='feedback_success')
-    
-
-#     return HttpResponseRedirect(reverse('patient_communication') + '#feedback')
-
 
 @login_required
 def submit_feedback(request):
@@ -1316,23 +1142,6 @@ def delete_feedback(request, feedback_id):
 # ADMIN
 
 
-# @login_required
-# def admin_feedback(request):
-#     # Ensure only admins can access this view
-#     if not request.user.is_staff:  # Assuming `is_staff` is used for admin users
-#         return redirect('home')
-
-#     # Get all feedback entries, sorted by date (newest first)
-#     feedbacks = Feedback.objects.all().order_by('-created_at')
-
-#     unread_feedback_count = Feedback.objects.filter(is_read=False).count()
-    
-#     context = {
-#         'feedbacks': feedbacks,
-#         'unread_feedback_count': unread_feedback_count
-#     }
-
-#     return render(request, 'CarePath/admin_feedback.html', context)
 
 @login_required
 def admin_feedback(request):
@@ -1476,83 +1285,7 @@ def all_appointments(request):
 
     return render(request, 'CarePath/all_appointments.html', context)
 
-# @login_required
-# def all_appointments(request):
-#     appointments = Appointment.objects.all()
 
-#     # Fetch filter values from the request
-#     date_filter = request.GET.get('date', None)
-#     provider_id = request.GET.get('provider', None)
-#     patient_id = request.GET.get('patient', None)
-#     location = request.GET.get('location', None)
-
-#     # Apply filters to the appointments queryset
-#     if date_filter:
-#         appointments = appointments.filter(date=date_filter)
-#     if provider_id:
-#         appointments = appointments.filter(provider__id=provider_id)
-#     if patient_id:
-#         appointments = appointments.filter(patient__id=patient_id)
-#     if location:
-#         appointments = appointments.filter(location__icontains=location)
-
-#     # Order the appointments by date and time
-#     appointments = appointments.order_by('date', 'start_time')
-
-#     # Get the list of providers and patients
-#     providers = CustomUser.objects.filter(role='Healthcare Provider')
-#     patients = CustomUser.objects.filter(role='Patient')
-
-#     # Add today's date to the context to set the minimum value for the date picker
-#     today_date = date.today().strftime('%Y-%m-%d')
-
-#     context = {
-#         'appointments': appointments,
-#         'providers': providers,
-#         'patients': patients,
-#         'selected_date': date_filter,
-#         'selected_provider': provider_id,
-#         'selected_patient': patient_id,
-#         'selected_location': location,
-#         'today_date': today_date,  # Pass today's date to the template
-#     }
-
-#     return render(request, 'CarePath/all_appointments.html', context)
-
-# @login_required
-# def all_appointments(request):
-#     appointments = Appointment.objects.all()
-
-#     date = request.GET.get('date', None)
-#     provider_id = request.GET.get('provider', None)
-#     patient_id = request.GET.get('patient', None)
-#     location = request.GET.get('location', None)
-
-#     if date:
-#         appointments = appointments.filter(date=date)
-#     if provider_id:
-#         appointments = appointments.filter(provider__id=provider_id)
-#     if patient_id:
-#         appointments = appointments.filter(patient__id=patient_id)
-#     if location:
-#         appointments = appointments.filter(location__icontains=location)
-
-#     appointments = appointments.order_by('date', 'start_time')
-    
-#     providers = CustomUser.objects.filter(role='Healthcare Provider')
-#     patients = CustomUser.objects.filter(role='Patient')
-
-#     context = {
-#         'appointments': appointments,
-#         'providers': providers,
-#         'patients': patients,
-#         'selected_date': date,
-#         'selected_provider': provider_id,
-#         'selected_patient': patient_id,
-#         'selected_location': location,
-#     }
-
-#     return render(request, 'CarePath/all_appointments.html', context)
 
 
 # search pt

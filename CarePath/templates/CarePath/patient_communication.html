@@ -29,9 +29,7 @@
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_appt' %}">My Appointment</a>
       </div>
-      <!-- <div class="nav-item" style="text-align: center">
-        <a href="{% url 'patient_communication' %}">Communication</a>
-      </div> -->
+      
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_communication' %}" style="position: relative">
           Communication 
@@ -260,19 +258,6 @@
         <br />
         <h3>Leave Feedback</h3>
 
-        <!-- {% if messages %}
-        <div>
-          {% for message in messages %}
-          <div
-            class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}"
-          >
-            {{ message }}
-          </div>
-          {% endfor %}
-        </div>
-        {% endif %} -->
-
-  
 
         {% if messages %}
         <div>
