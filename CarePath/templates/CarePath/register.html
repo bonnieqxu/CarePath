@@ -48,6 +48,7 @@
                   name="first_name"
                   pattern="[A-Za-z][A-Za-z\s]*"
                   placeholder="Only letters allowed"
+                  oninput="capitalizeFirstLetter(this)"
                   required
                 />
               </div>
@@ -62,6 +63,7 @@
                   name="last_name"
                   pattern="[A-Za-z][A-Za-z\s]*"
                   placeholder="Only letters allowed"
+                  oninput="capitalizeFirstLetter(this)"
                   required
                 />
               </div>
@@ -94,6 +96,7 @@
                   name="address"
                   pattern="[0-9A-Za-z\s,/]*"
                   placeholder="Address"
+                  oninput="capitalizeFirstLetter(this)"
                 />
               </div>
             </div>
@@ -213,6 +216,7 @@
                   id="department"
                   name="department"
                   placeholder="e.g., Cardiology, Radiology"
+                  oninput="capitalizeFirstLetter(this)"
                 />
               </div>
               <div class="form-group">
@@ -225,6 +229,7 @@
                   id="provider_role"
                   name="provider_role"
                   placeholder="e.g., Surgeon, Nurse"
+                  oninput="capitalizeFirstLetter(this)"
                 />
               </div>
             </div>
@@ -348,6 +353,13 @@
           </script> -->
 
           <script>
+            function capitalizeFirstLetter(inputField) {
+              // Capitalize the first letter and keep the rest of the string as it is
+              inputField.value =
+                inputField.value.charAt(0).toUpperCase() +
+                inputField.value.slice(1);
+            }
+
             // Role-based field visibility
             document
               .getElementById("role")
