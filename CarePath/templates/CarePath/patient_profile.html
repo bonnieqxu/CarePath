@@ -88,6 +88,7 @@
                 value="{{ user.first_name }}"
                 pattern="[A-Za-z\s]+"
                 title="First name should contain only letters."
+                oninput="capitalizeFirstLetter(this)"
                 required
               />
             </div>
@@ -101,6 +102,7 @@
                 value="{{ user.last_name }}"
                 pattern="[A-Za-z\s]+"
                 title="Last name should contain only letters."
+                oninput="capitalizeFirstLetter(this)"
                 required
               />
             </div>
@@ -150,6 +152,7 @@
                 id="address"
                 name="address"
                 value="{{ user.address|default_if_none:'' }}"
+                oninput="capitalizeFirstLetter(this)"
                 required
               />
             </div>
@@ -203,4 +206,11 @@
   </div>
 </div>
 
+<script>
+  function capitalizeFirstLetter(inputField) {
+    // Capitalize the first letter and keep the rest of the string as it is
+    inputField.value =
+      inputField.value.charAt(0).toUpperCase() + inputField.value.slice(1);
+  }
+</script>
 {% endblock %}

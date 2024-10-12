@@ -1335,17 +1335,20 @@ class AdminPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
 
 
 # view all appts
+
 @login_required
 def all_appointments(request):
     appointments = Appointment.objects.all()
 
-    date = request.GET.get('date', None)
+    # Fetch filter values from the request
+    date_filter = request.GET.get('date', None)
     provider_id = request.GET.get('provider', None)
     patient_id = request.GET.get('patient', None)
     location = request.GET.get('location', None)
 
-    if date:
-        appointments = appointments.filter(date=date)
+    # Apply filters to the appointments queryset
+    if date_filter:
+        appointments = appointments.filter(date=date_filter)
     if provider_id:
         appointments = appointments.filter(provider__id=provider_id)
     if patient_id:
@@ -1353,22 +1356,63 @@ def all_appointments(request):
     if location:
         appointments = appointments.filter(location__icontains=location)
 
+    # Order the appointments by date and time
     appointments = appointments.order_by('date', 'start_time')
-    
+
+    # Get the list of providers and patients
     providers = CustomUser.objects.filter(role='Healthcare Provider')
     patients = CustomUser.objects.filter(role='Patient')
+
+    # Add today's date to the context to set the minimum value for the date picker
+    today_date = date.today().strftime('%Y-%m-%d')
 
     context = {
         'appointments': appointments,
         'providers': providers,
         'patients': patients,
-        'selected_date': date,
+        'selected_date': date_filter,
         'selected_provider': provider_id,
         'selected_patient': patient_id,
         'selected_location': location,
+        'today_date': today_date,  # Pass today's date to the template
     }
 
     return render(request, 'CarePath/all_appointments.html', context)
+
+# @login_required
+# def all_appointments(request):
+#     appointments = Appointment.objects.all()
+
+#     date = request.GET.get('date', None)
+#     provider_id = request.GET.get('provider', None)
+#     patient_id = request.GET.get('patient', None)
+#     location = request.GET.get('location', None)
+
+#     if date:
+#         appointments = appointments.filter(date=date)
+#     if provider_id:
+#         appointments = appointments.filter(provider__id=provider_id)
+#     if patient_id:
+#         appointments = appointments.filter(patient__id=patient_id)
+#     if location:
+#         appointments = appointments.filter(location__icontains=location)
+
+#     appointments = appointments.order_by('date', 'start_time')
+    
+#     providers = CustomUser.objects.filter(role='Healthcare Provider')
+#     patients = CustomUser.objects.filter(role='Patient')
+
+#     context = {
+#         'appointments': appointments,
+#         'providers': providers,
+#         'patients': patients,
+#         'selected_date': date,
+#         'selected_provider': provider_id,
+#         'selected_patient': patient_id,
+#         'selected_location': location,
+#     }
+
+#     return render(request, 'CarePath/all_appointments.html', context)
 
 
 # search pt

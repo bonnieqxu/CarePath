@@ -86,6 +86,7 @@ Profile {% endblock %} {% block content %}
                 value="{{ user.first_name }}"
                 pattern="[A-Za-z\s]+"
                 title="First name should contain only letters."
+                oninput="capitalizeFirstLetter(this)"
                 required
               />
             </div>
@@ -99,6 +100,7 @@ Profile {% endblock %} {% block content %}
                 value="{{ user.last_name }}"
                 pattern="[A-Za-z\s]+"
                 title="Last name should contain only letters."
+                oninput="capitalizeFirstLetter(this)"
                 required
               />
             </div>
@@ -134,6 +136,7 @@ Profile {% endblock %} {% block content %}
                 id="department"
                 name="department"
                 value="{{ user.department|default_if_none:'' }}"
+                oninput="capitalizeFirstLetter(this)"
                 required
               />
             </div>
@@ -145,6 +148,7 @@ Profile {% endblock %} {% block content %}
                 id="provider_role"
                 name="provider_role"
                 value="{{ user.provider_role|default_if_none:'' }}"
+                oninput="capitalizeFirstLetter(this)"
                 required
               />
             </div>
@@ -164,6 +168,12 @@ Profile {% endblock %} {% block content %}
 </div>
 
 <script>
+  function capitalizeFirstLetter(inputField) {
+    // Capitalize the first letter and keep the rest of the string as it is
+    inputField.value =
+      inputField.value.charAt(0).toUpperCase() + inputField.value.slice(1);
+  }
+
   // Real-time validation for first name and last name
   document.getElementById("first_name").addEventListener("input", function () {
     if (!this.value.match(/^[A-Za-z\s]*$/)) {
