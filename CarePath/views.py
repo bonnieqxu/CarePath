@@ -16,7 +16,7 @@ from django.contrib.auth.tokens import default_token_generator as token_generato
 from django.contrib.sites.shortcuts import get_current_site
 
 from django.urls import reverse_lazy, reverse
-
+from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.timezone import datetime
@@ -1338,15 +1338,18 @@ class AdminPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
 
 @login_required
 def all_appointments(request):
-    appointments = Appointment.objects.all()
+    # Get today's date to filter future appointments
+    today = timezone.now().date()
 
-    # Fetch filter values from the request
+    # Retrieve appointments starting from today and beyond
+    appointments = Appointment.objects.filter(date__gte=today)
+
     date_filter = request.GET.get('date', None)
     provider_id = request.GET.get('provider', None)
     patient_id = request.GET.get('patient', None)
     location = request.GET.get('location', None)
 
-    # Apply filters to the appointments queryset
+    # Apply filters based on the user's selections
     if date_filter:
         appointments = appointments.filter(date=date_filter)
     if provider_id:
@@ -1356,16 +1359,16 @@ def all_appointments(request):
     if location:
         appointments = appointments.filter(location__icontains=location)
 
-    # Order the appointments by date and time
+    # Order the filtered appointments by date and start time
     appointments = appointments.order_by('date', 'start_time')
 
-    # Get the list of providers and patients
+    # Retrieve lists of healthcare providers and patients for the filter options
     providers = CustomUser.objects.filter(role='Healthcare Provider')
     patients = CustomUser.objects.filter(role='Patient')
 
-    # Add today's date to the context to set the minimum value for the date picker
     today_date = date.today().strftime('%Y-%m-%d')
 
+    # Pass the filtered appointments, today_date, and other data to the template
     context = {
         'appointments': appointments,
         'providers': providers,
@@ -1374,10 +1377,53 @@ def all_appointments(request):
         'selected_provider': provider_id,
         'selected_patient': patient_id,
         'selected_location': location,
-        'today_date': today_date,  # Pass today's date to the template
+        'today_date': today_date,  # Pass today's date to the template for date restriction
     }
 
     return render(request, 'CarePath/all_appointments.html', context)
+
+# @login_required
+# def all_appointments(request):
+#     appointments = Appointment.objects.all()
+
+#     # Fetch filter values from the request
+#     date_filter = request.GET.get('date', None)
+#     provider_id = request.GET.get('provider', None)
+#     patient_id = request.GET.get('patient', None)
+#     location = request.GET.get('location', None)
+
+#     # Apply filters to the appointments queryset
+#     if date_filter:
+#         appointments = appointments.filter(date=date_filter)
+#     if provider_id:
+#         appointments = appointments.filter(provider__id=provider_id)
+#     if patient_id:
+#         appointments = appointments.filter(patient__id=patient_id)
+#     if location:
+#         appointments = appointments.filter(location__icontains=location)
+
+#     # Order the appointments by date and time
+#     appointments = appointments.order_by('date', 'start_time')
+
+#     # Get the list of providers and patients
+#     providers = CustomUser.objects.filter(role='Healthcare Provider')
+#     patients = CustomUser.objects.filter(role='Patient')
+
+#     # Add today's date to the context to set the minimum value for the date picker
+#     today_date = date.today().strftime('%Y-%m-%d')
+
+#     context = {
+#         'appointments': appointments,
+#         'providers': providers,
+#         'patients': patients,
+#         'selected_date': date_filter,
+#         'selected_provider': provider_id,
+#         'selected_patient': patient_id,
+#         'selected_location': location,
+#         'today_date': today_date,  # Pass today's date to the template
+#     }
+
+#     return render(request, 'CarePath/all_appointments.html', context)
 
 # @login_required
 # def all_appointments(request):

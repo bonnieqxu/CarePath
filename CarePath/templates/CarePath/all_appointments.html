@@ -244,6 +244,7 @@ All Appointments
                 <td>{{ appointment.provider.first_name }} {{ appointment.provider.last_name }}</td>
                 <!-- <td>{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</td> -->
                 <td>
+                    
                     <a href="{% url 'admin_view_pt' appointment.patient.id %}">
                       {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
                     </a>
