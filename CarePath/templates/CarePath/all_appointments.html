@@ -221,6 +221,21 @@ All Appointments
         <button type="button" id="clear-filters" class="btn btn-secondary mt-3">Clear Filters</button>
     </form>
 
+
+<!-- Display error and success messages -->
+{% if messages %}
+<div>
+  {% for message in messages %}
+  
+  <div
+    class="alert {% if 'error' in message.tags %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}"
+  >
+    {{ message }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
     <!-- Appointments Table -->
     <table class="table table-striped mt-4">
         <thead>

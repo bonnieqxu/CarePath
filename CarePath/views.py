@@ -1239,6 +1239,7 @@ def submit_feedback(request):
     return HttpResponseRedirect(reverse('patient_communication') + '#feedback')
 
 
+# healthcare providers
 
 @login_required
 def provider_feedback(request):
@@ -1281,6 +1282,70 @@ def delete_feedback(request, feedback_id):
     return redirect('provider_feedback')
 
 
+
+
+# ADMIN
+
+
+# @login_required
+# def admin_feedback(request):
+#     # Ensure only admins can access this view
+#     if not request.user.is_staff:  # Assuming `is_staff` is used for admin users
+#         return redirect('home')
+
+#     # Get all feedback entries, sorted by date (newest first)
+#     feedbacks = Feedback.objects.all().order_by('-created_at')
+
+#     unread_feedback_count = Feedback.objects.filter(is_read=False).count()
+    
+#     context = {
+#         'feedbacks': feedbacks,
+#         'unread_feedback_count': unread_feedback_count
+#     }
+
+#     return render(request, 'CarePath/admin_feedback.html', context)
+
+@login_required
+def admin_feedback(request):
+    # Ensure only admins can access this view
+    if not request.user.is_staff:  # Assuming `is_staff` is used for admin users
+        return redirect('home')
+
+    # Get feedback directed at the admin user only
+    feedbacks = Feedback.objects.filter(provider=request.user).order_by('-created_at')
+
+    unread_feedback_count = Feedback.objects.filter(provider=request.user, is_read=False).count()
+    
+    context = {
+        'feedbacks': feedbacks,
+        'unread_feedback_count': unread_feedback_count
+    }
+
+    return render(request, 'CarePath/admin_feedback.html', context)
+
+
+@login_required
+def mark_admin_feedback_as_read(request, feedback_id):
+    feedback = get_object_or_404(Feedback, id=feedback_id)
+    feedback.is_read = True
+    feedback.save()
+    messages.success(request, 'Feedback marked as read.')
+    return redirect('admin_feedback')
+
+@login_required
+def mark_admin_feedback_as_unread(request, feedback_id):
+    feedback = get_object_or_404(Feedback, id=feedback_id)
+    feedback.is_read = False
+    feedback.save()
+    messages.success(request, 'Feedback marked as unread.')
+    return redirect('admin_feedback')
+
+@login_required
+def delete_admin_feedback(request, feedback_id):
+    feedback = get_object_or_404(Feedback, id=feedback_id)
+    feedback.delete()
+    messages.success(request, 'Feedback has been deleted.')
+    return redirect('admin_feedback')
 
 
 

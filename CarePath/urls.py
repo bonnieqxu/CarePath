@@ -112,6 +112,10 @@ urlpatterns = [
     path('discharge_patient/<int:patient_id>/', views.discharge_patient, name='discharge_patient'),
     path('activate_patient/<int:patient_id>/', views.activate_patient, name='activate_patient'),
 
+    path('admin_feedback/', views.admin_feedback, name='admin_feedback'),
+    path('admin_feedback/read/<int:feedback_id>/', views.mark_admin_feedback_as_read, name='mark_admin_feedback_as_read'),
+    path('admin_feedback/unread/<int:feedback_id>/', views.mark_admin_feedback_as_unread, name='mark_admin_feedback_as_unread'),
+    path('admin_feedback/delete/<int:feedback_id>/', views.delete_admin_feedback, name='delete_admin_feedback'),
 
 
     path('i18n/setlang/', set_language, name='set_language'),
