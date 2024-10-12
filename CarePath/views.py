@@ -438,9 +438,50 @@ def dashboard(request):
 
 #----------------------------- patient dashboard functions -----------------------
 # view and edit profile info
+# @login_required
+# def patient_profile(request, id):
+#      # Get the patient based on the provided id
+#     patient = get_object_or_404(CustomUser, id=id, role='Patient')
+
+#     # If the current user is the patient, allow editing; otherwise, restrict to view only
+#     if request.user == patient:
+#         if request.method == "POST":
+#             # Update the patient's profile info
+#             patient.first_name = request.POST['first_name']
+#             patient.last_name = request.POST['last_name']
+
+#             # Parse the date of birth
+#             date_of_birth_str = request.POST['date_of_birth']
+#             try:
+#                 date_of_birth = datetime.strptime(date_of_birth_str, '%d-%m-%Y').date()  # Parse the date
+#                 patient.date_of_birth = date_of_birth
+#             except ValueError:
+#                 messages.error(request, "Invalid date format. Please use DD-MM-YYYY.")
+#                 return render(request, 'CarePath/patient_profile.html', {'user': patient, 'is_editable': True})
+
+#             patient.email = request.POST['email']
+#             patient.phone_number = request.POST['phone_number']
+#             patient.address = request.POST['address']
+#             patient.save()
+
+#             messages.success(request, "Your profile has been updated successfully!")
+#             return redirect('patient_profile', id=patient.id)
+
+#         return render(request, 'CarePath/patient_profile.html', {
+#             'user': patient,
+#             'is_editable': True
+#         })
+#     else:
+#         # If the logged-in user is not the patient, show the profile as read-only
+#         return render(request, 'CarePath/patient_profile.html', {
+#             'user': patient,
+#             'is_editable': False
+#         })
+
+
 @login_required
 def patient_profile(request, id):
-     # Get the patient based on the provided id
+    # Get the patient based on the provided id
     patient = get_object_or_404(CustomUser, id=id, role='Patient')
 
     # If the current user is the patient, allow editing; otherwise, restrict to view only
@@ -450,26 +491,31 @@ def patient_profile(request, id):
             patient.first_name = request.POST['first_name']
             patient.last_name = request.POST['last_name']
 
-            # Parse the date of birth
+            # Parse and validate the date of birth
             date_of_birth_str = request.POST['date_of_birth']
             try:
                 date_of_birth = datetime.strptime(date_of_birth_str, '%d-%m-%Y').date()  # Parse the date
+                if date_of_birth > date.today():
+                    messages.error(request, "Date of birth cannot be in the future.")
+                    return render(request, 'CarePath/patient_profile.html', {'user': patient, 'is_editable': True})
                 patient.date_of_birth = date_of_birth
             except ValueError:
                 messages.error(request, "Invalid date format. Please use DD-MM-YYYY.")
                 return render(request, 'CarePath/patient_profile.html', {'user': patient, 'is_editable': True})
 
-            patient.email = request.POST['email']
             patient.phone_number = request.POST['phone_number']
             patient.address = request.POST['address']
-            patient.save()
 
+
+            patient.save()
             messages.success(request, "Your profile has been updated successfully!")
             return redirect('patient_profile', id=patient.id)
 
+        today_date = date.today().strftime('%d-%m-%Y')
         return render(request, 'CarePath/patient_profile.html', {
             'user': patient,
-            'is_editable': True
+            'is_editable': True,
+            'today_date': today_date
         })
     else:
         # If the logged-in user is not the patient, show the profile as read-only
@@ -477,6 +523,8 @@ def patient_profile(request, id):
             'user': patient,
             'is_editable': False
         })
+
+
 
 
 
@@ -533,10 +581,15 @@ class PatientPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
 
 
 # display pt appointments
+from datetime import datetime
+
 @login_required
 def patient_appt(request):
-    # Get all appointments where the patient is the logged-in user, sorted by date and time
-    appointments = Appointment.objects.filter(patient=request.user).order_by('date', 'start_time')
+    # Get today's date
+    today = datetime.now().date()
+
+    # Get all future appointments where the patient is the logged-in user, sorted by date and time
+    appointments = Appointment.objects.filter(patient=request.user, date__gte=today).order_by('date', 'start_time')
 
     # Calculate duration and pass it along with the appointments to the template
     appointment_data = []
@@ -563,10 +616,44 @@ def patient_appt(request):
             'appointment_id': appt.id
         })
 
-
     return render(request, 'CarePath/patient_appt.html', {
         'appointment_data': appointment_data
     })
+
+# @login_required
+# def patient_appt(request):
+#     # Get all appointments where the patient is the logged-in user, sorted by date and time
+#     appointments = Appointment.objects.filter(patient=request.user).order_by('date', 'start_time')
+
+#     # Calculate duration and pass it along with the appointments to the template
+#     appointment_data = []
+#     for appt in appointments:
+#         # Combine date and time to create datetime objects
+#         start_datetime = datetime.combine(appt.date, appt.start_time)
+#         finish_datetime = datetime.combine(appt.date, appt.finish_time)
+#         duration = finish_datetime - start_datetime  # Calculate the duration as timedelta
+
+#         # Convert duration to minutes
+#         duration_in_minutes = duration.total_seconds() / 60
+
+#         appointment_data.append({
+#             'date': appt.date,
+#             'start_time': appt.start_time,
+#             'finish_time': appt.finish_time,
+#             'duration': duration_in_minutes,
+#             'location': appt.location,
+#             'notes': appt.notes,
+#             'patient_name': f"{appt.patient.first_name} {appt.patient.last_name}",
+#             'provider_name': f"{appt.provider.first_name} {appt.provider.last_name}",
+#             'provider': appt.provider,  
+#             'patient_id': appt.patient.id,
+#             'appointment_id': appt.id
+#         })
+
+
+#     return render(request, 'CarePath/patient_appt.html', {
+#         'appointment_data': appointment_data
+#     })
 
 # pt view their healthcare provider details
 @login_required
@@ -633,8 +720,11 @@ class ProviderPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
 # display healthcare provider appointments
 @login_required
 def provider_appt(request):
-    # Get all appointments where the provider is the logged-in user, sorted by date and time
-    appointments = Appointment.objects.filter(provider=request.user).order_by('date', 'start_time')
+    # Get today's date
+    today = datetime.now().date()
+
+    # Get all future appointments where the provider is the logged-in user, sorted by date and time
+    appointments = Appointment.objects.filter(provider=request.user, date__gte=today).order_by('date', 'start_time')
 
     # Calculate duration and pass it along with the appointments to the template
     appointment_data = []
@@ -662,6 +752,40 @@ def provider_appt(request):
     return render(request, 'CarePath/provider_appt.html', {
         'appointment_data': appointment_data
     })
+
+# @login_required
+# def provider_appt(request):
+#     # Get all appointments where the provider is the logged-in user, sorted by date and time
+#     appointments = Appointment.objects.filter(provider=request.user).order_by('date', 'start_time')
+
+#     # Calculate duration and pass it along with the appointments to the template
+#     appointment_data = []
+#     for appt in appointments:
+#         # Combine date and time to create datetime objects
+#         start_datetime = datetime.combine(appt.date, appt.start_time)
+#         finish_datetime = datetime.combine(appt.date, appt.finish_time)
+#         duration = finish_datetime - start_datetime  # Calculate the duration as timedelta
+
+#         # Convert duration to minutes
+#         duration_in_minutes = duration.total_seconds() / 60
+
+#         appointment_data.append({
+#             'date': appt.date,
+#             'start_time': appt.start_time,
+#             'finish_time': appt.finish_time,
+#             'duration': duration_in_minutes,
+#             'location': appt.location,
+#             'notes': appt.notes,
+#             'patient_name': f"{appt.patient.first_name} {appt.patient.last_name}",
+#             'patient_id': appt.patient.id,
+#             'appointment_id': appt.id
+#         })
+
+#     return render(request, 'CarePath/provider_appt.html', {
+#         'appointment_data': appointment_data
+#     })
+
+
 
 
 #  view more appt info

@@ -84,6 +84,8 @@ Profile {% endblock %} {% block content %}
                 id="first_name"
                 name="first_name"
                 value="{{ user.first_name }}"
+                pattern="[A-Za-z\s]+"
+                title="First name should contain only letters."
                 required
               />
             </div>
@@ -95,6 +97,8 @@ Profile {% endblock %} {% block content %}
                 id="last_name"
                 name="last_name"
                 value="{{ user.last_name }}"
+                pattern="[A-Za-z\s]+"
+                title="Last name should contain only letters."
                 required
               />
             </div>
@@ -117,6 +121,8 @@ Profile {% endblock %} {% block content %}
                 id="phone_number"
                 name="phone_number"
                 value="{{ user.phone_number }}"
+                pattern="[0-9]+"
+                title="Phone number should contain only numbers."
                 required
               />
             </div>
@@ -156,5 +162,35 @@ Profile {% endblock %} {% block content %}
     </div>
   </div>
 </div>
+
+<script>
+  // Real-time validation for first name and last name
+  document.getElementById("first_name").addEventListener("input", function () {
+    if (!this.value.match(/^[A-Za-z\s]*$/)) {
+      this.setCustomValidity("First name should contain only letters.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+
+  document.getElementById("last_name").addEventListener("input", function () {
+    if (!this.value.match(/^[A-Za-z\s]*$/)) {
+      this.setCustomValidity("Last name should contain only letters.");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+
+  // Real-time validation for phone number
+  document
+    .getElementById("phone_number")
+    .addEventListener("input", function () {
+      if (!this.value.match(/^[0-9]*$/)) {
+        this.setCustomValidity("Phone number should contain only numbers.");
+      } else {
+        this.setCustomValidity("");
+      }
+    });
+</script>
 
 {% endblock %}
