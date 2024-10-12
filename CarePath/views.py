@@ -34,7 +34,7 @@ from sendgrid.helpers.mail import Mail
 
 
 
-
+from .tokens import token_generator
 from .models import CustomUser, Appointment, Message, Feedback
 
 
@@ -301,15 +301,44 @@ def activate_user(request, uidb64, token):
     except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
         user = None
 
+    # Check if the user exists and the token is valid
     if user is not None and token_generator.check_token(user, token):
-        user.is_active = True  # Activate the account but wait for user confirmation
+        # Check if the user is already active
+        if user.is_active:
+            return render(request, 'CarePath/activation_invalid.html', {'message': 'Account already activated.'})
+
+        # Activate the user account
+        user.is_active = True
         user.save()
 
-        # Navigate to the activate_account.html page for the user to confirm activation
-        return render(request, 'CarePath/activate_account.html', {'user': user})
+        # Add success message and render success page
+        messages.success(request, 'Your account has been activated successfully!')
 
+        # For healthcare providers, show account pending message
+        if user.role == 'Healthcare Provider':
+            return render(request, 'CarePath/account_pending.html')
+        else:
+            return redirect('login')  # Redirect patients to login
     else:
-        return render(request, 'CarePath/activation_invalid.html')  # Handle invalid token or user
+        # If the token is invalid, render an error page
+        return render(request, 'CarePath/activation_invalid.html', {'message': 'Invalid activation link or link expired.'})
+
+# def activate_user(request, uidb64, token):
+#     try:
+#         uid = force_str(urlsafe_base64_decode(uidb64))
+#         user = CustomUser.objects.get(pk=uid)
+#     except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+#         user = None
+
+#     if user is not None and token_generator.check_token(user, token):
+#         user.is_active = True  # Activate the account but wait for user confirmation
+#         user.save()
+
+#         # Navigate to the activate_account.html page for the user to confirm activation
+#         return render(request, 'CarePath/activate_account.html', {'user': user})
+
+#     else:
+#         return render(request, 'CarePath/activation_invalid.html')  # Handle invalid token or user
 
 
 # handle account activation after user confirms
