@@ -31,8 +31,20 @@
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'provider_search_pt' %}">Book a New Appointment</a>
       </div>
-      <div class="nav-item" style="text-align: center">
+      <!-- <div class="nav-item" style="text-align: center">
         <a href="{% url 'provider_feedback' %}">View Feedback</a>
+      </div> -->
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'provider_feedback' %}" style="position: relative">
+          View Feedback {% if unread_feedback_count > 0 %}
+          <!-- Red dot styled to be positioned at the top-right of the text -->
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+        </a>
       </div>
     </div>
     <!-- Log Out link -->

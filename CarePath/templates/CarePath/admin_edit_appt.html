@@ -42,6 +42,17 @@
           {% endif %}
         </a>
       </div>
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'admin_feedback' %}" style="position: relative">
+          View Feedback {% if unread_feedback_count > 0 %}
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+        </a>
+      </div>
     </div>
     <!-- Log Out link -->
     <form

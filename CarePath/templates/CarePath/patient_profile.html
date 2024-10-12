@@ -29,8 +29,20 @@
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_appt' %}">My Appointment</a>
       </div>
-      <div class="nav-item" style="text-align: center">
+      <!-- <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_communication' %}">Communication</a>
+      </div> -->
+      <div class="nav-item" style="text-align: center">
+        <a href="{% url 'patient_communication' %}" style="position: relative">
+          Communication 
+          {% if unread_messages_count > 0 or unread_reminders_count > 0 %}
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+        </a>
       </div>
     </div>
     <!-- Log Out link -->
