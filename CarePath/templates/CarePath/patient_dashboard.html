@@ -31,11 +31,10 @@
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_appt' %}">My Appointment</a>
       </div>
-      
+
       <div class="nav-item" style="text-align: center">
         <a href="{% url 'patient_communication' %}" style="position: relative">
-          Communication 
-          {% if unread_messages_count > 0 or unread_reminders_count > 0 %}
+          Communication {% if unread_messages_count > 0 or unread_reminders_count > 0 %}
           <span
             class="badge badge-danger"
             style="position: absolute; top: -5px; right: -10px"
@@ -85,7 +84,83 @@
     <h2>
       Welcome to your Dashboard, {{ user.first_name }} {{ user.last_name }}!
     </h2>
-    <p>Select an option from the sidebar to get started.</p>
+    <p>Select an option to get started.</p>
+
+    <!-- Cards for navigation in 2 rows, 2 columns -->
+    <br /><br />
+    <div
+      class="container"
+      style="max-width: 800px; margin-left: 0; margin-right: auto"
+    >
+      <div class="row">
+        <!-- Card 1 -->
+        <a
+          href="{% url 'patient_profile' user.id %}"
+          class="col-md-6 mb-4"
+          style="text-decoration: none"
+        >
+          <div class="card shadow-sm" style="height: 200px; text-align: center">
+            <div
+              class="card-body d-flex justify-content-center align-items-center"
+            >
+              <h3 class="card-title">My Profile</h3>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 2 -->
+        <a
+          href="{% url 'patient_password' %}"
+          class="col-md-6 mb-4"
+          style="text-decoration: none"
+        >
+          <div class="card shadow-sm" style="height: 200px; text-align: center">
+            <div
+              class="card-body d-flex justify-content-center align-items-center"
+            >
+              <h3 class="card-title">Change Password</h3>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 3 -->
+        <a
+          href="{% url 'patient_appt' %}"
+          class="col-md-6 mb-4"
+          style="text-decoration: none"
+        >
+          <div class="card shadow-sm" style="height: 200px; text-align: center">
+            <div
+              class="card-body d-flex justify-content-center align-items-center"
+            >
+              <h3 class="card-title">My Appointment</h3>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 4 -->
+        <a
+          href="{% url 'patient_communication' %}"
+          class="col-md-6 mb-4"
+          style="text-decoration: none"
+        >
+          <div class="card shadow-sm" style="height: 200px; text-align: center">
+            <div
+              class="card-body d-flex justify-content-center align-items-center"
+            >
+              <h3 class="card-title">Communication</h3>
+              {% if unread_messages_count > 0 or unread_reminders_count > 0 %}
+          <span
+            class="badge badge-danger"
+            style="position: absolute; top: -5px; right: -10px"
+            >●</span
+          >
+          {% endif %}
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 

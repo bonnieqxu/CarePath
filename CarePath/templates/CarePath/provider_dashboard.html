@@ -82,7 +82,99 @@ Dashboard {% endblock %} {% block content %}
     <h2>
       Welcome to your Dashboard, {{ user.first_name }} {{ user.last_name }}!
     </h2>
-    <p>Select an option from the sidebar to get started.</p>
+    <p>Select an option to get started.</p>
+    <br /><br />
+    <div
+      class="container"
+      style="max-width: 800px; margin-left: 0; margin-right: auto"
+    >
+      <div class="row">
+        <!-- Card 1: My Profile -->
+        <a
+          href="{% url 'provider_profile' %}"
+          class="col-md-6 mb-4"
+          style="text-decoration: none"
+        >
+          <div class="card shadow-sm" style="height: 200px; text-align: center">
+            <div
+              class="card-body d-flex justify-content-center align-items-center"
+            >
+              <h3 class="card-title">My Profile</h3>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 2: Change Password -->
+        <a
+          href="{% url 'provider_password' %}"
+          class="col-md-6 mb-4"
+          style="text-decoration: none"
+        >
+          <div class="card shadow-sm" style="height: 200px; text-align: center">
+            <div
+              class="card-body d-flex justify-content-center align-items-center"
+            >
+              <h3 class="card-title">Change Password</h3>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 3: My Appointment -->
+        <a
+          href="{% url 'provider_appt' %}"
+          class="col-md-4 mb-4"
+          style="text-decoration: none"
+        >
+          <div class="card shadow-sm" style="height: 200px; text-align: center">
+            <div
+              class="card-body d-flex justify-content-center align-items-center"
+            >
+              <h3 class="card-title">My Appointment</h3>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 4: Book a New Appointment -->
+        <a
+          href="{% url 'provider_search_pt' %}"
+          class="col-md-4 mb-4"
+          style="text-decoration: none"
+        >
+          <div class="card shadow-sm" style="height: 200px; text-align: center">
+            <div
+              class="card-body d-flex justify-content-center align-items-center"
+            >
+              <h3 class="card-title">Book a New Appointment</h3>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 5: View Feedback -->
+        <a
+          href="{% url 'provider_feedback' %}"
+          class="col-md-4 mb-4"
+          style="text-decoration: none"
+        >
+          <div
+            class="card shadow-sm"
+            style="height: 200px; text-align: center; position: relative"
+          >
+            <div
+              class="card-body d-flex justify-content-center align-items-center"
+            >
+              <h3 class="card-title">View Feedback</h3>
+              {% if unread_feedback_count > 0 %}
+              <span
+                class="badge badge-danger"
+                style="position: absolute; top: 10px; right: 10px"
+                >●</span
+              >
+              {% endif %}
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 
