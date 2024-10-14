@@ -1,18 +1,3 @@
-/* :root {
-  --primary: #0463fa;
-  --light: #eff5ff;
-  --dark: #1b2c51;
-
-
-  --dark-bg: #0a0a0a;
-  --dark-text: #000000;
-  --dark-secondary-text: #333333;
-  --dark-sidebar-bg: #d9d9d9;
-  --dark-sidebar-text: #000000;
-  --dark-primary: #90caf9;
-  --dark-hover: #64b5f6;
-} */
-
 :root {
   --primary: #0463fa;
   --light: #eff5ff;
@@ -230,53 +215,6 @@
     opacity: 1;
   }
 }
-
-/*** Dark Mode ***/
-/* Dark Mode Background and Text Colors */
-/* body.dark-mode {
-  background-color: var(--dark-bg) !important;
-  color: var(--dark-text) !important;
-}
-
-.sidebar.dark-mode {
-  background-color: var(--dark-sidebar-bg) !important;
-  color: var(--dark-sidebar-text) !important;
-}
-
-.nav-link.dark-mode {
-  color: var(--dark-primary) !important;
-}
-
-.badge-danger.dark-mode {
-  background-color: var(--dark-primary) !important;
-}
-
-.btn.dark-mode {
-  background-color: var(--dark-primary) !important;
-  color: var(--dark-sidebar-text) !important;
-}
-
-body.dark-mode .btn:hover {
-  background-color: var(--dark-hover) !important;
-}
-
-.top-bar.dark-mode {
-  background-color: var(--dark-bg) !important;
-  color: var(--dark-text) !important;
-}
-
-.navbar .navbar-nav .nav-link.dark-mode {
-  color: var(--dark-text) !important;
-}
-
-.service-item.dark-mode {
-  background-color: var(--dark-bg) !important;
-}
-
-.page-header.dark-mode {
-  background: none !important;
-  background-color: var(--dark-bg) !important;
-} */
 
 body.dark-mode {
   background-color: var(--dark-bg) !important;
