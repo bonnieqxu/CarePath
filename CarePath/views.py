@@ -394,7 +394,6 @@ def patient_dashboard(request):
 
 @login_required
 def provider_dashboard(request):
-    
     if request.user.role == 'Healthcare Provider' and request.user.status != 'Active':
         return render(request, 'CarePath/account_pending.html')  
     
@@ -413,7 +412,6 @@ def admin_dashboard(request):
     if request.user.role == 'Admin' and (not request.user.first_name or not request.user.last_name):
         messages.warning(request, 'Please complete your profile information.')
         return redirect('admin_profile')  
-
 
     pending_users = CustomUser.objects.filter(role='Healthcare Provider', status='Disabled')
 
@@ -937,9 +935,6 @@ def patient_communication(request):
     # Count unread messages
     unread_messages_count = Message.objects.filter(recipient=request.user, is_read=False).count()
 
-    # Since reminders are not marked as read/unread, use the number of reminders as the count
-    # unread_reminders_count = reminders.count()
-
     unread_reminders_count = Appointment.objects.filter(patient=request.user, is_read=False, date__range=[today, today + timedelta(days=3)]).count()
 
     # Get the list of providers for feedback
@@ -952,7 +947,6 @@ def patient_communication(request):
         'unread_messages_count': unread_messages_count,
         'unread_reminders_count': unread_reminders_count
     })
-
 
 
 
