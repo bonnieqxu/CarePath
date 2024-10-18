@@ -104,7 +104,7 @@ Book an Appointment
   {% endif %}
   
     
-  <form method="post"  action="{% url 'admin_book_pt_appointment' patient.id %}">
+  <form method="post" style="max-width: 500px;" action="{% url 'admin_book_pt_appointment' patient.id %}">
     {% csrf_token %}
 
 

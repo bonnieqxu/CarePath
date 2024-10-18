@@ -94,7 +94,7 @@
   {% endif %}
   
     
-  <form method="post"  action="{% url 'book_pt_appointment' patient.id %}">
+  <form method="post" action="{% url 'book_pt_appointment' patient.id %}">
     {% csrf_token %}
 
 
